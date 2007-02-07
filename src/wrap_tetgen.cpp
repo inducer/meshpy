@@ -20,7 +20,7 @@ struct tMeshDescriptor : public tetgenio, public boost::noncopyable
     tForeignArray<REAL>		Points; // in/out
     tForeignArray<REAL>		PointAttributes; // in/out
     tForeignArray<REAL>		AdditionalPoints; // out
-    tForeignArray<REAL>		AdditionalPointAttributs; // out
+    tForeignArray<REAL>		AdditionalPointAttributes; // out
     tForeignArray<int>		PointMarkers; // in/out
 
     tForeignArray<int>		Elements; // in/out
@@ -32,21 +32,21 @@ struct tMeshDescriptor : public tetgenio, public boost::noncopyable
 
   public:
     tMeshDescriptor()
-      : Points("Points", pointlist, numberofpoints, 3),
-        PointAttributes("PointAttributes", pointattributelist, numberofpoints, 0, &Points),
-        AdditionalPoints("AdditionalPoints", addpointlist, numberofaddpoints, 3),
-        PointAttributes("AdditionalPointAttributes", addpointattributelist, numberofaddpoints, 0, &AdditionalPoints),
-	PointMarkers("PointMarkers", pointmarkerlist, numberofpoints, 1, &Points),
+      : Points("points", pointlist, numberofpoints, 3),
+        PointAttributes("point_attributes", pointattributelist, numberofpoints, 0, &Points),
+        AdditionalPoints("additional_points", addpointlist, numberofaddpoints, 3),
+        AdditionalPointAttributes("additional_point_attributes", addpointattributelist, numberofaddpoints, 0, &AdditionalPoints),
+	PointMarkers("point_markers", pointmarkerlist, numberofpoints, 1, &Points),
 
-	Elements("Elements", tetrahedronlist, numberoftetrahedra, 4),
-	ElementAttributes("ElementAttributes", tetrahedronattributelist, 
+	Elements("elements", tetrahedronlist, numberoftetrahedra, 4),
+	ElementAttributes("element_attributes", tetrahedronattributelist, 
             numberoftetrahedra, 0, &Elements),
-	ElementVolumes("ElementVolumes", tetrahedronvolumelist, 
+	ElementVolumes("element_volumes", tetrahedronvolumelist, 
             numberoftetrahedra, 1, &Elements),
-	Neighbors("Neighbors", neighborlist, 
+	Neighbors("neighbors", neighborlist, 
             numberoftetrahedra, 4, &Elements),
 
-        Facets("Facets", facetlist, numberoffacets)
+        Facets("facets", facetlist, numberoffacets)
 
         /*
 	Segments("Segments", segmentlist, numberofsegments, 2),
@@ -177,6 +177,8 @@ BOOST_PYTHON_MODULE(internals)
       .def_readonly("points", &cl::Points)
       .def_readonly("point_attributes", &cl::PointAttributes)
       .def_readonly("point_markers", &cl::PointMarkers)
+      .def_readonly("additional_points", &cl::AdditionalPoints)
+      .def_readonly("additional_point_attributes", &cl::AdditionalPointAttributes)
 
       .def_readonly("elements", &cl::Elements)
       .def_readonly("element_attributes", &cl::ElementAttributes)
@@ -209,6 +211,12 @@ BOOST_PYTHON_MODULE(internals)
          return_value_policy<manage_new_object>())
          */
       //.enable_pickling()
+      ;
+  }
+  {
+    typedef tetgenio::facet cl;
+    class_<cl, boost::noncopyable>
+      ("Facet", no_init)
       ;
   }
 
