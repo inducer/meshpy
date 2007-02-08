@@ -1,4 +1,4 @@
-from meshpy.common import MeshInfoBase
+from meshpy.common import MeshInfoBase, dump_array
 import meshpy._triangle as internals
 
 
@@ -60,6 +60,9 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             for i, mark in enumerate(segment_markers):
                 self.SegmentMarkers[i] = mark
 
+    def dump(self):
+        for name in self._constituents:
+            dump_array(name, getattr(self, name))
 
 
 
@@ -100,26 +103,6 @@ def refine(input_p, verbose=False, refinement_func=None):
 
 
 
-def dump_parameters(par):
-    def dump_array(name, array):
-        subs = array.unit()
-        print "array %s: %d elements, %d values per element" % (name, array.size(), subs)
-        if array.size() == 0 or array.unit() == 0:
-            return
-        try:
-            array.get(0)
-        except RuntimeError:
-            print "  not allocated"
-            return
-
-        for i in range(array.size()):
-            print "  %d:" % i,
-            for j in range(subs):
-                print array.get_sub(i,j),
-            print
-
-    for name, arr in par._constituents:
-        dump_array(name, getattr(par, name))
 
 
 

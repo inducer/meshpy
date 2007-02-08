@@ -1,5 +1,6 @@
 #include "tetgen.h"
 #include <boost/python.hpp>
+#include <boost/lexical_cast.hpp>
 #include <vector>
 #include <stdexcept>
 #include <iostream>
@@ -21,7 +22,7 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
     tForeignArray<REAL>		PointAttributes; // in/out
     tForeignArray<REAL>		AdditionalPoints; // out
     tForeignArray<REAL>		AdditionalPointAttributes; // out
-    tForeignArray<int>		PointMarkers; // in/out
+    //tForeignArray<int>		PointMarkers; // in/out
 
     tForeignArray<int>		Elements; // in/out
     tForeignArray<REAL>		ElementAttributes; // in/out
@@ -35,30 +36,29 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
 
   public:
     tMeshInfo()
-      : Points("points", pointlist, numberofpoints, 3),
-        PointAttributes("point_attributes", pointattributelist, numberofpoints, 0, &Points),
-        AdditionalPoints("additional_points", addpointlist, numberofaddpoints, 3),
-        AdditionalPointAttributes("additional_point_attributes", addpointattributelist, numberofaddpoints, 0, &AdditionalPoints),
-	PointMarkers("point_markers", pointmarkerlist, numberofpoints, 1, &Points),
+      : Points(pointlist, numberofpoints, 3),
+        PointAttributes(pointattributelist, numberofpoints, 0, &Points),
+        AdditionalPoints(addpointlist, numberofaddpoints, 3),
+        AdditionalPointAttributes(addpointattributelist, 
+            numberofaddpoints, 0, &AdditionalPoints),
+	//PointMarkers(pointmarkerlist, numberofpoints, 1, &Points),
 
-	Elements("elements", tetrahedronlist, numberoftetrahedra, 4),
-	ElementAttributes("element_attributes", tetrahedronattributelist, 
+	Elements(tetrahedronlist, numberoftetrahedra, 4),
+	ElementAttributes(tetrahedronattributelist, 
             numberoftetrahedra, 0, &Elements),
-	ElementVolumes("element_volumes", tetrahedronvolumelist, 
-            numberoftetrahedra, 1, &Elements),
-	Neighbors("neighbors", neighborlist, 
-            numberoftetrahedra, 4, &Elements),
+	ElementVolumes(tetrahedronvolumelist, numberoftetrahedra, 1, &Elements),
+	Neighbors(neighborlist, numberoftetrahedra, 4, &Elements),
 
-        Facets("facets", facetlist, numberoffacets),
+        Facets(facetlist, numberoffacets),
 
         /*
 	Segments("Segments", segmentlist, numberofsegments, 2),
 	SegmentMarkers("SegmentMarkers", segmentmarkerlist, numberofsegments, 1, &Segments),
         */
 
-	Holes("Holes", holelist, numberofholes, 3),
+	Holes(holelist, numberofholes, 3),
 
-	Regions("Regions", regionlist, numberofregions, 5)
+	Regions(regionlist, numberofregions, 5)
 
         /*
 	Edges("Edges", edgelist, numberofedges, 2),
@@ -142,7 +142,14 @@ tTriangulationParameters *copyTriangulationParameters(const tTriangulationParame
 
 void tetrahedralizeWrapper(tetgenbehavior &bhv, tMeshInfo &in, tMeshInfo &out)
 {
-  tetrahedralize(&bhv, &in, &out);
+  try
+  {
+    tetrahedralize(&bhv, &in, &out);
+  }
+  catch (int &i)
+  {
+    throw runtime_error("TetGen runtime error code "+boost::lexical_cast<string>(i));
+  }
 }
 
 
@@ -160,7 +167,7 @@ struct manage_new_internal_reference
 
 tForeignArray<tetgenio::polygon> *facet_get_polygons(tetgenio::facet &self)
 {
-  return new tForeignArray<tetgenio::polygon>("polygons", 
+  return new tForeignArray<tetgenio::polygon>(
       self.polygonlist, self.numberofpolygons);
 }
 
@@ -169,7 +176,7 @@ tForeignArray<tetgenio::polygon> *facet_get_polygons(tetgenio::facet &self)
 
 tForeignArray<REAL> *facet_get_holes(tetgenio::facet &self)
 {
-  return new tForeignArray<REAL>("holes", self.holelist, self.numberofholes);
+  return new tForeignArray<REAL>(self.holelist, self.numberofholes);
 }
 
 
@@ -178,12 +185,17 @@ tForeignArray<REAL> *facet_get_holes(tetgenio::facet &self)
 
 tForeignArray<int> *polygon_get_vertices(tetgenio::polygon &self)
 {
-  return new tForeignArray<int>("vertices", self.vertexlist, self.numberofvertices);
+  return new tForeignArray<int>(self.vertexlist, self.numberofvertices);
 }
 
 
 
 
+
+#define DEF_RW_MEMBER(NAME) \
+    def_readwrite(#NAME, &cl::NAME)
+#define DEF_METHOD(NAME) \
+    def(#NAME, &cl::NAME)
 
 BOOST_PYTHON_MODULE(_tetgen)
 {
@@ -195,9 +207,9 @@ BOOST_PYTHON_MODULE(_tetgen)
       ("MeshInfo", init<>())
       .def_readonly("points", &cl::Points)
       .def_readonly("point_attributes", &cl::PointAttributes)
-      .def_readonly("point_markers", &cl::PointMarkers)
       .def_readonly("additional_points", &cl::AdditionalPoints)
       .def_readonly("additional_point_attributes", &cl::AdditionalPointAttributes)
+      //.def_readonly("point_markers", &cl::PointMarkers)
 
       .def_readonly("elements", &cl::Elements)
       .def_readonly("element_attributes", &cl::ElementAttributes)
@@ -229,6 +241,13 @@ BOOST_PYTHON_MODULE(_tetgen)
           &cl::numberOfElementAttributes,
           &cl::setNumberOfElementAttributes)
 
+      .DEF_METHOD(save_nodes)
+      .DEF_METHOD(save_elements)
+      .DEF_METHOD(save_faces)
+      .DEF_METHOD(save_edges)
+      .DEF_METHOD(save_neighbors)
+      .DEF_METHOD(save_poly)
+
       /*
          .def("copy", &copyTriangulationParameters,
          return_value_policy<manage_new_object>())
@@ -253,9 +272,6 @@ BOOST_PYTHON_MODULE(_tetgen)
   }
 
   {
-#define DEF_RW_MEMBER(NAME) \
-    def_readwrite(#NAME, &cl::NAME)
-
     typedef tetgenbehavior cl;
     class_<cl, boost::noncopyable>("Options", init<>())
       .DEF_RW_MEMBER(plc)

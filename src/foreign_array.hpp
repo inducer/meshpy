@@ -73,30 +73,34 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
   public boost::noncopyable
 {
   protected:
-    ElementT	*&Contents;
-    int		&NumberOf;
-    unsigned	Unit;
-    tSizeChangeNotifier *SlaveTo;
-    std::string      Name;
-    bool        DeleteOnDestruction;
+    ElementT	                *&Contents;
+    int		                &NumberOf;
+    unsigned	                Unit;
+    tSizeChangeNotifier         *SlaveTo;
+    bool                        AssumeOwnership;
 
   public:
     typedef ElementT value_type;
 
-    tReadOnlyForeignArray(const std::string &name, 
+    tReadOnlyForeignArray(
         ElementT *&cts, int &number_of, unsigned unit=1, tSizeChangeNotifier *slave_to=NULL,
-        bool delete_on_destruction=false)
-      : Contents(cts), NumberOf(number_of), Unit(unit), SlaveTo(slave_to), Name(name),
-      DeleteOnDestruction(delete_on_destruction)
+        bool assume_ownership=false)
+      : Contents(cts), NumberOf(number_of), Unit(unit), SlaveTo(slave_to), 
+      AssumeOwnership(assume_ownership)
     {
-      Contents = NULL;
+      if (AssumeOwnership)
+        Contents = NULL;
+
       if (SlaveTo)
       {
 	SlaveTo->registerForNotification(this);
 	setSizeInternal(SlaveTo->size());
       }
       else
-	setSize(0);
+      {
+        if (AssumeOwnership)
+          setSize(0);
+      }
     }
 
     ~tReadOnlyForeignArray()
@@ -104,11 +108,13 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
       if (SlaveTo)
 	SlaveTo->unregisterForNotification(this);
 
-      if (DeleteOnDestruction)
+      if (AssumeOwnership)
+      {
         deallocate();
 
-      if (!SlaveTo)
-	NumberOf = 0;
+        if (!SlaveTo)
+          NumberOf = 0;
+      }
     }
 
     unsigned size() const
@@ -156,7 +162,7 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
 	NumberOf = size;
       
       if (Contents != NULL)
-        deallocate();
+	free(Contents);
 
       if (size == 0 || Unit == 0)
 	Contents = NULL;
@@ -204,11 +210,11 @@ class tForeignArray : public tReadOnlyForeignArray<ElementT>
     typedef tReadOnlyForeignArray<ElementT> super;
 
   public:
-    tForeignArray(const std::string &name, 
+    tForeignArray(
         ElementT *&cts, int &number_of, unsigned unit=1, 
         tSizeChangeNotifier *slave_to=NULL,
-        bool delete_on_destruction=false)
-      : super(name, cts, number_of, unit, slave_to, delete_on_destruction)
+        bool assume_ownership=false)
+      : super(cts, number_of, unit, slave_to, assume_ownership)
     {
     }
 

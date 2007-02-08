@@ -38,28 +38,28 @@ struct tMeshInfo : public triangulateio, public boost::noncopyable
 
   public:
     tMeshInfo()
-      : Points("points", pointlist, numberofpoints, 2, NULL, true),
-        PointAttributes("point_attributes", pointattributelist, numberofpoints, 0, &Points, true),
-	PointMarkers("point_markers", pointmarkerlist, numberofpoints, 1, &Points, true),
+      : Points(pointlist, numberofpoints, 2, NULL, true),
+        PointAttributes(pointattributelist, numberofpoints, 0, &Points, true),
+	PointMarkers(pointmarkerlist, numberofpoints, 1, &Points, true),
 
-	Elements("elements", trianglelist, numberoftriangles, 3, NULL, true),
-	ElementAttributes("element_attributes", triangleattributelist, 
+	Elements(trianglelist, numberoftriangles, 3, NULL, true),
+	ElementAttributes(triangleattributelist, 
             numberoftriangles, 0, &Elements, true),
-	ElementVolumes("element_volumes", trianglearealist, 
+	ElementVolumes(trianglearealist, 
             numberoftriangles, 1, &Elements, true),
-	Neighbors("neighbors", neighborlist, 
+	Neighbors(neighborlist, 
             numberoftriangles, 3, &Elements, true),
 
-	Segments("segments", segmentlist, numberofsegments, 2, NULL, true),
-	SegmentMarkers("segment_markers", segmentmarkerlist, numberofsegments, 1, &Segments, true),
+	Segments(segmentlist, numberofsegments, 2, NULL, true),
+	SegmentMarkers(segmentmarkerlist, numberofsegments, 1, &Segments, true),
 
-	Holes("holes", holelist, numberofholes, 2, NULL, true),
+	Holes(holelist, numberofholes, 2, NULL, true),
 
-	Regions("regions", regionlist, numberofregions, 4, NULL, true),
+	Regions(regionlist, numberofregions, 4, NULL, true),
 
-	Edges("edges", edgelist, numberofedges, 2, NULL, true),
-	EdgeMarkers("edge_markers", edgemarkerlist, numberofedges, 1, &Edges, true),
-	Normals("normals", normlist, numberofedges, 2, &Edges, true)
+	Edges(edgelist, numberofedges, 2, NULL, true),
+	EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges, true),
+	Normals(normlist, numberofedges, 2, &Edges, true)
     {
       numberofpointattributes = 0;
       numberofcorners = 3;
