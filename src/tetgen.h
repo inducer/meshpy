@@ -135,6 +135,7 @@
 #include <string.h>         // String lib: strcpy(), strcat(), strcmp(), ...
 #include <math.h>                     // Math lib: sin(), sqrt(), pow(), ...
 #include <assert.h>
+#include <boost/noncopyable.hpp>
  
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           //
@@ -190,10 +191,13 @@ class tetgenio {
     // 'vertexlist' is a list of vertex indices (integers), its length is
     //   indicated by 'numberofvertices'.  The vertex indices are odered in
     //   either counterclockwise or clockwise way.
-    typedef struct {
+    struct polygon : public boost::noncopyable {
       int *vertexlist;
       int numberofvertices;
-    } polygon;
+
+      polygon();
+      ~polygon();
+    };
 
     static void init(polygon* p) {
       p->vertexlist = (int *) NULL;
@@ -204,12 +208,15 @@ class tetgenio {
     //   to represent a planar straight line graph (PSLG) in two dimension.
     //   A PSLG contains a list of polygons. It also may conatin holes in it,
     //   indicated by a list of hole points (their coordinates).
-    typedef struct {
+    struct facet : public boost::noncopyable {
       polygon *polygonlist;
       int numberofpolygons;
       REAL *holelist;
       int numberofholes;
-    } facet;
+
+      facet();
+      ~facet();
+    };
 
     static void init(facet* f) {
       f->polygonlist = (polygon *) NULL;

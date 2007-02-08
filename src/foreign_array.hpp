@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <stdexcept>
+#include <boost/python.hpp>
 
 
 
@@ -68,19 +69,25 @@ class tSizeChangeNotifier
 
 
 template<class ElementT> 
-class tForeignArray : public tSizeChangeNotifier, public tSizeChangeNotificationReceiver,
+class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNotificationReceiver,
   public boost::noncopyable
 {
+  protected:
     ElementT	*&Contents;
     int		&NumberOf;
     unsigned	Unit;
     tSizeChangeNotifier *SlaveTo;
     std::string      Name;
+    bool        DeleteOnDestruction;
 
   public:
-    tForeignArray(const std::string &name, 
-        ElementT *&cts, int &number_of, unsigned unit = 1, tSizeChangeNotifier *slave_to = NULL)
-      : Contents(cts), NumberOf(number_of), Unit(unit), SlaveTo(slave_to), Name(name)
+    typedef ElementT value_type;
+
+    tReadOnlyForeignArray(const std::string &name, 
+        ElementT *&cts, int &number_of, unsigned unit=1, tSizeChangeNotifier *slave_to=NULL,
+        bool delete_on_destruction=false)
+      : Contents(cts), NumberOf(number_of), Unit(unit), SlaveTo(slave_to), Name(name),
+      DeleteOnDestruction(delete_on_destruction)
     {
       Contents = NULL;
       if (SlaveTo)
@@ -92,10 +99,13 @@ class tForeignArray : public tSizeChangeNotifier, public tSizeChangeNotification
 	setSize(0);
     }
 
-    ~tForeignArray()
+    ~tReadOnlyForeignArray()
     {
       if (SlaveTo)
 	SlaveTo->unregisterForNotification(this);
+
+      if (DeleteOnDestruction)
+        deallocate();
 
       if (!SlaveTo)
 	NumberOf = 0;
@@ -114,7 +124,7 @@ class tForeignArray : public tSizeChangeNotifier, public tSizeChangeNotification
     void deallocate()
     {
       if (Contents != NULL)
-	free(Contents);
+	delete[] Contents;
       Contents = NULL;
     }
 
@@ -146,7 +156,7 @@ class tForeignArray : public tSizeChangeNotifier, public tSizeChangeNotification
 	NumberOf = size;
       
       if (Contents != NULL)
-	free(Contents);
+        deallocate();
 
       if (size == 0 || Unit == 0)
 	Contents = NULL;
@@ -169,21 +179,7 @@ class tForeignArray : public tSizeChangeNotifier, public tSizeChangeNotification
       }
     }
 
-    void set(unsigned index, ElementT value)
-    {
-      if (index >= NumberOf * Unit)
-	throw std::runtime_error("index out of bounds");
-      if (Contents == NULL)
-	throw std::runtime_error("Array unallocated");
-      Contents[ index ] = value;
-    }
-
-    void setSub(unsigned index, unsigned sub_index, ElementT value)
-    {
-      set(index * Unit + sub_index, value);
-    }
-
-    ElementT get(unsigned index)
+    ElementT &get(unsigned index)
     {
       if (index >= NumberOf * Unit)
 	throw std::runtime_error("index out of bounds");
@@ -192,27 +188,57 @@ class tForeignArray : public tSizeChangeNotifier, public tSizeChangeNotification
       return Contents[ index ];
     }
 
-    ElementT getSub(unsigned index, unsigned sub_index)
+    ElementT &getSub(unsigned index, unsigned sub_index)
     {
       return get(index * Unit + sub_index);
+    }
+};
+
+
+
+
+
+template<class ElementT> 
+class tForeignArray : public tReadOnlyForeignArray<ElementT>
+{
+    typedef tReadOnlyForeignArray<ElementT> super;
+
+  public:
+    tForeignArray(const std::string &name, 
+        ElementT *&cts, int &number_of, unsigned unit=1, 
+        tSizeChangeNotifier *slave_to=NULL,
+        bool delete_on_destruction=false)
+      : super(name, cts, number_of, unit, slave_to, delete_on_destruction)
+    {
+    }
+
+    void set(unsigned index, ElementT value)
+    {
+      if (index >= this->NumberOf * this->Unit)
+	throw std::runtime_error("index out of bounds");
+      if (this->Contents == NULL)
+	throw std::runtime_error("Array unallocated");
+      this->Contents[ index ] = value;
+    }
+
+    void setSub(unsigned index, unsigned sub_index, ElementT value)
+    {
+      set(index * this->Unit + sub_index, value);
     }
 
     tForeignArray &operator=(tForeignArray const &src)
     {
-      if (SlaveTo)
-        assert(src.size() == SlaveTo->size());
+      if (this->SlaveTo)
+        assert(src.size() == this->SlaveTo->size());
       else
         setSize(src.size());
 
       setUnit(src.Unit);
 
       if (src.Contents)
-        memcpy(Contents, src.Contents, sizeof(ElementT) * Unit * src.size());
+        memcpy(this->Contents, src.Contents, sizeof(ElementT) * this->Unit * src.size());
       else
-      {
-        free(Contents);
-        Contents = NULL;
-      }
+        this->deallocate();
 
       return *this;
     }

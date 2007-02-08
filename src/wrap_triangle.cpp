@@ -2,7 +2,7 @@
 #include <boost/python.hpp>
 #include <stdexcept>
 #include <iostream>
-#include "foreign_array.hpp"
+#include "foreign_array_wrap.hpp"
 
 
 
@@ -13,7 +13,7 @@ using namespace std;
 
 
 
-struct tMeshDescriptor : public triangulateio, public boost::noncopyable
+struct tMeshInfo : public triangulateio, public boost::noncopyable
 {
   public:
     tForeignArray<REAL>		Points; // in/out
@@ -37,29 +37,29 @@ struct tMeshDescriptor : public triangulateio, public boost::noncopyable
     tForeignArray<REAL>		Normals; // out only
 
   public:
-    tMeshDescriptor()
-      : Points("points", pointlist, numberofpoints, 2),
-        PointAttributes("point_attributes", pointattributelist, numberofpoints, 0, &Points),
-	PointMarkers("point_markers", pointmarkerlist, numberofpoints, 1, &Points),
+    tMeshInfo()
+      : Points("points", pointlist, numberofpoints, 2, NULL, true),
+        PointAttributes("point_attributes", pointattributelist, numberofpoints, 0, &Points, true),
+	PointMarkers("point_markers", pointmarkerlist, numberofpoints, 1, &Points, true),
 
-	Elements("elements", trianglelist, numberoftriangles, 3),
+	Elements("elements", trianglelist, numberoftriangles, 3, NULL, true),
 	ElementAttributes("element_attributes", triangleattributelist, 
-            numberoftriangles, 0, &Elements),
+            numberoftriangles, 0, &Elements, true),
 	ElementVolumes("element_volumes", trianglearealist, 
-            numberoftriangles, 1, &Elements),
+            numberoftriangles, 1, &Elements, true),
 	Neighbors("neighbors", neighborlist, 
-            numberoftriangles, 3, &Elements),
+            numberoftriangles, 3, &Elements, true),
 
-	Segments("segments", segmentlist, numberofsegments, 2),
-	SegmentMarkers("segment_markers", segmentmarkerlist, numberofsegments, 1, &Segments),
+	Segments("segments", segmentlist, numberofsegments, 2, NULL, true),
+	SegmentMarkers("segment_markers", segmentmarkerlist, numberofsegments, 1, &Segments, true),
 
-	Holes("holes", holelist, numberofholes, 2),
+	Holes("holes", holelist, numberofholes, 2, NULL, true),
 
-	Regions("regions", regionlist, numberofregions, 4),
+	Regions("regions", regionlist, numberofregions, 4, NULL, true),
 
-	Edges("edges", edgelist, numberofedges, 2),
-	EdgeMarkers("edge_markers", edgemarkerlist, numberofedges, 1, &Edges),
-	Normals("normals", normlist, numberofedges, 2, &Edges)
+	Edges("edges", edgelist, numberofedges, 2, NULL, true),
+	EdgeMarkers("edge_markers", edgemarkerlist, numberofedges, 1, &Edges, true),
+	Normals("normals", normlist, numberofedges, 2, &Edges, true)
     {
       numberofpointattributes = 0;
       numberofcorners = 3;
@@ -88,7 +88,7 @@ struct tMeshDescriptor : public triangulateio, public boost::noncopyable
       numberoftriangleattributes = attrs;
     }
 
-    tMeshDescriptor &operator=(const tMeshDescriptor &src)
+    tMeshInfo &operator=(const tMeshInfo &src)
     {
       numberofpointattributes = src.numberofpointattributes ;
       numberofcorners = src.numberofcorners;
@@ -121,9 +121,9 @@ struct tMeshDescriptor : public triangulateio, public boost::noncopyable
 
 
 
-tMeshDescriptor *copyMesh(const tMeshDescriptor &src)
+tMeshInfo *copyMesh(const tMeshInfo &src)
 {
-  auto_ptr<tMeshDescriptor> copy(new tMeshDescriptor);
+  auto_ptr<tMeshInfo> copy(new tMeshInfo);
   *copy = src;
   return copy.release();
 }
@@ -185,9 +185,9 @@ int triunsuitable(vertex triorg, vertex tridest, vertex triapex, REAL area)
 
 
 
-void triangulateWrapper(char *options, tMeshDescriptor &in, 
-    tMeshDescriptor &out,
-    tMeshDescriptor &voronoi,
+void triangulateWrapper(char *options, tMeshInfo &in, 
+    tMeshInfo &out,
+    tMeshInfo &voronoi,
     object refinement_func)
 {
   RefinementFunction = refinement_func;
@@ -204,38 +204,14 @@ void triangulateWrapper(char *options, tMeshDescriptor &in,
 
 
 
-template <typename T>
-void exposeForeignArray(T, const string &name)
-{
-  typedef tForeignArray<T> cl;
-
-  class_<cl, boost::noncopyable>
-    (name.c_str(), no_init)
-    .def("__len__", &cl::size)
-    .def("size", &cl::size)
-    .def("set_size", &cl::setSize)
-    .def("setup", &cl::setup)
-    .def("unit", &cl::unit)
-    .def("set", &cl::set)
-    .def("set_sub", &cl::setSub)
-    .def("get", &cl::get)
-    .def("get_sub", &cl::getSub)
-    .def("deallocate", &cl::deallocate)
-    ;
-}
-
-
-
-
-
-BOOST_PYTHON_MODULE(internals)
+BOOST_PYTHON_MODULE(_triangle)
 {
   def("triangulate", triangulateWrapper);
 
   {
-    typedef tMeshDescriptor cl;
+    typedef tMeshInfo cl;
     class_<cl, boost::noncopyable>
-      ("MeshDescriptor", init<>())
+      ("MeshInfo", init<>())
       .def_readonly("points", &cl::Points)
       .def_readonly("point_attributes", &cl::PointAttributes)
       .def_readonly("point_markers", &cl::PointMarkers)
@@ -245,17 +221,17 @@ BOOST_PYTHON_MODULE(internals)
       .def_readonly("element_volumes", &cl::ElementVolumes)
       .def_readonly("neighbors", &cl::Neighbors)
 
-      .def_readonly("Segments", &cl::Segments)
-      .def_readonly("SegmentMarkers", &cl::SegmentMarkers)
+      .def_readonly("segments", &cl::Segments)
+      .def_readonly("segment_markers", &cl::SegmentMarkers)
 
-      .def_readonly("Holes", &cl::Holes)
+      .def_readonly("holes", &cl::Holes)
 
-      .def_readonly("Regions", &cl::Regions)
+      .def_readonly("regions", &cl::Regions)
 
-      .def_readonly("Edges", &cl::Edges)
-      .def_readonly("EdgeMarkers", &cl::EdgeMarkers)
+      .def_readonly("edges", &cl::Edges)
+      .def_readonly("edge_markers", &cl::EdgeMarkers)
 
-      .def_readonly("Normals", &cl::Normals)
+      .def_readonly("normals", &cl::Normals)
 
       .add_property("number_of_point_attributes", 
           &cl::numberOfPointAttributes,
@@ -269,8 +245,8 @@ BOOST_PYTHON_MODULE(internals)
       ;
   }
   
-  exposeForeignArray(REAL(), "RealArray");
-  exposeForeignArray(int(), "IntArray");
+  exposePODForeignArray<REAL>("RealArray");
+  exposePODForeignArray<int>("IntArray");
 
   class_<tVertex, bases<>, tVertex, boost::noncopyable>("Vertex", no_init)
     .add_property("x", &tVertex::x)

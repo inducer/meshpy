@@ -3,7 +3,7 @@
 #include <vector>
 #include <stdexcept>
 #include <iostream>
-#include "foreign_array.hpp"
+#include "foreign_array_wrap.hpp"
 
 
 
@@ -14,7 +14,7 @@ using namespace std;
 
 
 
-struct tMeshDescriptor : public tetgenio, public boost::noncopyable
+struct tMeshInfo : public tetgenio, public boost::noncopyable
 {
   public:
     tForeignArray<REAL>		Points; // in/out
@@ -30,8 +30,11 @@ struct tMeshDescriptor : public tetgenio, public boost::noncopyable
 
     tForeignArray<tetgenio::facet>		Facets;
 
+    tForeignArray<REAL>         Holes;
+    tForeignArray<REAL>         Regions;
+
   public:
-    tMeshDescriptor()
+    tMeshInfo()
       : Points("points", pointlist, numberofpoints, 3),
         PointAttributes("point_attributes", pointattributelist, numberofpoints, 0, &Points),
         AdditionalPoints("additional_points", addpointlist, numberofaddpoints, 3),
@@ -46,16 +49,18 @@ struct tMeshDescriptor : public tetgenio, public boost::noncopyable
 	Neighbors("neighbors", neighborlist, 
             numberoftetrahedra, 4, &Elements),
 
-        Facets("facets", facetlist, numberoffacets)
+        Facets("facets", facetlist, numberoffacets),
 
         /*
 	Segments("Segments", segmentlist, numberofsegments, 2),
 	SegmentMarkers("SegmentMarkers", segmentmarkerlist, numberofsegments, 1, &Segments),
+        */
 
 	Holes("Holes", holelist, numberofholes, 3),
 
-	Regions("Regions", regionlist, numberofregions, 4),
+	Regions("Regions", regionlist, numberofregions, 5)
 
+        /*
 	Edges("Edges", edgelist, numberofedges, 2),
 	EdgeMarkers("EdgeMarkers", edgemarkerlist, numberofedges, 1, &Edges),
 	Normals("Normals", normlist, numberofedges, 2, &Edges)
@@ -135,45 +140,59 @@ tTriangulationParameters *copyTriangulationParameters(const tTriangulationParame
 
 
 
-void tetrahedralizeWrapper(tetgenbehavior &bhv, tMeshDescriptor &in, tMeshDescriptor &out)
+void tetrahedralizeWrapper(tetgenbehavior &bhv, tMeshInfo &in, tMeshInfo &out)
 {
   tetrahedralize(&bhv, &in, &out);
 }
 
 
 
-template <typename T>
-void exposeForeignArray(T, const string &name)
-{
-  typedef tForeignArray<T> cl;
 
-  class_<cl, boost::noncopyable>
-    (name.c_str(), no_init)
-    .def("__len__", &cl::size)
-    .def("size", &cl::size)
-    .def("set_size", &cl::setSize)
-    .def("setup", &cl::setup)
-    .def("unit", &cl::unit)
-    .def("set", &cl::set)
-    .def("set_sub", &cl::setSub)
-    .def("get", &cl::get)
-    .def("get_sub", &cl::getSub)
-    .def("deallocate", &cl::deallocate)
-    ;
+template <std::size_t owner_arg = 1, class Base = default_call_policies>
+struct manage_new_internal_reference
+    : with_custodian_and_ward_postcall<0, owner_arg, Base>
+{
+   typedef manage_new_object result_converter;
+};
+
+
+
+
+tForeignArray<tetgenio::polygon> *facet_get_polygons(tetgenio::facet &self)
+{
+  return new tForeignArray<tetgenio::polygon>("polygons", 
+      self.polygonlist, self.numberofpolygons);
+}
+
+
+
+
+tForeignArray<REAL> *facet_get_holes(tetgenio::facet &self)
+{
+  return new tForeignArray<REAL>("holes", self.holelist, self.numberofholes);
 }
 
 
 
 
 
-BOOST_PYTHON_MODULE(internals)
+tForeignArray<int> *polygon_get_vertices(tetgenio::polygon &self)
+{
+  return new tForeignArray<int>("vertices", self.vertexlist, self.numberofvertices);
+}
+
+
+
+
+
+BOOST_PYTHON_MODULE(_tetgen)
 {
   def("tetrahedralize", tetrahedralizeWrapper);
 
   {
-    typedef tMeshDescriptor cl;
+    typedef tMeshInfo cl;
     class_<cl, boost::noncopyable>
-      ("MeshDescriptor", init<>())
+      ("MeshInfo", init<>())
       .def_readonly("points", &cl::Points)
       .def_readonly("point_attributes", &cl::PointAttributes)
       .def_readonly("point_markers", &cl::PointMarkers)
@@ -188,11 +207,15 @@ BOOST_PYTHON_MODULE(internals)
       /*
       .def_readonly("Segments", &cl::Segments)
       .def_readonly("SegmentMarkers", &cl::SegmentMarkers)
+      */
 
-      .def_readonly("Holes", &cl::Holes)
+      .def_readonly("facets", &cl::Facets)
 
-      .def_readonly("Regions", &cl::Regions)
+      .def_readonly("holes", &cl::Holes)
 
+      .def_readonly("regions", &cl::Regions)
+
+      /*
       .def_readonly("Edges", &cl::Edges)
       .def_readonly("EdgeMarkers", &cl::EdgeMarkers)
 
@@ -213,13 +236,83 @@ BOOST_PYTHON_MODULE(internals)
       //.enable_pickling()
       ;
   }
+
   {
     typedef tetgenio::facet cl;
-    class_<cl, boost::noncopyable>
-      ("Facet", no_init)
+    class_<cl, boost::noncopyable>("Facet", no_init)
+      .def("get_polygons", facet_get_polygons, manage_new_internal_reference<>())
+      .def("get_holes", facet_get_holes, manage_new_internal_reference<>())
       ;
   }
 
-  exposeForeignArray(REAL(), "RealArray");
-  exposeForeignArray(int(), "IntArray");
+  {
+    typedef tetgenio::polygon cl;
+    class_<cl, boost::noncopyable>("Polygon", no_init)
+      .def("get_vertices", polygon_get_vertices, manage_new_internal_reference<>())
+      ;
+  }
+
+  {
+#define DEF_RW_MEMBER(NAME) \
+    def_readwrite(#NAME, &cl::NAME)
+
+    typedef tetgenbehavior cl;
+    class_<cl, boost::noncopyable>("Options", init<>())
+      .DEF_RW_MEMBER(plc)
+      .DEF_RW_MEMBER(refine)
+      .DEF_RW_MEMBER(quality)
+      .DEF_RW_MEMBER(smooth)
+      .DEF_RW_MEMBER(metric)
+      .DEF_RW_MEMBER(bgmesh)
+      .DEF_RW_MEMBER(varvolume)
+      .DEF_RW_MEMBER(fixedvolume)
+      .DEF_RW_MEMBER(insertaddpoints)
+      .DEF_RW_MEMBER(regionattrib)
+      .DEF_RW_MEMBER(offcenter)
+      .DEF_RW_MEMBER(conformdel)
+      .DEF_RW_MEMBER(diagnose)
+      .DEF_RW_MEMBER(zeroindex)
+      .DEF_RW_MEMBER(order)
+      .DEF_RW_MEMBER(facesout)
+      .DEF_RW_MEMBER(edgesout)
+      .DEF_RW_MEMBER(neighout)
+      .DEF_RW_MEMBER(meditview)
+      .DEF_RW_MEMBER(gidview)
+      .DEF_RW_MEMBER(geomview)
+      .DEF_RW_MEMBER(nobound)
+      .DEF_RW_MEMBER(nonodewritten)
+      .DEF_RW_MEMBER(noelewritten)
+      .DEF_RW_MEMBER(nofacewritten)
+      .DEF_RW_MEMBER(noiterationnum)
+      .DEF_RW_MEMBER(nomerge)
+      .DEF_RW_MEMBER(nobisect)
+      .DEF_RW_MEMBER(noflip)
+      .DEF_RW_MEMBER(nojettison)
+      .DEF_RW_MEMBER(steiner)
+      .DEF_RW_MEMBER(fliprepair)
+      .DEF_RW_MEMBER(docheck)
+      .DEF_RW_MEMBER(quiet)
+      .DEF_RW_MEMBER(verbose)
+      .DEF_RW_MEMBER(tol)
+      .DEF_RW_MEMBER(useshelles)
+      .DEF_RW_MEMBER(minratio)
+      .DEF_RW_MEMBER(goodratio)
+      .DEF_RW_MEMBER(minangle)
+      .DEF_RW_MEMBER(goodangle)
+      .DEF_RW_MEMBER(maxvolume)
+      .DEF_RW_MEMBER(maxdihedral)
+      .DEF_RW_MEMBER(alpha1)
+      .DEF_RW_MEMBER(alpha2)
+      .DEF_RW_MEMBER(alpha3)
+      .DEF_RW_MEMBER(epsilon)
+      .DEF_RW_MEMBER(epsilon2)
+
+      .def("parse_switches", (bool (tetgenbehavior::*)(char *)) &cl::parse_commandline)
+      ;
+  }
+
+  exposePODForeignArray<REAL>("RealArray");
+  exposePODForeignArray<int>("IntArray");
+  exposeStructureForeignArray<tetgenio::facet>("FacetArray");
+  exposeStructureForeignArray<tetgenio::polygon>("PolygonArray");
 }

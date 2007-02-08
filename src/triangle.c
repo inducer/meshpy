@@ -532,13 +532,6 @@ struct osub {
   int ssorient;                                       /* Ranges from 0 to 1. */
 };
 
-/* The vertex data structure.  Each vertex is actually an array of REALs.    */
-/*   The number of REALs is unknown until runtime.  An integer boundary      */
-/*   marker, and sometimes a pointer to a triangle, is appended after the    */
-/*   REALs.                                                                  */
-
-typedef REAL *vertex;
-
 /* A queue used to store encroached subsegments.  Each subsegment's vertices */
 /*   are stored so that we can check whether a subsegment is still the same. */
 

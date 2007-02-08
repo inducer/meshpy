@@ -47,6 +47,34 @@ void terminatetetgen(int x)
 // Begin of class 'tetgenio' implementation
 //
 
+tetgenio::polygon::polygon()
+{
+  vertexlist = (int *) NULL;
+  numberofvertices = 0;
+}
+
+tetgenio::polygon::~polygon()
+{
+  if (vertexlist)
+    delete [] vertexlist;
+}
+
+tetgenio::facet::facet()
+{
+  polygonlist = (polygon *) NULL;
+  numberofpolygons = 0;
+  holelist = (REAL *) NULL;
+  numberofholes = 0;
+}
+
+tetgenio::facet::~facet()
+{
+  if (polygonlist)
+    delete[] polygonlist;
+  if (holelist)
+    delete[] holelist;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           //
 // initialize()    Initialize all variables of 'tetgenio'.                   //
@@ -181,19 +209,9 @@ void tetgenio::deinitialize()
   }
 
   if (facetlist != (facet *) NULL) {
-    for (i = 0; i < numberoffacets; i++) {
-      f = &facetlist[i];
-      for (j = 0; j < f->numberofpolygons; j++) {
-        p = &f->polygonlist[j];
-        delete [] p->vertexlist;
-      }
-      delete [] f->polygonlist;
-      if (f->holelist != (REAL *) NULL) {
-        delete [] f->holelist;
-      }
-    }
     delete [] facetlist;
   }
+
   if (facetmarkerlist != (int *) NULL) {
     delete [] facetmarkerlist;
   }

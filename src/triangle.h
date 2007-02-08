@@ -1,3 +1,13 @@
+#ifndef _HEADER_SEEN_TRIANGLE_H
+#define _HEADER_SEEN_TRIANGLE_H
+
+
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 /*****************************************************************************/
 /*                                                                           */
 /*  (triangle.h)                                                             */
@@ -248,6 +258,23 @@
 /*                                                                           */
 /*****************************************************************************/
 
+#ifdef SINGLE
+#define REAL float
+#else /* not SINGLE */
+#define REAL double
+#endif /* not SINGLE */
+
+#define VOID void
+
+/* The vertex data structure.  Each vertex is actually an array of REALs.    */
+/*   The number of REALs is unknown until runtime.  An integer boundary      */
+/*   marker, and sometimes a pointer to a triangle, is appended after the    */
+/*   REALs.                                                                  */
+
+typedef REAL *vertex;
+
+int triunsuitable(vertex triorg, vertex tridest, vertex triapex, REAL area);
+
 struct triangulateio {
   REAL *pointlist;                                               /* In / out */
   REAL *pointattributelist;                                      /* In / out */
@@ -287,3 +314,11 @@ void trifree(VOID *memptr);
 void triangulate();
 void trifree();
 #endif /* not ANSI_DECLARATORS */
+#ifdef __cplusplus
+}
+#endif
+
+
+
+
+#endif
