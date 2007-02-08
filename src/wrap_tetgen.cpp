@@ -18,21 +18,22 @@ using namespace std;
 struct tMeshInfo : public tetgenio, public boost::noncopyable
 {
   public:
-    tForeignArray<REAL>		Points; // in/out
-    tForeignArray<REAL>		PointAttributes; // in/out
-    tForeignArray<REAL>		AdditionalPoints; // out
-    tForeignArray<REAL>		AdditionalPointAttributes; // out
+    tForeignArray<REAL>		        Points; // in/out
+    tForeignArray<REAL>		        PointAttributes; // in/out
+    tForeignArray<REAL>		        AdditionalPoints; // out
+    tForeignArray<REAL>		        AdditionalPointAttributes; // out
     //tForeignArray<int>		PointMarkers; // in/out
 
-    tForeignArray<int>		Elements; // in/out
-    tForeignArray<REAL>		ElementAttributes; // in/out
-    tForeignArray<REAL>		ElementVolumes; // out
-    tForeignArray<int>		Neighbors; // out
+    tForeignArray<int>		        Elements; // in/out
+    tForeignArray<REAL>		        ElementAttributes; // in/out
+    tForeignArray<REAL>		        ElementVolumes; // out
+    tForeignArray<int>		        Neighbors; // out
 
-    tForeignArray<tetgenio::facet>		Facets;
+    tForeignArray<tetgenio::facet>	Facets;
+    tForeignArray<int>                  FacetMarkers;
 
-    tForeignArray<REAL>         Holes;
-    tForeignArray<REAL>         Regions;
+    tForeignArray<REAL>                 Holes;
+    tForeignArray<REAL>                 Regions;
 
   public:
     tMeshInfo()
@@ -50,6 +51,7 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
 	Neighbors(neighborlist, numberoftetrahedra, 4, &Elements),
 
         Facets(facetlist, numberoffacets),
+        FacetMarkers(facetmarkerlist, numberoffacets, 1, &Facets),
 
         /*
 	Segments("Segments", segmentlist, numberofsegments, 2),
@@ -222,6 +224,7 @@ BOOST_PYTHON_MODULE(_tetgen)
       */
 
       .def_readonly("facets", &cl::Facets)
+      .def_readonly("facet_markers", &cl::FacetMarkers)
 
       .def_readonly("holes", &cl::Holes)
 
