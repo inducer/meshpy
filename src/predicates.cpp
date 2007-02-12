@@ -113,6 +113,10 @@
 /*                                                                           */
 /*****************************************************************************/
 
+#if defined(__linux__) && defined(__i386__)
+  #define LINUX 1
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -149,8 +153,8 @@
 /*   which is disastrously slow.  A faster way on IEEE machines might be to  */
 /*   mask the appropriate bit, but that's difficult to do in C.              */
 
-#define Absolute(a)  ((a) >= 0.0 ? (a) : -(a))
-/* #define Absolute(a)  fabs(a) */
+/* #define Absolute(a)  ((a) >= 0.0 ? (a) : -(a))*/
+#define Absolute(a)  fabs(a)
 
 /* Many of the operations are broken up into two pieces, a main part that    */
 /*   performs an approximate operation, and a "tail" that computes the       */

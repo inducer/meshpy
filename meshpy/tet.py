@@ -34,6 +34,17 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
                 print "  polygon %d: vertices [%s]" % \
                         (ipolygon, ",".join(str(vi) for vi in polygon.vertices))
 
+    def write_vtk(self, filename):
+        import pyvtk
+        vtkelements = pyvtk.VtkData(
+            pyvtk.UnstructuredGrid(
+              self.points, 
+              tetra=self.elements),
+            "Mesh")
+        vtkelements.tofile(filename)
+
+
+
 
 
 class Options(internals.Options):
@@ -56,8 +67,6 @@ def build(mesh_info, options=Options()):
     mesh = MeshInfo()
     internals.tetrahedralize(options, mesh_info, mesh)
     return mesh
-
-
 
 
 

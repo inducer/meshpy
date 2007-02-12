@@ -22,12 +22,15 @@ def main():
         [1,5,6,2],
         [2,6,7,3],
         [3,7,4,0],
-        ],
-        [-1,-2,0,0,0,0])
+        ])
     #mesh_info.dump()
     #mesh_info.save_nodes("test")
     #mesh_info.save_poly("test")
-    build(mesh_info)
+    mesh = build(mesh_info)
+    #for el in mesh.elements:
+        #print el
+    mesh.write_vtk("test.vtk")
+    
 
 
 

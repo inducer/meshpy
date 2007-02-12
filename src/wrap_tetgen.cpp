@@ -251,6 +251,19 @@ BOOST_PYTHON_MODULE(_tetgen)
       .DEF_METHOD(save_neighbors)
       .DEF_METHOD(save_poly)
 
+      .DEF_METHOD(load_node)
+      .DEF_METHOD(load_addnodes)
+      .DEF_METHOD(load_pbc)
+      .DEF_METHOD(load_var)
+      .DEF_METHOD(load_mtr)
+      .DEF_METHOD(load_poly)
+      .DEF_METHOD(load_off)
+      .DEF_METHOD(load_ply)
+      .DEF_METHOD(load_stl)
+      .DEF_METHOD(load_medit)
+      .DEF_METHOD(load_plc)
+      .DEF_METHOD(load_tetmesh)
+
       /*
          .def("copy", &copyTriangulationParameters,
          return_value_policy<manage_new_object>())

@@ -1,0 +1,73 @@
+Ballistic bunch compression gun, 2.6-cell model, thermionic-type cells
+!File received from John Lewellen
+&reg kprob=1, freq= 2856 ,
+!xmax= 15 , ymax= 4.2 ,
+kmax = 300, lmax = 100,
+
+! drive point for cathode cell
+xdri=.16, ydri=4.191
+
+! drive point for full cell #1
+!xdri=5.848, ydri=4.191
+
+! drive point for full cell #2
+!xdri=11.096, ydri=4.191
+&
+
+
+! define the cathode cell
+&po x=0., y=0. &
+&po x= 0 , y= .6  &
+&po x= .16 , y= 1.35  &
+&po x=.16 , y=4.191  &
+&po x=.6 , y=4.191  &
+&po nt=2, x0= .6 , y0= 1.727 , r= 2.464 , theta=0. &
+&po x=3.064 , y=1.4818  &
+&po nt=2, x0=2.861 , y0=1.4818, r=.203, theta=270  &
+&po x=2.75 , y=1.2788  &
+&po nt=2, x0=2.750 , y0=1.0588, r=.22, theta=180  &
+&po x=2.530 , y=1.008  &
+&po nt=2, x0=3.03 , y0=1.008, r=.5, theta=270  &
+&po x=3.224 , y=.508  &
+
+
+! full cell 1
+&po      x=3.481         , y=0.508                  &
+&po nt=2,         x0=3.481        , y0=1.008        , r=0.5          , theta=0.      &
+&po      x=3.981         , y=1.0588                 &
+&po nt=2,         x0=3.761        , y0=1.0588       , r=0.22         , theta=90.      &
+&po      x=3.587         , y=1.2788                 &
+&po nt=2,         x0=3.587        , y0=1.4818       , r=0.203        , theta=180.      &
+&po      x=3.384          , y=1.727                  &
+&po nt=2,         x0=5.848        , y0=1.727        , r=2.464        , theta=90.      &
+&po nt=2,         x0=5.858        , y0=1.727        , r=2.464        , theta= 0.      &
+&po      x=8.312         , y=1.4818                 &
+&po nt=2,         x0=8.109        , y0=1.4818       , r=0.203        , theta=270.      &
+&po      x=7.935         , y=1.2788                 &
+&po nt=2,         x0=7.935        , y0=1.0588       , r=0.22         , theta=180.      &
+&po      x=7.715         , y=1.008                  &
+&po nt=2,         x0=8.215        , y0=1.008        , r=0.5          , theta=270.      &
+&po      x=8.472         , y=0.508                  &
+
+
+
+! full cell 2
+&po             x=8.729         , y=0.508                  &
+&po nt=2,      x0=8.729        , y0=1.008        , r=0.5          , theta=0.      &
+&po             x=9.229         , y=1.0588                 &
+&po nt=2,      x0=9.009        , y0=1.0588       , r=0.22         , theta=90.      &
+&po             x=8.835         , y=1.2788                 &
+&po nt=2,      x0=8.835        , y0=1.4818       , r=0.203        , theta=180.      &
+&po             x=8.632         , y=1.727                  &
+&po nt=2,      x0=11.096        , y0=1.727        , r=2.464        , theta=90.      &
+&po nt=2,      x0=11.096       , y0=1.727        , r=2.464        , theta= 0.      &
+&po             x=13.560        , y=1.4818                 &
+&po nt=2,      x0=13.357       , y0=1.4818       , r=0.203        , theta=270.      &
+&po             x=13.183        , y=1.2788                 &
+&po nt=2,      x0=13.183       , y0=1.0588       , r=0.22         , theta=180.      &
+&po             x=12.963        , y=1.008                  &
+&po nt=2,      x0=13.463       , y0=1.008        , r=0.5          , theta=270.      &
+&po             x=13.72        , y=0.508                  &
+&po             x=15.0         , y=0.508  &
+&po             x=15.0         , y=0.  &
+&po x=0, y=0 &

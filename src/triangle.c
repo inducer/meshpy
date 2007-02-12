@@ -269,6 +269,10 @@
 /* #define CPU86 */
 /* #define LINUX */
 
+#if defined(__linux__) && defined(__i386__)
+  #define LINUX 1
+#endif
+
 #define INEXACT /* Nothing */
 /* #define INEXACT volatile */
 

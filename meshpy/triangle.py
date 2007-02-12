@@ -58,7 +58,7 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
         if segment_markers is not None:
             assert len(segment_markers) == len(segments)
             for i, mark in enumerate(segment_markers):
-                self.SegmentMarkers[i] = mark
+                self.segment_markers[i] = mark
 
     def dump(self):
         for name in self._constituents:
@@ -88,7 +88,7 @@ def build(mesh_info, verbose=False, refinement_func=None):
 
 def refine(input_p, verbose=False, refinement_func=None):
     opts = "razj"
-    if input_p.Segments.size() != 0:
+    if len(input_p.segments) != 0:
         opts += "p"
     if verbose:
         opts += "VV"

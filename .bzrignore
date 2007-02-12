@@ -1,4 +1,11 @@
 build
-*.node
-*.poly
 *.dat
+test/*.lua
+MANIFEST
+*.vtk
+*.ele
+*.face
+*.poly
+*.node
+test/ParaViewTrace*.pvs
+dist

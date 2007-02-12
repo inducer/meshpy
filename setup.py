@@ -17,6 +17,7 @@ triangle_macros = [
 
 tetgen_macros = [
   ("TETLIBRARY", 1),
+  ( "SELF_CHECK", 1 ) ,
   ]
 
 setup(name="MeshPy",
