@@ -22,7 +22,7 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
     tForeignArray<REAL>		        PointAttributes; // in/out
     tForeignArray<REAL>		        AdditionalPoints; // out
     tForeignArray<REAL>		        AdditionalPointAttributes; // out
-    //tForeignArray<int>		PointMarkers; // in/out
+    tForeignArray<int>		        PointMarkers; // in/out
 
     tForeignArray<int>		        Elements; // in/out
     tForeignArray<REAL>		        ElementAttributes; // in/out
@@ -35,6 +35,18 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
     tForeignArray<REAL>                 Holes;
     tForeignArray<REAL>                 Regions;
 
+    tForeignArray<REAL>                 FacetConstraints;
+    tForeignArray<REAL>                 SegmentConstraints;
+    tForeignArray<REAL>                 NodeConstraints;
+
+    tForeignArray<pbcgroup>             PBCGroups;
+
+    tForeignArray<int>                  Faces;
+    tForeignArray<int>                  AdjacentElements;
+    tForeignArray<int>                  FaceMarkers;
+
+    tForeignArray<int>                  Edges;
+    tForeignArray<int>                  EdgeMarkers;
   public:
     tMeshInfo()
       : Points(pointlist, numberofpoints, 3),
@@ -42,7 +54,7 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
         AdditionalPoints(addpointlist, numberofaddpoints, 3),
         AdditionalPointAttributes(addpointattributelist, 
             numberofaddpoints, 0, &AdditionalPoints),
-	//PointMarkers(pointmarkerlist, numberofpoints, 1, &Points),
+	PointMarkers(pointmarkerlist, numberofpoints, 1, &Points),
 
 	Elements(tetrahedronlist, numberoftetrahedra, 4),
 	ElementAttributes(tetrahedronattributelist, 
@@ -53,24 +65,23 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
         Facets(facetlist, numberoffacets),
         FacetMarkers(facetmarkerlist, numberoffacets, 1, &Facets),
 
-        /*
-	Segments("Segments", segmentlist, numberofsegments, 2),
-	SegmentMarkers("SegmentMarkers", segmentmarkerlist, numberofsegments, 1, &Segments),
-        */
-
 	Holes(holelist, numberofholes, 3),
 
-	Regions(regionlist, numberofregions, 5)
+	Regions(regionlist, numberofregions, 5),
 
-        /*
-	Edges("Edges", edgelist, numberofedges, 2),
-	EdgeMarkers("EdgeMarkers", edgemarkerlist, numberofedges, 1, &Edges),
-	Normals("Normals", normlist, numberofedges, 2, &Edges)
-        */
+        FacetConstraints(facetconstraintlist, numberoffacetconstraints, 2),
+        SegmentConstraints(facetconstraintlist, numberofsegmentconstraints, 3),
+        NodeConstraints(nodeconstraintlist, numberofnodeconstraints, 2),
+
+        PBCGroups(pbcgrouplist, numberofpbcgroups),
+
+        Faces(trifacelist, numberoftrifaces, 3),
+        AdjacentElements(adjtetlist, numberoftrifaces, 2, &Faces),
+        FaceMarkers(trifacemarkerlist, numberoftrifaces, 2, &Faces),
+
+        Edges(edgelist, numberofedges, 2),
+        EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges)
     {
-      numberofpointattributes = 0;
-      numberofcorners = 3;
-      numberoftetrahedronattributes = 0; 
     } 
     
     unsigned numberOfPointAttributes() const
@@ -194,6 +205,43 @@ tForeignArray<int> *polygon_get_vertices(tetgenio::polygon &self)
 
 
 
+REAL pbcgroup_get_transmat_entry(tetgenio::pbcgroup &self, long i, long j)
+{
+  if (i < 0) i += 4;
+  if (j < 0) j += 4;
+
+  if (i < 0 || i >= 4 || j < 0 || j >= 4)
+    PYTHON_ERROR(IndexError, "transform matrix index out of bounds");
+  return self.transmat[i][j];
+}
+
+
+
+
+
+void pbcgroup_set_transmat_entry(tetgenio::pbcgroup &self, long i, long j, REAL value)
+{
+  if (i < 0) i += 4;
+  if (j < 0) j += 4;
+
+  if (i < 0 || i >= 4 || j < 0 || j >= 4)
+    PYTHON_ERROR(IndexError, "transform matrix index out of bounds");
+  self.transmat[i][j] = value;
+}
+
+
+
+
+
+tForeignArray<int> *pbcgroup_get_pointpairs(tetgenio::pbcgroup &self)
+{
+  return new tForeignArray<int>(self.pointpairlist, self.numberofpointpairs);
+}
+
+
+
+
+
 #define DEF_RW_MEMBER(NAME) \
     def_readwrite(#NAME, &cl::NAME)
 #define DEF_METHOD(NAME) \
@@ -211,17 +259,13 @@ BOOST_PYTHON_MODULE(_tetgen)
       .def_readonly("point_attributes", &cl::PointAttributes)
       .def_readonly("additional_points", &cl::AdditionalPoints)
       .def_readonly("additional_point_attributes", &cl::AdditionalPointAttributes)
-      //.def_readonly("point_markers", &cl::PointMarkers)
+      .def_readonly("point_markers", &cl::PointMarkers)
 
       .def_readonly("elements", &cl::Elements)
       .def_readonly("element_attributes", &cl::ElementAttributes)
       .def_readonly("element_volumes", &cl::ElementVolumes)
       .def_readonly("neighbors", &cl::Neighbors)
 
-      /*
-      .def_readonly("Segments", &cl::Segments)
-      .def_readonly("SegmentMarkers", &cl::SegmentMarkers)
-      */
 
       .def_readonly("facets", &cl::Facets)
       .def_readonly("facet_markers", &cl::FacetMarkers)
@@ -230,12 +274,18 @@ BOOST_PYTHON_MODULE(_tetgen)
 
       .def_readonly("regions", &cl::Regions)
 
-      /*
-      .def_readonly("Edges", &cl::Edges)
-      .def_readonly("EdgeMarkers", &cl::EdgeMarkers)
+      .def_readonly("facet_constraints", &cl::FacetConstraints)
+      .def_readonly("segment_constraints", &cl::SegmentConstraints)
+      .def_readonly("node_constraints", &cl::NodeConstraints)
 
-      .def_readonly("Normals", &cl::Normals)
-      */
+      .def_readonly("pbc_groups", &cl::PBCGroups)
+
+      .def_readonly("faces", &cl::Faces)
+      .def_readonly("adjacent_elements", &cl::AdjacentElements)
+      .def_readonly("face_markers", &cl::FaceMarkers)
+
+      .def_readonly("edges", &cl::Edges)
+      .def_readonly("edge_markers", &cl::EdgeMarkers)
 
       .add_property("number_of_point_attributes", 
           &cl::numberOfPointAttributes,
@@ -284,6 +334,17 @@ BOOST_PYTHON_MODULE(_tetgen)
     typedef tetgenio::polygon cl;
     class_<cl, boost::noncopyable>("Polygon", no_init)
       .def("get_vertices", polygon_get_vertices, manage_new_internal_reference<>())
+      ;
+  }
+
+  {
+    typedef tetgenio::pbcgroup cl;
+    class_<cl, boost::noncopyable>("PBCGroup", no_init)
+      .def_readwrite("facet_marker_1", &cl::fmark1)
+      .def_readwrite("facet_marker_2", &cl::fmark2)
+      .def("get_transmat_entry", pbcgroup_get_transmat_entry)
+      .def("set_transmat_entry", pbcgroup_set_transmat_entry)
+      .def("get_point_pairs", pbcgroup_get_pointpairs, manage_new_internal_reference<>())
       ;
   }
 
@@ -347,4 +408,5 @@ BOOST_PYTHON_MODULE(_tetgen)
   exposePODForeignArray<int>("IntArray");
   exposeStructureForeignArray<tetgenio::facet>("FacetArray");
   exposeStructureForeignArray<tetgenio::polygon>("PolygonArray");
+  exposeStructureForeignArray<tetgenio::pbcgroup>("PBCGroupArray");
 }
