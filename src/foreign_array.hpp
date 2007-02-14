@@ -148,12 +148,16 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
 	throw std::runtime_error("cannot setup non-slave array");
       else
 	setSizeInternal(NumberOf);
-
     }
 
     void notifySizeChange(tSizeChangeNotifier *master, unsigned size)
     {
-      setSizeInternal(size);
+      if (!SlaveTo)
+	throw std::runtime_error("non-slave array should not get size notifications");
+
+      // only perform size change if we actually existed
+      if (Contents)
+        setSizeInternal(size);
     }
 
     void setSizeInternal(unsigned size)
@@ -189,7 +193,7 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
     {
       if (index >= NumberOf * Unit)
 	throw std::runtime_error("index out of bounds");
-      if (Contents == NULL)
+      if (!Contents)
 	throw std::runtime_error("Array unallocated");
       return Contents[ index ];
     }
@@ -222,7 +226,7 @@ class tForeignArray : public tReadOnlyForeignArray<ElementT>
     {
       if (index >= this->NumberOf * this->Unit)
 	throw std::runtime_error("index out of bounds");
-      if (this->Contents == NULL)
+      if (!this->Contents)
 	throw std::runtime_error("Array unallocated");
       this->Contents[ index ] = value;
     }
