@@ -7,5 +7,7 @@ MANIFEST
 *.face
 *.poly
 *.node
+.*.swp
 test/ParaViewTrace*.pvs
 dist
+*~
