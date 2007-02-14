@@ -22,6 +22,7 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
                 poly.vertices[j] = pt_idx
 
         if facet_markers:
+            self.facet_markers.setup()
             for i, mark in enumerate(facet_markers):
                 self.facet_markers[i] = mark
 
@@ -67,6 +68,72 @@ def build(mesh_info, options=Options()):
     mesh = MeshInfo()
     internals.tetrahedralize(options, mesh_info, mesh)
     return mesh
+
+
+
+
+def generate_surface_of_revolution(rz_points, radial_subdiv=16, point_offset=0):
+    assert len(rz_points) > 0
+
+    from math import sin, cos, pi
+
+    def gen_point(r, phi, z):
+        return (r*cos(phi), r*sin(phi), z)
+
+    def gen_ring(r, z):
+        if r == 0:
+            p_indices = [p0+len(points)]
+            points.append(gen_point(r, 0, z))
+        else:
+            p_indices = [p0+len(points)+i for i in range(radial_subdiv)]
+            points.extend([gen_point(r, dphi*i, z) for i in range(radial_subdiv)])
+        return p_indices
+
+    def pair_with_successor(l):
+        n = len(l)
+        return [(l[i], l[(i+1)%n]) for i in range(n)]
+
+    p0 = point_offset
+    points = []
+    polygons = []
+
+    dphi = 2*pi/radial_subdiv
+
+    last_r, last_z = rz_points[0]
+    last_ring = gen_ring(last_r, last_z)
+
+    for r, z in rz_points[1:]:
+        ring = gen_ring(r, z)
+        if last_r == 0:
+            # make opening fan
+            assert len(last_ring) == 1
+            start_pt = last_ring[0]
+            if r != 0:
+                polygons.extend(
+                        [(start_pt, succ, pt) for pt, succ in pair_with_successor(ring)]
+                        )
+        elif r == 0:
+            # make closing fan
+            assert len(ring) == 1
+            end_pt = ring[0]
+            polygons.extend(
+                    [(pt, succ, end_pt) for pt, succ in pair_with_successor(last_ring)]
+                    )
+        else:
+            # make quad strip
+            last_pairs = pair_with_successor(last_ring)
+            my_pairs = pair_with_successor(ring)
+            polygons.extend(
+                    [(a, b, c, d) for ((a,b), (d,c)) in zip(last_pairs, my_pairs)]
+                    )
+
+        last_ring = ring
+        last_r = r
+        last_z = z
+
+    return points, polygons
+            
+
 
 
 
