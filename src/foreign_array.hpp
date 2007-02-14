@@ -147,7 +147,10 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
       if (!SlaveTo)
 	throw std::runtime_error("cannot setup non-slave array");
       else
-	setSizeInternal(NumberOf);
+      {
+        if (!Contents)
+          setSizeInternal(NumberOf);
+      }
     }
 
     void notifySizeChange(tSizeChangeNotifier *master, unsigned size)
