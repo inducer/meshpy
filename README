@@ -76,7 +76,7 @@ If you figure you need to build manually, proceed as follows:
 * Run ldconfig.
   
 INSTALLING MESHPY
--------------------
+-----------------
 
 Simply run
 

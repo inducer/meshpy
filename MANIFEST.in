@@ -1,3 +1,5 @@
 include src/*.h
 include src/*.hpp
 include LICENSE
+include test/*.py
+include test/clean.sh

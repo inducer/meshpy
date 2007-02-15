@@ -86,8 +86,14 @@ internals.PBCGroup.matrix = property(_PBCGroup_get_transmat)
 
 
 
-def build(mesh_info, options=Options()):
+def build(mesh_info, options=Options(), verbose=False, varvolume=False):
     mesh = MeshInfo()
+
+    if not verbose:
+        options.quiet = 1
+    if varvolume:
+        options.varvolume = 1
+
     internals.tetrahedralize(options, mesh_info, mesh)
     return mesh
 
@@ -106,8 +112,8 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN, point_idx_offset
 
     def gen_ring(r, z):
         if r == 0:
-            p_indices = [p0+len(points)]
-            points.append(gen_point(r, 0, z))
+            p_indices = [point_idx_offset+len(points)]
+            points.append((0,0, z))
         else:
             first_idx = point_idx_offset+len(points)
             p_indices = range(first_idx, first_idx+len(base_shape))
