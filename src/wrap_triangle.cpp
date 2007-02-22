@@ -131,7 +131,7 @@ tMeshInfo *copyMesh(const tMeshInfo &src)
 
 
 
-object RefinementFunction;
+PyObject *RefinementFunction;
 
 
 
@@ -157,29 +157,11 @@ class tVertex : public boost::noncopyable
 int triunsuitable(vertex triorg, vertex tridest, vertex triapex, REAL area)
 {
   // return 1 if triangle is too large, 0 otherwise
-  try
-  {
-    tVertex org(triorg);
-    tVertex dest(tridest);
-    tVertex apex(triapex);
-    return extract<bool>(RefinementFunction(
-	  boost::ref(org), boost::ref(dest), boost::ref(apex), area));
-  }
-  catch (exception &ex)
-  {
-    cerr 
-      << "*** Oops. Your Python refinement function raised an exception." << endl
-      << "*** " << ex.what() << endl
-      << "*** Sorry, we can't continue." << endl;
-    abort();
-  }
-  catch (...)
-  {
-    cerr 
-      << "*** Oops. Your Python refinement function raised an exception." << endl
-      << "*** Sorry, we can't continue." << endl;
-    abort();
-  }
+  tVertex org(triorg);
+  tVertex dest(tridest);
+  tVertex apex(triapex);
+  return call<bool>(RefinementFunction,
+      boost::ref(org), boost::ref(dest), boost::ref(apex), area);
 }
 
 
@@ -188,11 +170,10 @@ int triunsuitable(vertex triorg, vertex tridest, vertex triapex, REAL area)
 void triangulateWrapper(char *options, tMeshInfo &in, 
     tMeshInfo &out,
     tMeshInfo &voronoi,
-    object refinement_func)
+    PyObject *refinement_func)
 {
   RefinementFunction = refinement_func;
   triangulate(options, &in, &out, &voronoi);
-  RefinementFunction = object(); // i.e. None
 
   out.holelist = NULL;
   out.numberofholes = 0;
