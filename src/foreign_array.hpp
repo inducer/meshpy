@@ -127,6 +127,11 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
       return Unit;
     }
 
+    bool is_allocated()
+    {
+      return Contents != NULL;
+    }
+
     void deallocate()
     {
       if (Contents != NULL)
