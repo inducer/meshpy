@@ -44,6 +44,8 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             else:
                 if len(dest_array) != len(array):
                     dest_array.resize(len(array))
+                if not dest_array.allocated and len(array)>0:
+                    dest_array.setup()
 
                 for i,tup in enumerate(array):
                     for j,v in enumerate(tup):
