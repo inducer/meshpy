@@ -30,7 +30,7 @@ info.set_points(points)
 info.set_holes([(0,0)])
 info.set_segments(round_trip_connect(0, len(points)-1))
 
-mesh = triangle.triangulate(info, refinement_func=needs_refinement)
+mesh = triangle.build(info, refinement_func=needs_refinement)
 
 pickled = pickle.dumps(mesh)
 mesh_2 = pickle.loads(pickled)
