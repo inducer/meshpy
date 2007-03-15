@@ -5,6 +5,7 @@ MANIFEST
 *.vtk
 *.ele
 *.face
+*.neu
 *.poly
 *.node
 .*.swp
