@@ -20,8 +20,11 @@ tetgen_macros = [
   ( "SELF_CHECK", 1 ) ,
   ]
 
+
+
+execfile("meshpy/__init__.py")
 setup(name="MeshPy",
-      version="0.90",
+      version=version,
       description="A wrapper around the TetGen and Triangle",
       author="Andreas Kloeckner",
       author_email="inform@tiker.net",
