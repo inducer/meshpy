@@ -6,9 +6,9 @@ import meshpy._tetgen as internals
 
 
 class MeshInfo(internals.MeshInfo, MeshInfoBase):
-    def set_facets(self, facets, facet_markers=None):
-        if facet_markers:
-            assert len(facet_markers) == len(facets)
+    def set_facets(self, facets, markers=None):
+        if markers:
+            assert len(markers) == len(facets)
 
         self.facets.resize(len(facets))
 
@@ -21,9 +21,9 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             for j, pt_idx in enumerate(vlist):
                 poly.vertices[j] = pt_idx
 
-        if facet_markers:
+        if markers:
             self.facet_markers.setup()
-            for i, mark in enumerate(facet_markers):
+            for i, mark in enumerate(markers):
                 self.facet_markers[i] = mark
 
     def dump(self):

@@ -1,3 +1,33 @@
+class _Table:
+    def __init__(self):
+        self.Rows = []
+
+    def add_row(self, row):
+        self.Rows.append([str(i) for i in row])
+
+    def __str__(self):
+        columns = len(self.Rows[0])
+        col_widths = [max(len(row[i]) for row in self.Rows)
+                      for i in range(columns)]
+
+        lines = [
+            " ".join([cell.ljust(col_width)
+                      for cell, col_width in zip(row, col_widths)])
+            for row in self.Rows]
+        return "\n".join(lines)
+
+
+
+
+def _linebreak_list(list, per_line=8):
+    result = ""
+    while len(list) > per_line:
+        result += "\t".join(list[:per_line]) + "\n"
+        list = list[per_line:]
+    return result + "\t".join(list)
+        
+
+
 class MeshInfoBase:
     def set_points(self, points, point_markers=None):
         if point_markers is not None:
@@ -20,6 +50,128 @@ class MeshInfoBase:
         self.holes.resize(len(hole_starts))
         for i, hole in enumerate(hole_starts):
             self.holes[i] = hole
+
+
+
+
+    def write_neu(self, outfile, bc, description="MeshPy Output"):
+        """Write the mesh out in (an approximation to) Gambit neutral mesh format.
+        
+        outfile is a file-like object opened for writing.
+
+        bc is a dictionary mapping face markers to a tuple
+        (bc_name, bc_code).
+        """
+
+        from meshpy import version
+        from datetime import datetime
+
+        # header --------------------------------------------------------------
+        outfile.write("CONTROL INFO 2.1.2\n")
+        outfile.write("** GAMBIT NEUTRAL FILE\n")
+        outfile.write("%s\n" % description)
+        outfile.write("PROGRAM: MeshPy VERSION: %s\n" % version)
+        outfile.write("%s\n" % datetime.now().ctime())
+        
+        assert len(self.points)
+        dim = len(self.points[0])
+        data = (
+                ("NUMNP", len(self.points)),
+                ("NELEM", len(self.elements)),
+                ("NGRPS", 1),
+                ("NBSETS", 0), # FIXME
+                ("NDFCD", dim),
+                ("NDFVL", dim),
+                )
+
+        tbl = _Table()
+        tbl.add_row(key for key, value in data)
+        tbl.add_row(value for key, value in data)
+        outfile.write(str(tbl))
+        outfile.write("\n")
+        outfile.write("ENDOFSECTION\n")
+
+        # nodes ---------------------------------------------------------------
+        outfile.write("NODAL COORDINATES 2.1.2\n")
+        for i, pt in enumerate(self.points):
+            outfile.write("%d\t%s\n" % 
+                    (i+1, "\t".join(repr(c) for c in pt)))
+        outfile.write("ENDOFSECTION\n")
+
+        # elements ------------------------------------------------------------
+        outfile.write("ELEMENTS/CELLS 2.1.2\n")
+        if dim == 2:
+            eltype = 3
+        else:
+            eltype = 6
+        for i, el in enumerate(self.elements):
+            outfile.write("%d\t%d\t%d\t%s\n" % 
+                    (i+1, eltype, len(el), 
+                        "\t".join(str(p+1) for p in el)))
+        outfile.write("ENDOFSECTION\n")
+
+        # element groups ------------------------------------------------------
+        outfile.write("ELEMENT GROUP 1.3.0\n")
+        # FIXME
+        i = 0
+        grp_elements = range(len(self.elements))
+        material = 1.
+        flags = 0
+        outfile.write("GROUP: %d ELEMENTS: %d MATERIAL: %s NFLAGS: %d\n"
+                % (1, len(grp_elements), repr(material), flags))
+        outfile.write("epsilon: %s\n" % material) # FIXME
+        outfile.write("0\n")
+        outfile.write(_linebreak_list([str(i+1) for i in grp_elements])
+                + "\n")
+        outfile.write("ENDOFSECTION\n")
+
+        # boundary conditions -------------------------------------------------
+        # build mapping face -> (tet, neu_face_index)
+        face2tet = {}
+        for ti, el in enumerate(self.elements):
+            # Sledge++ Users' Guide, figure 5
+            tet_faces = [
+                    frozenset([el[1], el[0], el[2]]),
+                    frozenset([el[0], el[1], el[3]]),
+                    frozenset([el[1], el[2], el[3]]),
+                    frozenset([el[2], el[0], el[3]]),
+                    ]
+            for fi, face in enumerate(tet_faces):
+                face2tet.setdefault(face, []).append((ti, fi+1))
+
+        # actually output bc sections
+        assert self.faces.allocated # require -f option
+        for bc_marker, (bc_name, bc_code) in bc.iteritems():
+            face_indices = [i
+                    for i, face in enumerate(self.faces)
+                    if bc_marker == self.face_markers[i]]
+
+            outfile.write("BOUNDARY CONDITIONS 2.1.2\n")
+            outfile.write("%s\t%d\t%d\t%d\t%d\n" 
+                    % (bc_name, 
+                        1, # face BC
+                        len(face_indices),
+                        0, # zero additional values per face,
+                        bc_code,
+                        )
+                    )
+            for i, fi in enumerate(face_indices):
+                face_nodes = frozenset(self.faces[fi])
+                adj_el = face2tet[face_nodes]
+                assert len(adj_el) == 1
+
+                tet_index, tetface_number = adj_el[0]
+
+                outfile.write("%d\t%d\t%d\n" % 
+                        (tet_index+1, eltype, tetface_number))
+
+            outfile.write("ENDOFSECTION\n")
+
+        # FIXME curved boundaries?
+        # FIXME triangle support
+        # FIXME periodic BCs
+        # FIXME proper element group support
+
 
 
 

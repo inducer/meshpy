@@ -10,7 +10,7 @@ def main():
     big_r = 3
     little_r = 1
 
-    points = 90
+    points = 30
     dphi = 2*pi/points
 
     rz = [(big_r+little_r*cos(i*dphi), little_r*sin(i*dphi))
@@ -18,16 +18,19 @@ def main():
 
     mesh_info = MeshInfo()
     points, facets = generate_surface_of_revolution(rz,
-            closure=EXT_CLOSED_IN_RZ, radial_subdiv=40)
+            closure=EXT_CLOSED_IN_RZ, radial_subdiv=20)
 
     mesh_info.set_points(points)
-    mesh_info.set_facets(facets, [0 for i in range(len(facets))])
+    mesh_info.set_facets(facets, [1 for i in range(len(facets))])
     mesh_info.save_nodes("torus")
     mesh_info.save_poly("torus")
     mesh = build(mesh_info)
     mesh.write_vtk("torus.vtk")
     mesh.save_elements("torus_mesh")
     mesh.save_nodes("torus_mesh")
+
+    mesh.write_neu(file("torus.neu", "w"),
+            {1: ("pec", 0)})
 
 
 

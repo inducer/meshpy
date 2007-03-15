@@ -77,7 +77,7 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
 
         Faces(trifacelist, numberoftrifaces, 3),
         AdjacentElements(adjtetlist, numberoftrifaces, 2, &Faces),
-        FaceMarkers(trifacemarkerlist, numberoftrifaces, 2, &Faces),
+        FaceMarkers(trifacemarkerlist, numberoftrifaces, 1, &Faces),
 
         Edges(edgelist, numberofedges, 2),
         EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges)
