@@ -58,7 +58,7 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             self.segments[i] = seg
 
         if segment_markers is not None:
-            assert len(segment_markers) == len(segments)
+            self.segment_markers.setup()
             for i, mark in enumerate(segment_markers):
                 self.segment_markers[i] = mark
 
