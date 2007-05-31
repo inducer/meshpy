@@ -4,10 +4,10 @@ import os
 from distutils.core import setup,Extension
 
 home = os.getenv("HOME")
-boost_path = "%s/work/boost" % home
+boost_path = "%s/pool/include/boost-1_34" % home
 include_dirs = [boost_path, "src"]
 library_dirs = ["%s/pool/lib" % home]
-libraries = ["boost_python"]
+libraries = ["boost_python-gcc41-mt"]
 
 triangle_macros = [
   ( "EXTERNAL_TEST", 1 ),
