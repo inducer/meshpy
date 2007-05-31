@@ -31526,6 +31526,7 @@ void tetrahedralize(tetgenbehavior *b, tetgenio *in, tetgenio *out,
   if (bgmesh) {
     delete m.bgm;
   }
+  exactdeinit();
 }
 
 #ifndef TETLIBRARY

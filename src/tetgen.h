@@ -539,6 +539,7 @@ class tetgenbehavior {
 ///////////////////////////////////////////////////////////////////////////////
 
 REAL exactinit();
+void exactdeinit();
 REAL orient3d(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
 REAL insphere(REAL *pa, REAL *pb, REAL *pc, REAL *pd, REAL *pe);
 

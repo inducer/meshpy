@@ -664,6 +664,8 @@ float uniformfloatrand()
 /*                                                                           */
 /*****************************************************************************/
 
+static int previous_cword;
+
 REAL exactinit()
 {
   REAL half;
@@ -680,7 +682,9 @@ REAL exactinit()
   _control87(_PC_53, _MCW_PC); /* Set FPU control word for double precision. */
 #endif /* not SINGLE */
 #endif /* CPU86 */
+
 #ifdef LINUX
+  _FPU_GETCW(previous_cword);
 #ifdef SINGLE
   /*  cword = 4223; */
   cword = 4210;                 /* set FPU control word for single precision */
@@ -727,6 +731,13 @@ REAL exactinit()
   isperrboundC = (71.0 + 1408.0 * epsilon) * epsilon * epsilon;
 
   return epsilon; /* Added by H. Si 30 Juli, 2004. */
+}
+
+void exactdeinit()
+{
+#ifdef LINUX
+  _FPU_SETCW(previous_cword);
+#endif /* LINUX */
 }
 
 /*****************************************************************************/

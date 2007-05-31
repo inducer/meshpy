@@ -266,6 +266,8 @@
 /*   Floating-Point Arithmetic and Fast Robust Geometric Predicates" (also   */
 /*   available as Section 6.6 of my dissertation).                           */
 
+void exactdeinit(void);
+
 /* #define CPU86 */
 /* #define LINUX */
 
@@ -316,7 +318,7 @@
 /*   compiler is smarter, feel free to replace the "int" with "void".        */
 /*   Not that it matters.                                                    */
 
-#define VOID int
+// #define VOID int
 
 /* Two constants for algorithms based on random sampling.  Both constants    */
 /*   have been chosen empirically to optimize their respective algorithms.   */
@@ -1353,7 +1355,7 @@ int minus1mod3[3] = {2, 0, 1};
 
 #ifdef EXTERNAL_TEST
 
-int triunsuitable();
+//int triunsuitable(void);
 
 #else /* not EXTERNAL_TEST */
 
@@ -3261,7 +3263,7 @@ void info()
 /*                                                                           */
 /*****************************************************************************/
 
-void internalerror()
+void internalerror(void)
 {
   printf("  Please report this bug to jrs@cs.berkeley.edu\n");
   printf("  Include the message above, your input data set, and the exact\n");
@@ -4637,6 +4639,7 @@ struct behavior *b;
     }
   }
 #endif /* not CDT_ONLY */
+  exactdeinit();
 }
 
 /**                                                                         **/
@@ -4880,7 +4883,9 @@ struct osub *newsubseg;
 /*                                                                           */
 /*****************************************************************************/
 
-void exactinit()
+static int previous_cword;
+
+void exactinit(void)
 {
   REAL half;
   REAL check, lastcheck;
@@ -4897,6 +4902,7 @@ void exactinit()
 #endif /* not SINGLE */
 #endif /* CPU86 */
 #ifdef LINUX
+  _FPU_GETCW(previous_cword);
 #ifdef SINGLE
   /*  cword = 4223; */
   cword = 4210;                 /* set FPU control word for single precision */
@@ -4938,6 +4944,14 @@ void exactinit()
   o3derrboundB = (3.0 + 28.0 * epsilon) * epsilon;
   o3derrboundC = (26.0 + 288.0 * epsilon) * epsilon * epsilon;
 }
+
+void exactdeinit()
+{
+#ifdef LINUX
+  _FPU_SETCW(previous_cword);
+#endif /* LINUX */
+}
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -13200,7 +13214,7 @@ struct behavior *b;
 
 #ifndef CDT_ONLY
 
-void precisionerror()
+void precisionerror(void)
 {
   printf("Try increasing the area criterion and/or reducing the minimum\n");
   printf("  allowable angle so that tiny triangles are not created.\n");
