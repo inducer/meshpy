@@ -47,6 +47,7 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
 
     tForeignArray<int>                  Edges;
     tForeignArray<int>                  EdgeMarkers;
+
   public:
     tMeshInfo()
       : Points(pointlist, numberofpoints, 3),

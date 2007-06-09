@@ -25,8 +25,8 @@ struct tMeshInfo : public triangulateio, public boost::noncopyable
     tForeignArray<REAL>		ElementVolumes; // in only
     tForeignArray<int>		Neighbors; // out only
 
-    tForeignArray<int>		Segments; // in/out
-    tForeignArray<int>		SegmentMarkers; // in/out
+    tForeignArray<int>		Faces; // in/out
+    tForeignArray<int>		FaceMarkers; // in/out
     
     tForeignArray<REAL>		Holes; // in only
 
@@ -50,8 +50,8 @@ struct tMeshInfo : public triangulateio, public boost::noncopyable
 	Neighbors(neighborlist, 
             numberoftriangles, 3, &Elements, true),
 
-	Segments(segmentlist, numberofsegments, 2, NULL, true),
-	SegmentMarkers(segmentmarkerlist, numberofsegments, 1, &Segments, true),
+	Faces(segmentlist, numberofsegments, 2, NULL, true),
+	FaceMarkers(segmentmarkerlist, numberofsegments, 1, &Faces, true),
 
 	Holes(holelist, numberofholes, 2, NULL, true),
 
@@ -103,8 +103,8 @@ struct tMeshInfo : public triangulateio, public boost::noncopyable
       ElementVolumes = src.ElementVolumes;
       Neighbors = src.Neighbors;
 
-      Segments = src.Segments;
-      SegmentMarkers = src.SegmentMarkers;
+      Faces = src.Faces;
+      FaceMarkers = src.FaceMarkers;
 
       Holes = src.Holes;
 
@@ -202,8 +202,8 @@ BOOST_PYTHON_MODULE(_triangle)
       .def_readonly("element_volumes", &cl::ElementVolumes)
       .def_readonly("neighbors", &cl::Neighbors)
 
-      .def_readonly("segments", &cl::Segments)
-      .def_readonly("segment_markers", &cl::SegmentMarkers)
+      .def_readonly("faces", &cl::Faces)
+      .def_readonly("face_markers", &cl::FaceMarkers)
 
       .def_readonly("holes", &cl::Holes)
 

@@ -9,7 +9,7 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             "points", "point_attributes", "point_markers", 
             "elements", "element_attributes", "element_volumes", 
             "neighbors", 
-            "segments", "segment_markers", 
+            "faces", "face_markers", 
             "holes", 
             "regions", 
             "edges", "edge_markers", 
@@ -51,16 +51,16 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
                     for j,v in enumerate(tup):
                         dest_array[i, j] = v
 
-    def set_segments(self, segments, segment_markers=None):
-        self.segments.resize(len(segments))
+    def set_faces(self, faces, face_markers=None):
+        self.faces.resize(len(faces))
         
-        for i, seg in enumerate(segments):
-            self.segments[i] = seg
+        for i, face in enumerate(faces):
+            self.faces[i] = face
 
-        if segment_markers is not None:
-            self.segment_markers.setup()
-            for i, mark in enumerate(segment_markers):
-                self.segment_markers[i] = mark
+        if face_markers is not None:
+            self.face_markers.setup()
+            for i, mark in enumerate(face_markers):
+                self.face_markers[i] = mark
 
     def dump(self):
         for name in self._constituents:
@@ -90,7 +90,7 @@ def build(mesh_info, verbose=False, refinement_func=None):
 
 def refine(input_p, verbose=False, refinement_func=None):
     opts = "razj"
-    if len(input_p.segments) != 0:
+    if len(input_p.faces) != 0:
         opts += "p"
     if verbose:
         opts += "VV"
