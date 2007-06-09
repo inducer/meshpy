@@ -127,17 +127,34 @@ class MeshInfoBase:
 
         # boundary conditions -------------------------------------------------
         # build mapping face -> (tet, neu_face_index)
-        face2tet = {}
-        for ti, el in enumerate(self.elements):
-            # Sledge++ Users' Guide, figure 5
-            tet_faces = [
-                    frozenset([el[1], el[0], el[2]]),
-                    frozenset([el[0], el[1], el[3]]),
-                    frozenset([el[1], el[2], el[3]]),
-                    frozenset([el[2], el[0], el[3]]),
-                    ]
-            for fi, face in enumerate(tet_faces):
-                face2tet.setdefault(face, []).append((ti, fi+1))
+        face2el = {}
+
+        if dim == 2:
+            for ti, el in enumerate(self.elements):
+                # Sledge++ Users' Guide, figure 4
+                faces = [
+                        frozenset([el[0], el[1]]),
+                        frozenset([el[1], el[2]]),
+                        frozenset([el[2], el[0]]),
+                        ]
+                for fi, face in enumerate(faces):
+                    face2el.setdefault(face, []).append((ti, fi+1))
+
+        elif dim == 3:
+            face2el = {}
+            for ti, el in enumerate(self.elements):
+                # Sledge++ Users' Guide, figure 5
+                faces = [
+                        frozenset([el[1], el[0], el[2]]),
+                        frozenset([el[0], el[1], el[3]]),
+                        frozenset([el[1], el[2], el[3]]),
+                        frozenset([el[2], el[0], el[3]]),
+                        ]
+                for fi, face in enumerate(tet_faces):
+                    face2el.setdefault(face, []).append((ti, fi+1))
+
+        else:
+            raise ValueError, "invalid number of dimensions (%d)" % dim
 
         # actually output bc sections
         assert self.faces.allocated # require -f option
@@ -157,18 +174,18 @@ class MeshInfoBase:
                     )
             for i, fi in enumerate(face_indices):
                 face_nodes = frozenset(self.faces[fi])
-                adj_el = face2tet[face_nodes]
+                adj_el = face2el[face_nodes]
                 assert len(adj_el) == 1
 
-                tet_index, tetface_number = adj_el[0]
+                el_index, el_face_number = adj_el[0]
 
                 outfile.write("%d\t%d\t%d\n" % 
-                        (tet_index+1, eltype, tetface_number))
+                        (el_index+1, eltype, el_face_number))
 
             outfile.write("ENDOFSECTION\n")
 
+        outfile.close()
         # FIXME curved boundaries?
-        # FIXME triangle support
         # FIXME periodic BCs
         # FIXME proper element group support
 
