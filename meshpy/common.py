@@ -79,7 +79,7 @@ class MeshInfoBase:
                 ("NUMNP", len(self.points)),
                 ("NELEM", len(self.elements)),
                 ("NGRPS", 1),
-                ("NBSETS", 0), # FIXME
+                ("NBSETS", len(bc.keys())),
                 ("NDFCD", dim),
                 ("NDFVL", dim),
                 )
@@ -157,7 +157,8 @@ class MeshInfoBase:
             raise ValueError, "invalid number of dimensions (%d)" % dim
 
         # actually output bc sections
-        assert self.faces.allocated # require -f option
+        assert self.faces.allocated # requires -f option in tetgen
+
         for bc_marker, (bc_name, bc_code) in bc.iteritems():
             face_indices = [i
                     for i, face in enumerate(self.faces)
