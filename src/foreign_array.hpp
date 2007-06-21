@@ -188,6 +188,8 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
       tSizeChangeNotifier::setSize(size);
     }
 
+    /** Set the unit size of the array and reallocate the foreign array.
+     */
     void setUnit(unsigned unit)
     {
       if (unit != Unit)
@@ -195,6 +197,14 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
         Unit = unit;
         setSizeInternal(NumberOf);
       }
+    }
+
+    /** Set the unit size of the array without reallocating. It is assumed
+     * that the correct amount of memory has already been allocated.
+     */
+    void fixUnit(unsigned unit)
+    {
+      Unit = unit;
     }
 
     ElementT &get(unsigned index)

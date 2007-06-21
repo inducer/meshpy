@@ -72,12 +72,25 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
 
 
 
-def build(mesh_info, verbose=False, refinement_func=None):
+def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
+        area_constraints=True, max_area=None):
+    """Triangulate the domain given in `mesh_info'."""
     opts = "pzqj"
     if verbose:
         opts += "VV"
     else:
         opts += "Q"
+
+    if attributes:
+        opts += "A"
+
+    if area_constraints:
+        opts += "a"
+        if max_area:
+            raise ValueError, "cannot specify both area_constraints and max_area"
+    elif max_area:
+        opts += "a%s" % repr(max_area)
+
     if refinement_func is not None:
         opts += "u"
 
@@ -101,10 +114,6 @@ def refine(input_p, verbose=False, refinement_func=None):
     output_p = MeshInfo()
     internals.triangulate(opts, input_p, output_p, MeshInfo(), refinement_func)
     return output_p
-
-
-
-
 
 
 
