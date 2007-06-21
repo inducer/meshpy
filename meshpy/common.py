@@ -54,13 +54,17 @@ class MeshInfoBase:
 
 
 
-    def write_neu(self, outfile, bc, description="MeshPy Output"):
+    def write_neu(self, outfile, bc={}, periodicity=None, description="MeshPy Output"):
         """Write the mesh out in (an approximation to) Gambit neutral mesh format.
         
         outfile is a file-like object opened for writing.
 
         bc is a dictionary mapping face markers to a tuple
         (bc_name, bc_code).
+
+        periodicity is either a tuple (face_marker, (px,py,..)) giving the 
+        face marker of the periodic boundary and the period in each coordinate
+        direction (0 if none) or the value None for no periodicity.
         """
 
         from meshpy import version
@@ -73,13 +77,19 @@ class MeshInfoBase:
         outfile.write("PROGRAM: MeshPy VERSION: %s\n" % version)
         outfile.write("%s\n" % datetime.now().ctime())
         
+        bc_markers = bc.keys()
+        if periodicity:
+            periodic_marker, periods = periodicity
+            bc_markers.append(periodic_marker)
+            
         assert len(self.points)
+
         dim = len(self.points[0])
         data = (
                 ("NUMNP", len(self.points)),
                 ("NELEM", len(self.elements)),
                 ("NGRPS", 1),
-                ("NBSETS", len(bc.keys())),
+                ("NBSETS", len(bc_markers)),
                 ("NDFCD", dim),
                 ("NDFVL", dim),
                 )
@@ -159,20 +169,35 @@ class MeshInfoBase:
         # actually output bc sections
         assert self.faces.allocated # requires -f option in tetgen
 
-        for bc_marker, (bc_name, bc_code) in bc.iteritems():
+        for bc_marker in bc_markers:
             face_indices = [i
                     for i, face in enumerate(self.faces)
                     if bc_marker == self.face_markers[i]]
 
             outfile.write("BOUNDARY CONDITIONS 2.1.2\n")
-            outfile.write("%s\t%d\t%d\t%d\t%d\n" 
-                    % (bc_name, 
-                        1, # face BC
-                        len(face_indices),
-                        0, # zero additional values per face,
-                        bc_code,
+            if bc_marker in bc:
+                # regular BC
+
+                bc_name, bc_code = bc[bc_marker]
+                outfile.write("%s\t%d\t%d\t%d\t%d\n" 
+                        % (bc_name, 
+                            1, # face BC
+                            len(face_indices),
+                            0, # zero additional values per face,
+                            bc_code,
+                            )
                         )
-                    )
+            else:
+                # periodic BC
+
+                outfile.write("periodic\t%s\t%d\t%d\t%d\n"
+                        % ("\t".join(repr(p) for p in periods),
+                            len(face_indices),
+                            0, # zero additional values per face,
+                            0,
+                            )
+                        )
+
             for i, fi in enumerate(face_indices):
                 face_nodes = frozenset(self.faces[fi])
                 adj_el = face2el[face_nodes]
@@ -187,7 +212,6 @@ class MeshInfoBase:
 
         outfile.close()
         # FIXME curved boundaries?
-        # FIXME periodic BCs
         # FIXME proper element group support
 
 
