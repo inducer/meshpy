@@ -43,7 +43,7 @@ mesh_info.regions[1] = [0,0,7, # point in volume -> second box
         1e-2, # max tet volume in region
         ]
 
-mesh = build(mesh_info, varvolume=True)
+mesh = build(mesh_info, area_constraints=True)
 
 # this is a no-op, but it shows how to access the output data
 for point in mesh.points:

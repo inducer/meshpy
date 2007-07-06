@@ -164,6 +164,9 @@ void tetrahedralizeWrapper(tetgenbehavior &bhv, tMeshInfo &in, tMeshInfo &out)
   {
     throw runtime_error("TetGen runtime error code "+boost::lexical_cast<string>(i));
   }
+
+  out.PointAttributes.fixUnit(out.numberofpointattributes);
+  out.ElementAttributes.fixUnit(out.numberoftetrahedronattributes);
 }
 
 
