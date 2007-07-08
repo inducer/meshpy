@@ -1,7 +1,3 @@
-
-
-
-
 def main():
     from math import pi, cos, sin
     from meshpy.tet import MeshInfo, build, generate_surface_of_revolution,\

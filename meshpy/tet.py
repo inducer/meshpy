@@ -87,7 +87,7 @@ internals.PBCGroup.matrix = property(_PBCGroup_get_transmat)
 
 
 def build(mesh_info, options=Options(), verbose=False, 
-        attributes=False, area_constraints=False):
+        attributes=False, volume_constraints=False, max_volume=None):
     mesh = MeshInfo()
 
     if not verbose:
@@ -95,8 +95,11 @@ def build(mesh_info, options=Options(), verbose=False,
 
     if attributes:
         options.regionattrib = 1
-    if area_constraints:
+    if volume_constraints:
         options.varvolume = 1
+    if max_volume:
+        options.fixedvolume = 1
+        options.maxvolume = max_volume
 
     internals.tetrahedralize(options, mesh_info, mesh)
     return mesh

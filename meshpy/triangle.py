@@ -73,7 +73,7 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
 
 
 def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
-        area_constraints=True, max_area=None):
+        volume_constraints=True, max_volume=None):
     """Triangulate the domain given in `mesh_info'."""
     opts = "pzqj"
     if verbose:
@@ -84,11 +84,11 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
     if attributes:
         opts += "A"
 
-    if area_constraints:
+    if volume_constraints:
         opts += "a"
-        if max_area:
+        if max_volume:
             raise ValueError, "cannot specify both area_constraints and max_area"
-    elif max_area:
+    elif max_volume:
         opts += "a%s" % repr(max_area)
 
     if refinement_func is not None:
