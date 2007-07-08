@@ -160,7 +160,7 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN, point_idx_offset
     first_ring = prev_ring = gen_ring(first_r, z)
     prev_r = first_r
     if closure == EXT_CLOSE_IN_Z:
-        polygons.extend(first_ring)
+        polygons.append(first_ring)
 
     for r, z in rz_points[1:]:
         ring = gen_ring(r, z)
@@ -170,7 +170,7 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN, point_idx_offset
         prev_r = r
 
     if closure == EXT_CLOSE_IN_Z:
-        polygons.extend(prev_ring[::-1])
+        polygons.append(prev_ring[::-1])
     if closure == EXT_CLOSED_IN_RZ:
         polygons.extend(connect_ring(first_r, first_ring, prev_r, prev_ring))
 
