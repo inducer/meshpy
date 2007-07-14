@@ -1,13 +1,27 @@
 #!/usr/bin/env python
 
-import os
+import sys
+
+try:
+    execfile("siteconf.py")
+except IOError:
+    print "*** Please run configure first."
+    sys.exit(1)
+
 from distutils.core import setup,Extension
 
-home = os.getenv("HOME")
-boost_path = "%s/pool/include/boost-1_34" % home
-include_dirs = [boost_path, "src"]
-library_dirs = ["%s/pool/lib" % home]
-libraries = ["boost_python-gcc41-mt"]
+def non_matching_config():
+    print "*** The version of your configuration template does not match"
+    print "*** the version of the setup script. Please re-run configure."
+    sys.exit(1)
+
+try:
+    MESHPY_CONF_TEMPLATE_VERSION
+except NameError:
+    non_matching_config()
+
+if MESHPY_CONF_TEMPLATE_VERSION != 1:
+    non_matching_config()
 
 triangle_macros = [
   ( "EXTERNAL_TEST", 1 ),
@@ -20,7 +34,9 @@ tetgen_macros = [
   ( "SELF_CHECK", 1 ) ,
   ]
 
-
+INCLUDE_DIRS = BOOST_INCLUDE_DIRS
+LIBRARY_DIRS = BOOST_LIBRARY_DIRS
+LIBRARIES = BPL_LIBRARIES
 
 execfile("meshpy/__init__.py")
 setup(name="MeshPy",
@@ -35,17 +51,17 @@ setup(name="MeshPy",
         Extension(
           "meshpy._triangle", 
           ["src/wrap_triangle.cpp","src/triangle.c"],
-          include_dirs = include_dirs,
-          library_dirs = library_dirs,
-          libraries = libraries,
+          include_dirs=INCLUDE_DIRS,
+          library_dirs=LIBRARY_DIRS,
+          libraries=LIBRARIES,
           define_macros=triangle_macros
           ),
         Extension(
           "meshpy._tetgen", 
           ["src/tetgen.cpp", "src/predicates.cpp", "src/wrap_tetgen.cpp"],
-          include_dirs = include_dirs,
-          library_dirs = library_dirs,
-          libraries = libraries,
+          include_dirs=INCLUDE_DIRS,
+          library_dirs=LIBRARY_DIRS,
+          libraries=LIBRARIES,
           define_macros=tetgen_macros
           ),
         ]

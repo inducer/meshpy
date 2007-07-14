@@ -1,0 +1,20 @@
+# --------------------------------------------------------------------
+# Specify your configuration below.
+# See documentation for hints.
+# --------------------------------------------------------------------
+
+MESHPY_CONF_TEMPLATE_VERSION = 1
+
+# --------------------------------------------------------------------
+# Path options
+# --------------------------------------------------------------------
+
+BOOST_INCLUDE_DIRS = [$str{BOOST_INC_DIR}]
+BOOST_LIBRARY_DIRS = [$str{BOOST_LIB_DIR}] 
+BPL_LIBRARIES = [$str{BOOST_PYTHON_LIBNAME}]
+
+# --------------------------------------------------------------------
+# Compiler flags
+# --------------------------------------------------------------------
+EXTRA_COMPILE_ARGS = [$str{CXXFLAGS}]
+

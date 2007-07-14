@@ -1,0 +1,5 @@
+all:
+	${PYTHON_EXE} setup.py build
+
+install:
+	${PYTHON_EXE} setup.py install

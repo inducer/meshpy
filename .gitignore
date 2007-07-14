@@ -12,3 +12,5 @@ MANIFEST
 test/ParaViewTrace*.pvs
 dist
 *~
+Makefile
+siteconf.py
