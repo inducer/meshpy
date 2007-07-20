@@ -38,7 +38,7 @@ INCLUDE_DIRS = BOOST_INCLUDE_DIRS
 LIBRARY_DIRS = BOOST_LIBRARY_DIRS
 LIBRARIES = BPL_LIBRARIES
 
-execfile("meshpy/__init__.py")
+execfile("src/python/__init__.py")
 setup(name="MeshPy",
       version=version,
       description="A wrapper around the TetGen and Triangle",
@@ -47,10 +47,11 @@ setup(name="MeshPy",
       license = "BSD for the wrapper/non-commercial MIT for the meshers",
       url="http://news.tiker.net/software/meshpy",
       packages = [ "meshpy" ],
+      package_dir={"meshpy": "src/python"},
       ext_modules = [
         Extension(
           "meshpy._triangle", 
-          ["src/wrap_triangle.cpp","src/triangle.c"],
+          ["src/cpp/wrap_triangle.cpp","src/cpp/triangle.c"],
           include_dirs=INCLUDE_DIRS,
           library_dirs=LIBRARY_DIRS,
           libraries=LIBRARIES,
@@ -58,7 +59,7 @@ setup(name="MeshPy",
           ),
         Extension(
           "meshpy._tetgen", 
-          ["src/tetgen.cpp", "src/predicates.cpp", "src/wrap_tetgen.cpp"],
+          ["src/cpp/tetgen.cpp", "src/cpp/predicates.cpp", "src/cpp/wrap_tetgen.cpp"],
           include_dirs=INCLUDE_DIRS,
           library_dirs=LIBRARY_DIRS,
           libraries=LIBRARIES,
