@@ -1884,6 +1884,17 @@ REAL orient3dadapt(REAL *pa, REAL *pb, REAL *pc, REAL *pd, REAL permanent)
   REAL fin1[192], fin2[192];
   int finlength;
 
+  ////////////////////////////////////////////////////////
+  // To avoid uninitialized warnings reported by valgrind.
+  int i;
+  for (i = 0; i < 8; i++) {
+    adet[i] = bdet[i] = cdet[i] = 0.0;
+  }
+  for (i = 0; i < 16; i++) {
+    abdet[i] = 0.0;
+  }
+  ////////////////////////////////////////////////////////
+
   REAL adxtail, bdxtail, cdxtail;
   REAL adytail, bdytail, cdytail;
   REAL adztail, bdztail, cdztail;

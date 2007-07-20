@@ -15,6 +15,8 @@ by Hang Si.
 [1] http://www.cs.cmu.edu/~quake/triangle.html
 [2] http://tetgen.berlios.de/
 
+MeshPy is based on TetGen 1.4.2 and Triangle 1.6.
+
 GETTING STARTED
 ---------------
 

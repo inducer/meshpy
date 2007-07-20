@@ -14,7 +14,7 @@ def main():
     points, facets = generate_surface_of_revolution(simple_rz)
 
     mesh_info.set_points(points)
-    mesh_info.set_facets(facets, [0 for i in range(len(facets))])
+    mesh_info.set_faces(facets, [0 for i in range(len(facets))])
     #mesh_info.save_nodes("test")
     #mesh_info.save_poly("test")
     #mesh_info.load_poly("test")

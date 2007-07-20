@@ -3,3 +3,6 @@ all:
 
 install:
 	${PYTHON_EXE} setup.py install
+
+clean:
+	rm build -Rf

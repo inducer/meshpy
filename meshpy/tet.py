@@ -6,7 +6,7 @@ import meshpy._tetgen as internals
 
 
 class MeshInfo(internals.MeshInfo, MeshInfoBase):
-    def set_facets(self, facets, markers=None):
+    def set_faces(self, facets, markers=None):
         if markers:
             assert len(markers) == len(facets)
 

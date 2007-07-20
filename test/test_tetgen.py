@@ -5,6 +5,7 @@ from meshpy.tet import MeshInfo, build
 
 def main():
     mesh_info = MeshInfo()
+
     mesh_info.set_points([
         (0,0,0),
         (2,0,0),
@@ -15,7 +16,8 @@ def main():
         (2,2,12),
         (0,2,12),
         ])
-    mesh_info.set_facets([
+
+    mesh_info.set_faces([
         [0,1,2,3],
         [4,5,6,7],
         [0,4,5,1],

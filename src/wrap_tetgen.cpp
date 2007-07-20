@@ -20,8 +20,7 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
   public:
     tForeignArray<REAL>		        Points; // in/out
     tForeignArray<REAL>		        PointAttributes; // in/out
-    tForeignArray<REAL>		        AdditionalPoints; // out
-    tForeignArray<REAL>		        AdditionalPointAttributes; // out
+    tForeignArray<REAL>		        PointMetricTensors; // in/out
     tForeignArray<int>		        PointMarkers; // in/out
 
     tForeignArray<int>		        Elements; // in/out
@@ -37,7 +36,6 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
 
     tForeignArray<REAL>                 FacetConstraints;
     tForeignArray<REAL>                 SegmentConstraints;
-    tForeignArray<REAL>                 NodeConstraints;
 
     tForeignArray<pbcgroup>             PBCGroups;
 
@@ -52,9 +50,7 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
     tMeshInfo()
       : Points(pointlist, numberofpoints, 3),
         PointAttributes(pointattributelist, numberofpoints, 0, &Points),
-        AdditionalPoints(addpointlist, numberofaddpoints, 3),
-        AdditionalPointAttributes(addpointattributelist, 
-            numberofaddpoints, 0, &AdditionalPoints),
+        PointMetricTensors(pointmtrlist, numberofpoints, 0, &Points),
 	PointMarkers(pointmarkerlist, numberofpoints, 1, &Points),
 
 	Elements(tetrahedronlist, numberoftetrahedra, 4),
@@ -72,7 +68,6 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
 
         FacetConstraints(facetconstraintlist, numberoffacetconstraints, 2),
         SegmentConstraints(facetconstraintlist, numberofsegmentconstraints, 3),
-        NodeConstraints(nodeconstraintlist, numberofnodeconstraints, 2),
 
         PBCGroups(pbcgrouplist, numberofpbcgroups),
 
@@ -90,6 +85,11 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
       return numberofpointattributes;
     }
 
+    unsigned numberOfPointMetricTensors() const
+    {
+      return numberofpointmtrs;
+    }
+
     unsigned numberOfElementAttributes() const
     {
       return numberoftetrahedronattributes;
@@ -99,6 +99,12 @@ struct tMeshInfo : public tetgenio, public boost::noncopyable
     {
       PointAttributes.setUnit(attrs);
       numberofpointattributes = attrs;
+    }
+
+    void setNumberOfPointMetricTensors(unsigned mtrs)
+    {
+      PointMetricTensors.setUnit(mtrs);
+      numberofpointmtrs = mtrs;
     }
 
     void setNumberOfElementAttributes(unsigned attrs)
@@ -166,6 +172,7 @@ void tetrahedralizeWrapper(tetgenbehavior &bhv, tMeshInfo &in, tMeshInfo &out)
   }
 
   out.PointAttributes.fixUnit(out.numberofpointattributes);
+  out.PointMetricTensors.fixUnit(out.numberofpointmtrs);
   out.ElementAttributes.fixUnit(out.numberoftetrahedronattributes);
 }
 
@@ -261,8 +268,7 @@ BOOST_PYTHON_MODULE(_tetgen)
       ("MeshInfo", init<>())
       .def_readonly("points", &cl::Points)
       .def_readonly("point_attributes", &cl::PointAttributes)
-      .def_readonly("additional_points", &cl::AdditionalPoints)
-      .def_readonly("additional_point_attributes", &cl::AdditionalPointAttributes)
+      .def_readonly("point_metric_tensors", &cl::PointMetricTensors)
       .def_readonly("point_markers", &cl::PointMarkers)
 
       .def_readonly("elements", &cl::Elements)
@@ -280,7 +286,6 @@ BOOST_PYTHON_MODULE(_tetgen)
 
       .def_readonly("facet_constraints", &cl::FacetConstraints)
       .def_readonly("segment_constraints", &cl::SegmentConstraints)
-      .def_readonly("node_constraints", &cl::NodeConstraints)
 
       .def_readonly("pbc_groups", &cl::PBCGroups)
 
@@ -306,7 +311,6 @@ BOOST_PYTHON_MODULE(_tetgen)
       .DEF_METHOD(save_poly)
 
       .DEF_METHOD(load_node)
-      .DEF_METHOD(load_addnodes)
       .DEF_METHOD(load_pbc)
       .DEF_METHOD(load_var)
       .DEF_METHOD(load_mtr)
@@ -356,11 +360,10 @@ BOOST_PYTHON_MODULE(_tetgen)
     typedef tetgenbehavior cl;
     class_<cl, boost::noncopyable>("Options", init<>())
       .DEF_RW_MEMBER(plc)
-      .DEF_RW_MEMBER(refine)
       .DEF_RW_MEMBER(quality)
-      .DEF_RW_MEMBER(smooth)
+      .DEF_RW_MEMBER(refine)
+      .DEF_RW_MEMBER(coarse)
       .DEF_RW_MEMBER(metric)
-      .DEF_RW_MEMBER(bgmesh)
       .DEF_RW_MEMBER(varvolume)
       .DEF_RW_MEMBER(fixedvolume)
       .DEF_RW_MEMBER(insertaddpoints)
@@ -369,10 +372,13 @@ BOOST_PYTHON_MODULE(_tetgen)
       .DEF_RW_MEMBER(conformdel)
       .DEF_RW_MEMBER(diagnose)
       .DEF_RW_MEMBER(zeroindex)
+      .DEF_RW_MEMBER(optlevel)
+      .DEF_RW_MEMBER(optpasses)
       .DEF_RW_MEMBER(order)
       .DEF_RW_MEMBER(facesout)
       .DEF_RW_MEMBER(edgesout)
       .DEF_RW_MEMBER(neighout)
+      .DEF_RW_MEMBER(voroout)
       .DEF_RW_MEMBER(meditview)
       .DEF_RW_MEMBER(gidview)
       .DEF_RW_MEMBER(geomview)
@@ -387,10 +393,10 @@ BOOST_PYTHON_MODULE(_tetgen)
       .DEF_RW_MEMBER(nojettison)
       .DEF_RW_MEMBER(steiner)
       .DEF_RW_MEMBER(fliprepair)
+      .DEF_RW_MEMBER(offcenter)
       .DEF_RW_MEMBER(docheck)
       .DEF_RW_MEMBER(quiet)
       .DEF_RW_MEMBER(verbose)
-      .DEF_RW_MEMBER(tol)
       .DEF_RW_MEMBER(useshelles)
       .DEF_RW_MEMBER(minratio)
       .DEF_RW_MEMBER(goodratio)
