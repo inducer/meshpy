@@ -9,10 +9,10 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             "points", "point_attributes", "point_markers", 
             "elements", "element_attributes", "element_volumes", 
             "neighbors", 
-            "faces", "face_markers", 
+            "facets", "facet_markers", 
             "holes", 
             "regions", 
-            "edges", "edge_markers", 
+            "faces", "face_markers", 
             "normals", 
             ]
 
@@ -51,16 +51,16 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
                     for j,v in enumerate(tup):
                         dest_array[i, j] = v
 
-    def set_faces(self, faces, face_markers=None):
-        self.faces.resize(len(faces))
+    def set_facets(self, facets, facet_markers=None):
+        self.facets.resize(len(facets))
         
-        for i, face in enumerate(faces):
-            self.faces[i] = face
+        for i, facet in enumerate(facets):
+            self.facets[i] = facet
 
-        if face_markers is not None:
-            self.face_markers.setup()
-            for i, mark in enumerate(face_markers):
-                self.face_markers[i] = mark
+        if facet_markers is not None:
+            self.facet_markers.setup()
+            for i, mark in enumerate(facet_markers):
+                self.facet_markers[i] = mark
 
     def dump(self):
         for name in self._constituents:

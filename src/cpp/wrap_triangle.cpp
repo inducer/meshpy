@@ -25,15 +25,15 @@ struct tMeshInfo : public triangulateio, public boost::noncopyable
     tForeignArray<REAL>		ElementVolumes; // in only
     tForeignArray<int>		Neighbors; // out only
 
-    tForeignArray<int>		Faces; // in/out
-    tForeignArray<int>		FaceMarkers; // in/out
+    tForeignArray<int>		Facets; // in/out
+    tForeignArray<int>		FacetMarkers; // in/out
     
     tForeignArray<REAL>		Holes; // in only
 
     tForeignArray<REAL>		Regions; // in only
 
-    tForeignArray<int>		Edges; // out only
-    tForeignArray<int>		EdgeMarkers; // out only
+    tForeignArray<int>		Faces; // out only
+    tForeignArray<int>		FaceMarkers; // out only
     tForeignArray<REAL>		Normals; // out only
 
   public:
@@ -50,16 +50,16 @@ struct tMeshInfo : public triangulateio, public boost::noncopyable
 	Neighbors(neighborlist, 
             numberoftriangles, 3, &Elements, true),
 
-	Faces(segmentlist, numberofsegments, 2, NULL, true),
-	FaceMarkers(segmentmarkerlist, numberofsegments, 1, &Faces, true),
+	Facets(segmentlist, numberofsegments, 2, NULL, true),
+	FacetMarkers(segmentmarkerlist, numberofsegments, 1, &Facets, true),
 
 	Holes(holelist, numberofholes, 2, NULL, true),
 
 	Regions(regionlist, numberofregions, 4, NULL, true),
 
-	Edges(edgelist, numberofedges, 2, NULL, true),
-	EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges, true),
-	Normals(normlist, numberofedges, 2, &Edges, true)
+	Faces(edgelist, numberofedges, 2, NULL, true),
+	FaceMarkers(edgemarkerlist, numberofedges, 1, &Faces, true),
+	Normals(normlist, numberofedges, 2, &Faces, true)
     {
       numberofpointattributes = 0;
       numberofcorners = 3;
@@ -103,15 +103,15 @@ struct tMeshInfo : public triangulateio, public boost::noncopyable
       ElementVolumes = src.ElementVolumes;
       Neighbors = src.Neighbors;
 
-      Faces = src.Faces;
-      FaceMarkers = src.FaceMarkers;
+      Facets = src.Facets;
+      FacetMarkers = src.FacetMarkers;
 
       Holes = src.Holes;
 
       Regions = src.Regions;
 
-      Edges = src.Edges;
-      EdgeMarkers = src.EdgeMarkers;
+      Faces = src.Faces;
+      FaceMarkers = src.FaceMarkers;
       Normals = src.Normals;
 
       return *this;
@@ -205,15 +205,15 @@ BOOST_PYTHON_MODULE(_triangle)
       .def_readonly("element_volumes", &cl::ElementVolumes)
       .def_readonly("neighbors", &cl::Neighbors)
 
-      .def_readonly("faces", &cl::Faces)
-      .def_readonly("face_markers", &cl::FaceMarkers)
+      .def_readonly("facets", &cl::Facets)
+      .def_readonly("facet_markers", &cl::FacetMarkers)
 
       .def_readonly("holes", &cl::Holes)
 
       .def_readonly("regions", &cl::Regions)
 
-      .def_readonly("edges", &cl::Edges)
-      .def_readonly("edge_markers", &cl::EdgeMarkers)
+      .def_readonly("faces", &cl::Faces)
+      .def_readonly("face_markers", &cl::FaceMarkers)
 
       .def_readonly("normals", &cl::Normals)
 
@@ -232,7 +232,7 @@ BOOST_PYTHON_MODULE(_triangle)
   exposePODForeignArray<REAL>("RealArray");
   exposePODForeignArray<int>("IntArray");
 
-  class_<tVertex, bases<>, tVertex, boost::noncopyable>("Vertex", no_init)
+  class_<tVertex, tVertex, boost::noncopyable>("Vertex", no_init)
     .add_property("x", &tVertex::x)
     .add_property("y", &tVertex::y)
     ;

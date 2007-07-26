@@ -15,238 +15,241 @@ using namespace std;
 
 
 
-struct tMeshInfo : public tetgenio, public boost::noncopyable
+namespace 
 {
-  public:
-    tForeignArray<REAL>		        Points; // in/out
-    tForeignArray<REAL>		        PointAttributes; // in/out
-    tForeignArray<REAL>		        PointMetricTensors; // in/out
-    tForeignArray<int>		        PointMarkers; // in/out
-
-    tForeignArray<int>		        Elements; // in/out
-    tForeignArray<REAL>		        ElementAttributes; // in/out
-    tForeignArray<REAL>		        ElementVolumes; // out
-    tForeignArray<int>		        Neighbors; // out
-
-    tForeignArray<tetgenio::facet>	Facets;
-    tForeignArray<int>                  FacetMarkers;
-
-    tForeignArray<REAL>                 Holes;
-    tForeignArray<REAL>                 Regions;
-
-    tForeignArray<REAL>                 FacetConstraints;
-    tForeignArray<REAL>                 SegmentConstraints;
-
-    tForeignArray<pbcgroup>             PBCGroups;
-
-    tForeignArray<int>                  Faces;
-    tForeignArray<int>                  AdjacentElements;
-    tForeignArray<int>                  FaceMarkers;
-
-    tForeignArray<int>                  Edges;
-    tForeignArray<int>                  EdgeMarkers;
-
-  public:
-    tMeshInfo()
-      : Points(pointlist, numberofpoints, 3),
-        PointAttributes(pointattributelist, numberofpoints, 0, &Points),
-        PointMetricTensors(pointmtrlist, numberofpoints, 0, &Points),
-	PointMarkers(pointmarkerlist, numberofpoints, 1, &Points),
-
-	Elements(tetrahedronlist, numberoftetrahedra, 4),
-	ElementAttributes(tetrahedronattributelist, 
-            numberoftetrahedra, 0, &Elements),
-	ElementVolumes(tetrahedronvolumelist, numberoftetrahedra, 1, &Elements),
-	Neighbors(neighborlist, numberoftetrahedra, 4, &Elements),
-
-        Facets(facetlist, numberoffacets),
-        FacetMarkers(facetmarkerlist, numberoffacets, 1, &Facets),
-
-	Holes(holelist, numberofholes, 3),
-
-	Regions(regionlist, numberofregions, 5),
-
-        FacetConstraints(facetconstraintlist, numberoffacetconstraints, 2),
-        SegmentConstraints(facetconstraintlist, numberofsegmentconstraints, 3),
-
-        PBCGroups(pbcgrouplist, numberofpbcgroups),
-
-        Faces(trifacelist, numberoftrifaces, 3),
-        AdjacentElements(adjtetlist, numberoftrifaces, 2, &Faces),
-        FaceMarkers(trifacemarkerlist, numberoftrifaces, 1, &Faces),
-
-        Edges(edgelist, numberofedges, 2),
-        EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges)
-    {
-    } 
-    
-    unsigned numberOfPointAttributes() const
-    {
-      return numberofpointattributes;
-    }
-
-    unsigned numberOfPointMetricTensors() const
-    {
-      return numberofpointmtrs;
-    }
-
-    unsigned numberOfElementAttributes() const
-    {
-      return numberoftetrahedronattributes;
-    }
-
-    void setNumberOfPointAttributes(unsigned attrs)
-    {
-      PointAttributes.setUnit(attrs);
-      numberofpointattributes = attrs;
-    }
-
-    void setNumberOfPointMetricTensors(unsigned mtrs)
-    {
-      PointMetricTensors.setUnit(mtrs);
-      numberofpointmtrs = mtrs;
-    }
-
-    void setNumberOfElementAttributes(unsigned attrs)
-    {
-      ElementAttributes.setUnit(attrs);
-      numberoftetrahedronattributes = attrs;
-    }
-
-    /*
-    tTriangulationParameters &operator=(const tTriangulationParameters &src)
-    {
-      numberofpointattributes = src.numberofpointattributes ;
-      numberofcorners = src.numberofcorners;
-      numberoftriangleattributes = src.numberoftriangleattributes;
-
-      Points = src.Points;
-      PointAttributes = src.PointAttributes;
-      PointMarkers = src.PointMarkers;
-
-      Triangles = src.Triangles;
-      TriangleAttributes = src.TriangleAttributes;
-      TriangleAreas = src.TriangleAreas;
-      Neighbors = src.Neighbors;
-
-      Segments = src.Segments;
-      SegmentMarkers = src.SegmentMarkers;
-
-      Holes = src.Holes;
-
-      Regions = src.Regions;
-
-      Edges = src.Edges;
-      EdgeMarkers = src.EdgeMarkers;
-      Normals = src.Normals;
-
-      return *this;
-    }
-    */
-};
-
-
-
-
-/*
-tTriangulationParameters *copyTriangulationParameters(const tTriangulationParameters &src)
-{
-  auto_ptr<tTriangulationParameters> copy(new tTriangulationParameters);
-  *copy = src;
-  return copy.release();
-}
-*/
-
-
-
-
-void tetrahedralizeWrapper(tetgenbehavior &bhv, tMeshInfo &in, tMeshInfo &out)
-{
-  try
+  struct tMeshInfo : public tetgenio, public boost::noncopyable
   {
-    tetrahedralize(&bhv, &in, &out);
-  }
-  catch (int &i)
+    public:
+      tForeignArray<REAL>		        Points; // in/out
+      tForeignArray<REAL>		        PointAttributes; // in/out
+      tForeignArray<REAL>		        PointMetricTensors; // in/out
+      tForeignArray<int>		        PointMarkers; // in/out
+
+      tForeignArray<int>		        Elements; // in/out
+      tForeignArray<REAL>		        ElementAttributes; // in/out
+      tForeignArray<REAL>		        ElementVolumes; // out
+      tForeignArray<int>		        Neighbors; // out
+
+      tForeignArray<tetgenio::facet>	  Facets;
+      tForeignArray<int>                  FacetMarkers;
+
+      tForeignArray<REAL>                 Holes;
+      tForeignArray<REAL>                 Regions;
+
+      tForeignArray<REAL>                 FacetConstraints;
+      tForeignArray<REAL>                 SegmentConstraints;
+
+      tForeignArray<pbcgroup>             PBCGroups;
+
+      tForeignArray<int>                  Faces;
+      tForeignArray<int>                  AdjacentElements;
+      tForeignArray<int>                  FaceMarkers;
+
+      tForeignArray<int>                  Edges;
+      tForeignArray<int>                  EdgeMarkers;
+
+    public:
+      tMeshInfo()
+        : Points(pointlist, numberofpoints, 3),
+          PointAttributes(pointattributelist, numberofpoints, 0, &Points),
+          PointMetricTensors(pointmtrlist, numberofpoints, 0, &Points),
+          PointMarkers(pointmarkerlist, numberofpoints, 1, &Points),
+
+          Elements(tetrahedronlist, numberoftetrahedra, 4),
+          ElementAttributes(tetrahedronattributelist, 
+              numberoftetrahedra, 0, &Elements),
+          ElementVolumes(tetrahedronvolumelist, numberoftetrahedra, 1, &Elements),
+          Neighbors(neighborlist, numberoftetrahedra, 4, &Elements),
+
+          Facets(facetlist, numberoffacets),
+          FacetMarkers(facetmarkerlist, numberoffacets, 1, &Facets),
+
+          Holes(holelist, numberofholes, 3),
+
+          Regions(regionlist, numberofregions, 5),
+
+          FacetConstraints(facetconstraintlist, numberoffacetconstraints, 2),
+          SegmentConstraints(facetconstraintlist, numberofsegmentconstraints, 3),
+
+          PBCGroups(pbcgrouplist, numberofpbcgroups),
+
+          Faces(trifacelist, numberoftrifaces, 3),
+          AdjacentElements(adjtetlist, numberoftrifaces, 2, &Faces),
+          FaceMarkers(trifacemarkerlist, numberoftrifaces, 1, &Faces),
+
+          Edges(edgelist, numberofedges, 2),
+          EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges)
+      {
+      } 
+      
+      unsigned numberOfPointAttributes() const
+      {
+        return numberofpointattributes;
+      }
+
+      unsigned numberOfPointMetricTensors() const
+      {
+        return numberofpointmtrs;
+      }
+
+      unsigned numberOfElementAttributes() const
+      {
+        return numberoftetrahedronattributes;
+      }
+
+      void setNumberOfPointAttributes(unsigned attrs)
+      {
+        PointAttributes.setUnit(attrs);
+        numberofpointattributes = attrs;
+      }
+
+      void setNumberOfPointMetricTensors(unsigned mtrs)
+      {
+        PointMetricTensors.setUnit(mtrs);
+        numberofpointmtrs = mtrs;
+      }
+
+      void setNumberOfElementAttributes(unsigned attrs)
+      {
+        ElementAttributes.setUnit(attrs);
+        numberoftetrahedronattributes = attrs;
+      }
+
+      /*
+      tTriangulationParameters &operator=(const tTriangulationParameters &src)
+      {
+        numberofpointattributes = src.numberofpointattributes ;
+        numberofcorners = src.numberofcorners;
+        numberoftriangleattributes = src.numberoftriangleattributes;
+
+        Points = src.Points;
+        PointAttributes = src.PointAttributes;
+        PointMarkers = src.PointMarkers;
+
+        Triangles = src.Triangles;
+        TriangleAttributes = src.TriangleAttributes;
+        TriangleAreas = src.TriangleAreas;
+        Neighbors = src.Neighbors;
+
+        Segments = src.Segments;
+        SegmentMarkers = src.SegmentMarkers;
+
+        Holes = src.Holes;
+
+        Regions = src.Regions;
+
+        Edges = src.Edges;
+        EdgeMarkers = src.EdgeMarkers;
+        Normals = src.Normals;
+
+        return *this;
+      }
+      */
+  };
+
+
+
+
+  /*
+  tTriangulationParameters *copyTriangulationParameters(const tTriangulationParameters &src)
   {
-    throw runtime_error("TetGen runtime error code "+boost::lexical_cast<string>(i));
+    auto_ptr<tTriangulationParameters> copy(new tTriangulationParameters);
+    *copy = src;
+    return copy.release();
+  }
+  */
+
+
+
+
+  void tetrahedralizeWrapper(tetgenbehavior &bhv, tMeshInfo &in, tMeshInfo &out)
+  {
+    try
+    {
+      tetrahedralize(&bhv, &in, &out);
+    }
+    catch (int &i)
+    {
+      throw runtime_error("TetGen runtime error code "+boost::lexical_cast<string>(i));
+    }
+
+    out.PointAttributes.fixUnit(out.numberofpointattributes);
+    out.PointMetricTensors.fixUnit(out.numberofpointmtrs);
+    out.ElementAttributes.fixUnit(out.numberoftetrahedronattributes);
   }
 
-  out.PointAttributes.fixUnit(out.numberofpointattributes);
-  out.PointMetricTensors.fixUnit(out.numberofpointmtrs);
-  out.ElementAttributes.fixUnit(out.numberoftetrahedronattributes);
-}
+
+
+
+  template <std::size_t owner_arg = 1, class Base = default_call_policies>
+  struct manage_new_internal_reference
+      : with_custodian_and_ward_postcall<0, owner_arg, Base>
+  {
+     typedef manage_new_object result_converter;
+  };
 
 
 
 
-template <std::size_t owner_arg = 1, class Base = default_call_policies>
-struct manage_new_internal_reference
-    : with_custodian_and_ward_postcall<0, owner_arg, Base>
-{
-   typedef manage_new_object result_converter;
-};
+  tForeignArray<tetgenio::polygon> *facet_get_polygons(tetgenio::facet &self)
+  {
+    return new tForeignArray<tetgenio::polygon>(
+        self.polygonlist, self.numberofpolygons);
+  }
 
 
 
 
-tForeignArray<tetgenio::polygon> *facet_get_polygons(tetgenio::facet &self)
-{
-  return new tForeignArray<tetgenio::polygon>(
-      self.polygonlist, self.numberofpolygons);
-}
-
-
-
-
-tForeignArray<REAL> *facet_get_holes(tetgenio::facet &self)
-{
-  return new tForeignArray<REAL>(self.holelist, self.numberofholes);
-}
+  tForeignArray<REAL> *facet_get_holes(tetgenio::facet &self)
+  {
+    return new tForeignArray<REAL>(self.holelist, self.numberofholes);
+  }
 
 
 
 
 
-tForeignArray<int> *polygon_get_vertices(tetgenio::polygon &self)
-{
-  return new tForeignArray<int>(self.vertexlist, self.numberofvertices);
-}
+  tForeignArray<int> *polygon_get_vertices(tetgenio::polygon &self)
+  {
+    return new tForeignArray<int>(self.vertexlist, self.numberofvertices);
+  }
 
 
 
 
 
-REAL pbcgroup_get_transmat_entry(tetgenio::pbcgroup &self, long i, long j)
-{
-  if (i < 0) i += 4;
-  if (j < 0) j += 4;
+  REAL pbcgroup_get_transmat_entry(tetgenio::pbcgroup &self, long i, long j)
+  {
+    if (i < 0) i += 4;
+    if (j < 0) j += 4;
 
-  if (i < 0 || i >= 4 || j < 0 || j >= 4)
-    PYTHON_ERROR(IndexError, "transform matrix index out of bounds");
-  return self.transmat[i][j];
-}
-
-
-
-
-
-void pbcgroup_set_transmat_entry(tetgenio::pbcgroup &self, long i, long j, REAL value)
-{
-  if (i < 0) i += 4;
-  if (j < 0) j += 4;
-
-  if (i < 0 || i >= 4 || j < 0 || j >= 4)
-    PYTHON_ERROR(IndexError, "transform matrix index out of bounds");
-  self.transmat[i][j] = value;
-}
+    if (i < 0 || i >= 4 || j < 0 || j >= 4)
+      PYTHON_ERROR(IndexError, "transform matrix index out of bounds");
+    return self.transmat[i][j];
+  }
 
 
 
 
 
-tForeignArray<int> *pbcgroup_get_pointpairs(tetgenio::pbcgroup &self)
-{
-  return new tForeignArray<int>(self.pointpairlist, self.numberofpointpairs);
+  void pbcgroup_set_transmat_entry(tetgenio::pbcgroup &self, long i, long j, REAL value)
+  {
+    if (i < 0) i += 4;
+    if (j < 0) j += 4;
+
+    if (i < 0 || i >= 4 || j < 0 || j >= 4)
+      PYTHON_ERROR(IndexError, "transform matrix index out of bounds");
+    self.transmat[i][j] = value;
+  }
+
+
+
+
+
+  tForeignArray<int> *pbcgroup_get_pointpairs(tetgenio::pbcgroup &self)
+  {
+    return new tForeignArray<int>(self.pointpairlist, self.numberofpointpairs, 2);
+  }
 }
 
 
@@ -333,15 +336,18 @@ BOOST_PYTHON_MODULE(_tetgen)
   {
     typedef tetgenio::facet cl;
     class_<cl, boost::noncopyable>("Facet", no_init)
-      .def("get_polygons", facet_get_polygons, manage_new_internal_reference<>())
-      .def("get_holes", facet_get_holes, manage_new_internal_reference<>())
+      .add_property("polygons", 
+          make_function(facet_get_polygons, manage_new_internal_reference<>()))
+      .add_property("holes", 
+          make_function(facet_get_holes, manage_new_internal_reference<>()))
       ;
   }
 
   {
     typedef tetgenio::polygon cl;
     class_<cl, boost::noncopyable>("Polygon", no_init)
-      .def("get_vertices", polygon_get_vertices, manage_new_internal_reference<>())
+      .add_property("vertices", 
+          make_function(polygon_get_vertices, manage_new_internal_reference<>()))
       ;
   }
 
@@ -352,7 +358,8 @@ BOOST_PYTHON_MODULE(_tetgen)
       .def_readwrite("facet_marker_2", &cl::fmark2)
       .def("get_transmat_entry", pbcgroup_get_transmat_entry)
       .def("set_transmat_entry", pbcgroup_set_transmat_entry)
-      .def("get_point_pairs", pbcgroup_get_pointpairs, manage_new_internal_reference<>())
+      .add_property("point_pairs", 
+          make_function(pbcgroup_get_pointpairs, manage_new_internal_reference<>()))
       ;
   }
 

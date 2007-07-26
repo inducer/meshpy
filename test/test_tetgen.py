@@ -17,7 +17,7 @@ def main():
         (0,2,12),
         ])
 
-    mesh_info.set_faces([
+    mesh_info.set_facets([
         [0,1,2,3],
         [4,5,6,7],
         [0,4,5,1],

@@ -6,7 +6,7 @@ import meshpy._tetgen as internals
 
 
 class MeshInfo(internals.MeshInfo, MeshInfoBase):
-    def set_faces(self, facets, markers=None):
+    def set_facets(self, facets, markers=None):
         if markers:
             assert len(markers) == len(facets)
 
@@ -26,10 +26,23 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             for i, mark in enumerate(markers):
                 self.facet_markers[i] = mark
 
+    @property
+    def face_vertex_indices_to_face_marker(self):
+        try:
+            return self._fvi2fm
+        except AttributeError:
+            result = {}
+
+            for i, face in enumerate(self.faces):
+                result[frozenset(face)] = self.face_markers[i]
+
+            self._fvi2fm = result
+            return result
+
     def dump(self):
         for name in ["points"]:
             dump_array(name, getattr(self, name))
-        for ifacet, facet in enumerate(self.facets):
+        for ifacet, facet in enumerate(self.faces):
             print "facet %d:" % ifacet
             for ipolygon, polygon in enumerate(facet.polygons):
                 print "  polygon %d: vertices [%s]" % \
@@ -59,29 +72,52 @@ class Options(internals.Options):
 
 
 def _PBCGroup_get_transmat(self):
-    return PBCGroupTransmat(self)
+    import pylinear.array as num
+
+    return num.array(
+            [[self.get_transmat_entry(i,j) 
+                for j in xrange(4)]
+                for i in xrange(4)])
 
 
 
 
-class PBCGroupTransmat:
-    def __init__(self, pbcgroup):
-        self.pbcgroup = pbcgroup
+def _PBCGroup_set_transmat(self, matrix):
+    import pylinear.array as num
 
-    def __getitem__(self, (i,j)):
-        return self.pcgroup.get_transmat_entry(i, j)
-
-    def __setitem__(self, (i,j), v):
-        return self.pcgroup.set_transmat_entry(i, j, v)
+    for i in xrange(4):
+        for j in xrange(4):
+            self.set_transmat_entry(i, j, matrix[i,j])
 
 
 
 
-internals.Facet.polygons = property(internals.Facet.get_polygons)
-internals.Facet.holes = property(internals.Facet.get_holes)
-internals.Polygon.vertices = property(internals.Polygon.get_vertices)
-internals.PBCGroup.point_pairs = property(internals.PBCGroup.get_point_pairs)
-internals.PBCGroup.matrix = property(_PBCGroup_get_transmat)
+def _PBCGroup_set_transform(self, matrix=None, translation=None):
+    for i in xrange(4):
+        for j in xrange(4):
+            self.set_transmat_entry(i, j, 0)
+
+    self.set_transmat_entry(3, 3, 1)
+
+    if matrix is not None:
+        for i in xrange(3):
+            for j in xrange(3):
+                self.set_transmat_entry(i, j, matrix[i][j])
+    else:
+        for i in xrange(3):
+            self.set_transmat_entry(i, i, 1)
+
+    if translation is not None:
+        for i in xrange(3):
+            self.set_transmat_entry(i, 3, translation[i])
+
+
+    
+
+internals.PBCGroup.matrix = property(
+        _PBCGroup_get_transmat,
+        _PBCGroup_set_transmat)
+internals.PBCGroup.set_transform = _PBCGroup_set_transform
 
 
 
@@ -114,7 +150,46 @@ EXT_CLOSED_IN_RZ = 2
 
 
 
-def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN, point_idx_offset=0):
+def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN, 
+        point_idx_offset=0, ring_tags=None, closure_tag=0):
+    """Extrude a given connected `base_shape' (a list of (x,y) points)
+    along the z axis. For each step in the extrusion, the base shape
+    is multiplied by a radius and shifted in the z direction. Radius
+    and z offset are given by `rz_points', which is a list of
+    (r, z) tuples.
+
+    Returns (points, facets), where points is a list of points
+    and facets is a list of tuples of indices into that point list, 
+    each tuple specifying a polygon. If point_idx_offset is not
+    zero, these indices start at this number. There may be a third
+    return value, see `facet_markers' below.
+
+    The extrusion proceeds by generating quadrilaterals connecting each
+    ring.  If any given radius in `rz_points' is 0, triangle fans are
+    produced instead of quads to provide non-degenerate closure.
+
+    If `closure' is EXT_OPEN, no efforts are made to put end caps on the
+    extrusion. 
+
+    Specifying `closure' as EXT_CLOSE_IN_Z is (almost)
+    equivalent to adding points with zero radius at the beginning 
+    at end of the rz_points list. The z coordinates are equal to 
+    the existing first and last points in that list. (This case is
+    handled more efficiently by just generating big flat facets.
+    Since these facets are always flat, triangle fans are 
+    unnecessary.)
+
+    If `closure' is EXT_CLOSED_IN_RZ, then a torus-like structure
+    is assumed and the last ring is just connected to the first.
+
+    If `ring_tags' is not None, it is an list of tags added to each
+    ring. There should be len(rz_points)-1 entries in this list.
+    If rings are added because of closure options, they receive the
+    tag `closure_tag'.  If `facet_markers' is given, this function 
+    returns (points, facets, tags), where tags is is a list containing 
+    a tag for each generated facet.
+    """
+
     assert len(rz_points) > 0
 
     def gen_ring(r, z):
@@ -153,37 +228,61 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN, point_idx_offset
             my_pairs = pair_with_successor(ring)
             return [(a, b, c, d) for ((a,b), (d,c)) in zip(prev_pairs, my_pairs)]
 
+
+    def add_polygons(new_polys, tag):
+        polygons.extend(new_polys)
+
+        if ring_tags is not None:
+            tags.extend(len(new_polys)*[tag])
+
     points = []
     polygons = []
+    tags = []
 
     first_r, z = rz_points[0]
     first_ring = prev_ring = gen_ring(first_r, z)
     prev_r = first_r
     if closure == EXT_CLOSE_IN_Z:
-        polygons.append(first_ring)
+        add_polygons([tuple(first_ring)], closure_tag)
 
-    for r, z in rz_points[1:]:
+    for i, (r, z) in enumerate(rz_points[1:]):
         ring = gen_ring(r, z)
-        polygons.extend(connect_ring(r, ring, prev_r, prev_ring))
+
+        if ring_tags is not None:
+            ring_tag = ring_tags[i]
+        else:
+            ring_tag = None
+
+        add_polygons(
+                connect_ring(r, ring, prev_r, prev_ring),
+                ring_tag)
 
         prev_ring = ring
         prev_r = r
 
     if closure == EXT_CLOSE_IN_Z:
-        polygons.append(prev_ring[::-1])
+        add_polygons([tuple(prev_ring[::-1])], closure_tag)
     if closure == EXT_CLOSED_IN_RZ:
-        polygons.extend(connect_ring(first_r, first_ring, prev_r, prev_ring))
+        add_polygons(connect_ring(
+            first_r, first_ring, prev_r, prev_ring),
+            closure_tag)
 
-    return points, polygons
+    if ring_tags is not None:
+        return points, polygons, tags
+    else:
+        return points, polygons
 
 
 
 
-def generate_surface_of_revolution(rz_points, closure=EXT_OPEN, radial_subdiv=16, point_idx_offset=0):
+def generate_surface_of_revolution(rz_points, 
+        closure=EXT_OPEN, radial_subdiv=16, 
+        point_idx_offset=0, ring_tags=None,
+        closure_tag=0):
     from math import sin, cos, pi
 
     dphi = 2*pi/radial_subdiv
     base_shape = [(cos(dphi*i), sin(dphi*i)) for i in range(radial_subdiv)]
     return generate_extrusion(rz_points, base_shape, closure=closure,
-            point_idx_offset=point_idx_offset)
-            
+            point_idx_offset=point_idx_offset,
+            ring_tags=ring_tags, closure_tag=closure_tag)

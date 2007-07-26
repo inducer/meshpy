@@ -160,7 +160,7 @@ class MeshInfoBase:
                         frozenset([el[1], el[2], el[3]]),
                         frozenset([el[2], el[0], el[3]]),
                         ]
-                for fi, face in enumerate(tet_faces):
+                for fi, face in enumerate(faces):
                     face2el.setdefault(face, []).append((ti, fi+1))
 
         else:

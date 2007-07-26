@@ -1,8 +1,14 @@
-all:
+.PHONY	: all install clean tags
+
+all: tags
 	${PYTHON_EXE} setup.py build
 
-install:
+install: tags
 	${PYTHON_EXE} setup.py install
 
 clean:
-	rm build -Rf
+	rm -Rf build
+	rm tags
+
+tags:
+	ctags -R src || true

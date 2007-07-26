@@ -39,7 +39,8 @@ namespace {
     static object getitem(FA &self, long idx)
     {
       if (idx < 0) idx += self.size();
-      if (idx >= (long) self.size()) PYTHON_ERROR(IndexError, "index out of bounds");
+      if (idx < 0 || idx >= (long) self.size()) 
+        PYTHON_ERROR(IndexError, "index out of bounds");
         
       if (self.unit() > 1)
       {
@@ -60,9 +61,11 @@ namespace {
       long i_sub = extract<int>(idx[1]);
 
       if (i_main < 0) idx += self.size();
-      if (i_main >= (long) self.size()) PYTHON_ERROR(IndexError, "index out of bounds");
+      if (i_main < 0 || i_main >= (long) self.size()) 
+        PYTHON_ERROR(IndexError, "index out of bounds");
       if (i_sub < 0) idx += self.unit();
-      if (i_sub >= (long) self.unit()) PYTHON_ERROR(IndexError, "subindex out of bounds");
+      if (i_sub < 0 || i_sub >= (long) self.unit()) 
+        PYTHON_ERROR(IndexError, "subindex out of bounds");
 
       return object(self.getSub(i_main, i_sub));
     }
@@ -70,7 +73,8 @@ namespace {
     static void setitem(FA &self, long idx, object value)
     {
       if (idx < 0) idx += self.size();
-      if (idx >= (long) self.size()) PYTHON_ERROR(IndexError, "index out of bounds");
+      if (idx < 0 || idx >= (long) self.size()) 
+        PYTHON_ERROR(IndexError, "index out of bounds");
 
       if (self.unit() > 1)
       {
@@ -92,9 +96,11 @@ namespace {
       long i_sub = extract<int>(idx[1]);
 
       if (i_main < 0) idx += self.size();
-      if (i_main >= (long) self.size()) PYTHON_ERROR(IndexError, "index out of bounds");
+      if (i_main < 0 || i_main >= (long) self.size()) 
+        PYTHON_ERROR(IndexError, "index out of bounds");
       if (i_sub < 0) idx += self.unit();
-      if (i_sub >= (long) self.unit()) PYTHON_ERROR(IndexError, "subindex out of bounds");
+      if (i_main < 0 || i_sub >= (long) self.unit()) 
+        PYTHON_ERROR(IndexError, "subindex out of bounds");
 
       self.setSub(i_main, i_sub, v);
     }
