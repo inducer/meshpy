@@ -191,6 +191,9 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
     """
 
     assert len(rz_points) > 0
+    
+    if ring_tags is not None:
+        assert len(rz_points) == len(ring_tags)+1
 
     def gen_ring(r, z):
         if r == 0:
