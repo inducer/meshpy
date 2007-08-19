@@ -1,9 +1,173 @@
-Nur in tetgen1.4.2-hacked: headerpatch.
-Nur in tetgen1.4.2-hacked: headerpatch~.
-Nur in tetgen1.4.2-hacked: meshpy.
-diff -u tetgen1.4.2/predicates.cxx tetgen1.4.2-hacked/predicates.cxx
---- tetgen1.4.2/predicates.cxx	2007-04-16 09:45:04.000000000 -0500
-+++ tetgen1.4.2-hacked/predicates.cxx	2007-07-19 18:59:39.000000000 -0500
+--- /home/andreas/tetgen1.4.2/tetgen.h	2007-04-16 10:45:13.000000000 -0400
++++ ../src/cpp/tetgen.h	2007-08-19 03:03:45.000000000 -0400
+@@ -87,6 +87,7 @@
+ #include <math.h>                     // Math lib: sin(), sqrt(), pow(), ...
+ #include <time.h>           // Defined type clock_t, constant CLOCKS_PER_SEC.
+ #include <assert.h> 
++#include <boost/noncopyable.hpp>
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ //                                                                           //
+@@ -194,10 +195,13 @@
+     // 'vertexlist' is a list of vertex indices (integers), its length is
+     //   indicated by 'numberofvertices'.  The vertex indices are odered in
+     //   either counterclockwise or clockwise way.
+-    typedef struct {
++    struct polygon : public boost::noncopyable {
+       int *vertexlist;
+       int numberofvertices;
+-    } polygon;
++
++      polygon();
++      ~polygon();
++    };
+ 
+     static void init(polygon* p) {
+       p->vertexlist = (int *) NULL;
+@@ -208,12 +212,15 @@
+     //   to represent a planar straight line graph (PSLG) in two dimension.
+     //   A PSLG contains a list of polygons. It also may conatin holes in it,
+     //   indicated by a list of hole points (their coordinates).
+-    typedef struct {
++    struct facet {
+       polygon *polygonlist;
+       int numberofpolygons;
+       REAL *holelist;
+       int numberofholes;
+-    } facet;
++
++      facet();
++      ~facet();
++    };
+ 
+     static void init(facet* f) {
+       f->polygonlist = (polygon *) NULL;
+@@ -253,12 +260,15 @@
+     //   maps a point in f1 into f2.  An array of pbc point pairs are saved
+     //   in 'pointpairlist'. The first point pair is at indices [0] and [1],
+     //   followed by remaining pairs. Two integers per pair.
+-    typedef struct {
++    struct pbcgroup {
+       int fmark1, fmark2;
+       REAL transmat[4][4];
+       int numberofpointpairs;
+       int *pointpairlist;
+-    } pbcgroup;
++
++      pbcgroup();
++      ~pbcgroup();
++    };
+ 
+   public:
+ 
+@@ -568,6 +578,7 @@
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+ REAL exactinit();
++void exactdeinit();
+ REAL orient3d(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
+ REAL insphere(REAL *pa, REAL *pb, REAL *pc, REAL *pd, REAL *pe);
+ 
+--- /home/andreas/tetgen1.4.2/tetgen.cxx	2007-04-16 10:45:11.000000000 -0400
++++ ../src/cpp/tetgen.cpp	2007-08-19 03:05:28.000000000 -0400
+@@ -49,6 +49,45 @@
+ // Begin of class 'tetgenio' implementation
+ //
+ 
++tetgenio::polygon::polygon()
++{
++  vertexlist = 0;
++  numberofvertices = 0;
++}
++
++tetgenio::polygon::~polygon()
++{
++  if (vertexlist)
++    delete [] vertexlist;
++}
++
++tetgenio::facet::facet()
++{
++  polygonlist = 0;
++  numberofpolygons = 0;
++  holelist = 0;
++  numberofholes = 0;
++}
++
++tetgenio::facet::~facet()
++{
++  if (polygonlist)
++    delete[] polygonlist;
++  if (holelist)
++    delete[] holelist;
++}
++
++tetgenio::pbcgroup::pbcgroup()
++{ 
++  numberofpointpairs = 0;
++  pointpairlist = 0;
++}
++
++tetgenio::pbcgroup::~pbcgroup()
++{
++  delete[] pointpairlist;
++}
++
+ ///////////////////////////////////////////////////////////////////////////////
+ //                                                                           //
+ // initialize()    Initialize all variables of 'tetgenio'.                   //
+@@ -143,6 +182,7 @@
+   pbcgroup *pg;
+   int i, j;
+ 
++  using namespace std;
+   if (pointlist != (REAL *) NULL) {
+     delete [] pointlist;
+   }
+@@ -187,19 +227,9 @@
+   }
+ 
+   if (facetlist != (facet *) NULL) {
+-    for (i = 0; i < numberoffacets; i++) {
+-      f = &facetlist[i];
+-      for (j = 0; j < f->numberofpolygons; j++) {
+-        p = &f->polygonlist[j];
+-        delete [] p->vertexlist;
+-      }
+-      delete [] f->polygonlist;
+-      if (f->holelist != (REAL *) NULL) {
+-        delete [] f->holelist;
+-      }
+-    }
+     delete [] facetlist;
+   }
++
+   if (facetmarkerlist != (int *) NULL) {
+     delete [] facetmarkerlist;
+   }
+@@ -217,12 +247,6 @@
+     delete [] segmentconstraintlist;
+   }
+   if (pbcgrouplist != (pbcgroup *) NULL) {
+-    for (i = 0; i < numberofpbcgroups; i++) {
+-      pg = &(pbcgrouplist[i]);
+-      if (pg->pointpairlist != (int *) NULL) {
+-        delete [] pg->pointpairlist;
+-      }
+-    }
+     delete [] pbcgrouplist;
+   }
+   if (vpointlist != (REAL *) NULL) {
+@@ -34887,6 +34911,7 @@
+   if (b->metric) {
+     delete m.bgm;
+   }
++  exactdeinit();
+ }
+ 
+ #ifndef TETLIBRARY
+--- /home/andreas/tetgen1.4.2/predicates.cxx	2007-04-16 10:45:04.000000000 -0400
++++ ../src/cpp/predicates.cpp	2007-07-19 20:55:24.000000000 -0400
 @@ -113,6 +113,10 @@
  /*                                                                           */
  /*****************************************************************************/
@@ -59,130 +223,3 @@ diff -u tetgen1.4.2/predicates.cxx tetgen1.4.2-hacked/predicates.cxx
  /*****************************************************************************/
  /*                                                                           */
  /*  grow_expansion()   Add a scalar to an expansion.                         */
-Nur in tetgen1.4.2-hacked: predicates.patch.
-Nur in tetgen1.4.2-hacked: predicates.patch~.
-Nur in tetgen1.4.2-hacked: sourcepatch.
-diff -u tetgen1.4.2/tetgen.cxx tetgen1.4.2-hacked/tetgen.cxx
---- tetgen1.4.2/tetgen.cxx	2007-04-16 09:45:11.000000000 -0500
-+++ tetgen1.4.2-hacked/tetgen.cxx	2007-07-19 19:02:15.000000000 -0500
-@@ -49,6 +49,34 @@
- // Begin of class 'tetgenio' implementation
- //
- 
-+tetgenio::polygon::polygon()
-+{
-+  vertexlist = (int *) NULL;
-+  numberofvertices = 0;
-+}
-+
-+tetgenio::polygon::~polygon()
-+{
-+  if (vertexlist)
-+    delete [] vertexlist;
-+}
-+
-+tetgenio::facet::facet()
-+{
-+  polygonlist = (polygon *) NULL;
-+  numberofpolygons = 0;
-+  holelist = (REAL *) NULL;
-+  numberofholes = 0;
-+}
-+
-+tetgenio::facet::~facet()
-+{
-+  if (polygonlist)
-+    delete[] polygonlist;
-+  if (holelist)
-+    delete[] holelist;
-+}
-+
- ///////////////////////////////////////////////////////////////////////////////
- //                                                                           //
- // initialize()    Initialize all variables of 'tetgenio'.                   //
-@@ -187,19 +215,9 @@
-   }
- 
-   if (facetlist != (facet *) NULL) {
--    for (i = 0; i < numberoffacets; i++) {
--      f = &facetlist[i];
--      for (j = 0; j < f->numberofpolygons; j++) {
--        p = &f->polygonlist[j];
--        delete [] p->vertexlist;
--      }
--      delete [] f->polygonlist;
--      if (f->holelist != (REAL *) NULL) {
--        delete [] f->holelist;
--      }
--    }
-     delete [] facetlist;
-   }
-+
-   if (facetmarkerlist != (int *) NULL) {
-     delete [] facetmarkerlist;
-   }
-@@ -34887,6 +34905,7 @@
-   if (b->metric) {
-     delete m.bgm;
-   }
-+  exactdeinit();
- }
- 
- #ifndef TETLIBRARY
-Nur in tetgen1.4.2-hacked: tetgen.cxx.orig.
-diff -u tetgen1.4.2/tetgen.h tetgen1.4.2-hacked/tetgen.h
---- tetgen1.4.2/tetgen.h	2007-04-16 09:45:13.000000000 -0500
-+++ tetgen1.4.2-hacked/tetgen.h	2007-07-19 19:02:06.000000000 -0500
-@@ -87,6 +87,7 @@
- #include <math.h>                     // Math lib: sin(), sqrt(), pow(), ...
- #include <time.h>           // Defined type clock_t, constant CLOCKS_PER_SEC.
- #include <assert.h> 
-+#include <boost/noncopyable.hpp>
- 
- ///////////////////////////////////////////////////////////////////////////////
- //                                                                           //
-@@ -194,10 +195,13 @@
-     // 'vertexlist' is a list of vertex indices (integers), its length is
-     //   indicated by 'numberofvertices'.  The vertex indices are odered in
-     //   either counterclockwise or clockwise way.
--    typedef struct {
-+    struct polygon : public boost::noncopyable {
-       int *vertexlist;
-       int numberofvertices;
--    } polygon;
-+
-+      polygon();
-+      ~polygon();
-+    };
- 
-     static void init(polygon* p) {
-       p->vertexlist = (int *) NULL;
-@@ -208,12 +212,15 @@
-     //   to represent a planar straight line graph (PSLG) in two dimension.
-     //   A PSLG contains a list of polygons. It also may conatin holes in it,
-     //   indicated by a list of hole points (their coordinates).
--    typedef struct {
-+    struct facet : public boost::noncopyable {
-       polygon *polygonlist;
-       int numberofpolygons;
-       REAL *holelist;
-       int numberofholes;
--    } facet;
-+
-+      facet();
-+      ~facet();
-+    };
- 
-     static void init(facet* f) {
-       f->polygonlist = (polygon *) NULL;
-@@ -568,6 +575,7 @@
- ///////////////////////////////////////////////////////////////////////////////
- 
- REAL exactinit();
-+void exactdeinit();
- REAL orient3d(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
- REAL insphere(REAL *pa, REAL *pb, REAL *pc, REAL *pd, REAL *pe);
- 
-Nur in tetgen1.4.2-hacked: tetgen.h~.
-Nur in tetgen1.4.2-hacked: tetgen.h.orig.
-Nur in tetgen1.4.2-hacked: tetgen.h.rej.

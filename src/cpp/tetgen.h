@@ -260,12 +260,15 @@ class tetgenio {
     //   maps a point in f1 into f2.  An array of pbc point pairs are saved
     //   in 'pointpairlist'. The first point pair is at indices [0] and [1],
     //   followed by remaining pairs. Two integers per pair.
-    typedef struct {
+    struct pbcgroup {
       int fmark1, fmark2;
       REAL transmat[4][4];
       int numberofpointpairs;
       int *pointpairlist;
-    } pbcgroup;
+
+      pbcgroup();
+      ~pbcgroup();
+    };
 
   public:
 

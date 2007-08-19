@@ -51,7 +51,7 @@ void terminatetetgen(int x)
 
 tetgenio::polygon::polygon()
 {
-  vertexlist = (int *) NULL;
+  vertexlist = 0;
   numberofvertices = 0;
 }
 
@@ -63,9 +63,9 @@ tetgenio::polygon::~polygon()
 
 tetgenio::facet::facet()
 {
-  polygonlist = (polygon *) NULL;
+  polygonlist = 0;
   numberofpolygons = 0;
-  holelist = (REAL *) NULL;
+  holelist = 0;
   numberofholes = 0;
 }
 
@@ -75,6 +75,17 @@ tetgenio::facet::~facet()
     delete[] polygonlist;
   if (holelist)
     delete[] holelist;
+}
+
+tetgenio::pbcgroup::pbcgroup()
+{ 
+  numberofpointpairs = 0;
+  pointpairlist = 0;
+}
+
+tetgenio::pbcgroup::~pbcgroup()
+{
+  delete[] pointpairlist;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -171,6 +182,7 @@ void tetgenio::deinitialize()
   pbcgroup *pg;
   int i, j;
 
+  using namespace std;
   if (pointlist != (REAL *) NULL) {
     delete [] pointlist;
   }
@@ -235,12 +247,6 @@ void tetgenio::deinitialize()
     delete [] segmentconstraintlist;
   }
   if (pbcgrouplist != (pbcgroup *) NULL) {
-    for (i = 0; i < numberofpbcgroups; i++) {
-      pg = &(pbcgrouplist[i]);
-      if (pg->pointpairlist != (int *) NULL) {
-        delete [] pg->pointpairlist;
-      }
-    }
     delete [] pbcgrouplist;
   }
   if (vpointlist != (REAL *) NULL) {

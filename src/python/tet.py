@@ -60,7 +60,6 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
 
 
 
-
 class Options(internals.Options):
     def __init__(self, switches="pq"):
         internals.Options.__init__(self)

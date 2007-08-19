@@ -1,0 +1,5 @@
+#! /bin/sh
+
+diff -u $1/tetgen.h ../src/cpp/tetgen.h 
+diff -u $1/tetgen.cxx ../src/cpp/tetgen.cpp 
+diff -u $1/predicates.cxx ../src/cpp/predicates.cpp
