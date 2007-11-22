@@ -150,27 +150,30 @@ EXT_CLOSED_IN_RZ = 2
 
 
 def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN, 
-        point_idx_offset=0, ring_tags=None, closure_tag=0):
-    """Extrude a given connected `base_shape' (a list of (x,y) points)
+        point_idx_offset=0, ring_point_indices=None,
+        ring_tags=None, rz_closure_tag=0, 
+        minus_z_closure_tag=0, plus_z_closure_tag=0):
+    """Extrude a given connected C{base_shape} (a list of (x,y) points)
     along the z axis. For each step in the extrusion, the base shape
     is multiplied by a radius and shifted in the z direction. Radius
-    and z offset are given by `rz_points', which is a list of
+    and z offset are given by C{rz_points}, which is a list of
     (r, z) tuples.
 
-    Returns (points, facets), where points is a list of points
-    and facets is a list of tuples of indices into that point list, 
-    each tuple specifying a polygon. If point_idx_offset is not
-    zero, these indices start at this number. There may be a third
-    return value, see `facet_markers' below.
+    Returns C{(points, facets, tags)}, where C{points} is a list of (3D) points
+    and facets is a list of tuples of indices into C{points}, 
+    each tuple specifying a polygon. If C{point_idx_offset} is not
+    zero, these indices start at that number. C{tags} is a list equal
+    in length to C{facets}, each specifying the facet tag of that
+    facet.
 
     The extrusion proceeds by generating quadrilaterals connecting each
-    ring.  If any given radius in `rz_points' is 0, triangle fans are
+    ring.  If any given radius in C{rz_points} is 0, triangle fans are
     produced instead of quads to provide non-degenerate closure.
 
-    If `closure' is EXT_OPEN, no efforts are made to put end caps on the
+    If C{closure} is L{EXT_OPEN}, no efforts are made to put end caps on the
     extrusion. 
 
-    Specifying `closure' as EXT_CLOSE_IN_Z is (almost)
+    Specifying C{closure} as L{EXT_CLOSE_IN_Z} is (almost)
     equivalent to adding points with zero radius at the beginning 
     at end of the rz_points list. The z coordinates are equal to 
     the existing first and last points in that list. (This case is
@@ -178,15 +181,23 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
     Since these facets are always flat, triangle fans are 
     unnecessary.)
 
-    If `closure' is EXT_CLOSED_IN_RZ, then a torus-like structure
+    If C{closure} is L{EXT_CLOSED_IN_RZ}, then a torus-like structure
     is assumed and the last ring is just connected to the first.
 
-    If `ring_tags' is not None, it is an list of tags added to each
+    If C{ring_tags} is not None, it is an list of tags added to each
     ring. There should be len(rz_points)-1 entries in this list.
     If rings are added because of closure options, they receive the
-    tag `closure_tag'.  If `facet_markers' is given, this function 
+    corresponding C{XXX_closure_tag}.  If C{facet_markers} is given, this function 
     returns (points, facets, tags), where tags is is a list containing 
-    a tag for each generated facet.
+    a tag for each generated facet. Unspecified tags generally
+    default to 0.
+
+    If C{ring_point_indices} is given, it must be a list of the same 
+    length as C{rz_points}. Each entry in the list may either be None,
+    or a list of point indices. This list must contain the same number
+    of points as the C{base_shape}; it is taken as the indices of 
+    pre-existing points that are to be used for the given ring, instead
+    of generating new points. If the corresponding r
     """
 
     assert len(rz_points) > 0
@@ -194,14 +205,25 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
     if ring_tags is not None:
         assert len(rz_points) == len(ring_tags)+1
 
-    def gen_ring(r, z):
+    def gen_ring(ring_idx, r, z):
+        p_indices = None
+        if ring_point_indices is not None:
+            p_indices = ring_point_indices[ring_idx]
+
+        first_idx = point_idx_offset+len(points)
+
         if r == 0:
-            p_indices = [point_idx_offset+len(points)]
-            points.append((0,0, z))
+            if p_indices is not None:
+                assert len(p_indices) == 1
+            else:
+                p_indices = [first_idx]
+                points.append((0,0, z))
         else:
-            first_idx = point_idx_offset+len(points)
-            p_indices = range(first_idx, first_idx+len(base_shape))
-            points.extend([(x*r, y*r, z) for (x,y) in base_shape])
+            if p_indices is not None:
+                assert len(p_indices) == len(base_shape)
+            else:
+                p_indices = range(first_idx, first_idx+len(base_shape))
+                points.extend([(x*r, y*r, z) for (x,y) in base_shape])
         return p_indices
 
     def pair_with_successor(l):
@@ -233,27 +255,25 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
 
     def add_polygons(new_polys, tag):
         polygons.extend(new_polys)
-
-        if ring_tags is not None:
-            tags.extend(len(new_polys)*[tag])
+        tags.extend(len(new_polys)*[tag])
 
     points = []
     polygons = []
     tags = []
 
     first_r, z = rz_points[0]
-    first_ring = prev_ring = gen_ring(first_r, z)
+    first_ring = prev_ring = gen_ring(0, first_r, z)
     prev_r = first_r
     if closure == EXT_CLOSE_IN_Z:
-        add_polygons([tuple(first_ring)], closure_tag)
+        add_polygons([tuple(first_ring)], minus_z_closure_tag)
 
     for i, (r, z) in enumerate(rz_points[1:]):
-        ring = gen_ring(r, z)
+        ring = gen_ring(i+1, r, z)
 
         if ring_tags is not None:
             ring_tag = ring_tags[i]
         else:
-            ring_tag = None
+            ring_tag = 0
 
         add_polygons(
                 connect_ring(r, ring, prev_r, prev_ring),
@@ -263,28 +283,29 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
         prev_r = r
 
     if closure == EXT_CLOSE_IN_Z:
-        add_polygons([tuple(prev_ring[::-1])], closure_tag)
+        add_polygons([tuple(prev_ring[::-1])], plus_z_closure_tag)
     if closure == EXT_CLOSED_IN_RZ:
         add_polygons(connect_ring(
             first_r, first_ring, prev_r, prev_ring),
-            closure_tag)
+            rz_closure_tag)
 
-    if ring_tags is not None:
-        return points, polygons, tags
-    else:
-        return points, polygons
+    return points, polygons, tags
 
 
 
 
 def generate_surface_of_revolution(rz_points, 
         closure=EXT_OPEN, radial_subdiv=16, 
-        point_idx_offset=0, ring_tags=None,
-        closure_tag=0):
+        point_idx_offset=0, ring_point_indices=None,
+        ring_tags=None, rz_closure_tag=0, 
+        minus_z_closure_tag=0, plus_z_closure_tag=0):
     from math import sin, cos, pi
 
     dphi = 2*pi/radial_subdiv
     base_shape = [(cos(dphi*i), sin(dphi*i)) for i in range(radial_subdiv)]
     return generate_extrusion(rz_points, base_shape, closure=closure,
-            point_idx_offset=point_idx_offset,
-            ring_tags=ring_tags, closure_tag=closure_tag)
+            point_idx_offset=point_idx_offset, 
+            ring_point_indices=ring_point_indices,
+            ring_tags=ring_tags, rz_closure_tag=rz_closure_tag,
+            minus_z_closure_tag=minus_z_closure_tag,
+            plus_z_closure_tag=plus_z_closure_tag)
