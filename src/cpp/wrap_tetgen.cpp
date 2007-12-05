@@ -202,7 +202,7 @@ namespace
 
   tForeignArray<REAL> *facet_get_holes(tetgenio::facet &self)
   {
-    return new tForeignArray<REAL>(self.holelist, self.numberofholes);
+    return new tForeignArray<REAL>(self.holelist, self.numberofholes, 3);
   }
 
 

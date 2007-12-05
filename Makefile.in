@@ -1,4 +1,4 @@
-.PHONY	: all install clean tags dist
+.PHONY	: all install clean tags dist doc
 
 all: tags
 	${PYTHON_EXE} setup.py build
@@ -15,3 +15,10 @@ clean:
 
 tags:
 	ctags -R src || true
+
+doc:
+	rm -Rf doc/html
+	mkdir doc/html
+	${PYTHON_EXE} `which epydoc` \
+	  -o doc/html -v --html \
+	  meshpy

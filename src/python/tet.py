@@ -7,6 +7,20 @@ import meshpy._tetgen as internals
 
 class MeshInfo(internals.MeshInfo, MeshInfoBase):
     def set_facets(self, facets, markers=None):
+        """Set a list of simple, single-polygon factes. Unlike L{set_facets_ex},
+        C{set_facets} does not allow hole and only lets you use a single
+        polygon per facet.
+
+        @param facets: a list of facets, where each facet is a single 
+          polygons, represented by a list of point indices.
+        @param markers: Either None or a list of integers of the same
+          length as C{facets}. Each integer is the facet marker assigned
+          to its corresponding facet.
+
+        @note: When the above says "list", any repeatable iterable 
+          also accepted instead.
+        """
+
         if markers:
             assert len(markers) == len(facets)
 
@@ -20,6 +34,58 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             poly.vertices.resize(len(vlist))
             for j, pt_idx in enumerate(vlist):
                 poly.vertices[j] = pt_idx
+
+        if markers:
+            self.facet_markers.setup()
+            for i, mark in enumerate(markers):
+                self.facet_markers[i] = mark
+
+    def set_facets_ex(self, facets, markers=None, holelists=None):
+        """Set a list of complicated factes. Unlike L{set_facets},
+        C{set_facets_ex()} allows holes and multiple polygons per
+        facet.
+
+        @param facets: a list of facets, where each facet is a list
+          of polygons, and each polygon is represented by a list
+          of point indices.
+        @param markers: Either None or a list of integers of the same
+          length as C{facets}. Each integer is the facet marker assigned
+          to its corresponding facet.
+        @param holelists: Either None or a list of hole starting points
+          for each facet. Each facet may have several hole starting points.
+          The mesh generator starts "eating" a hole into the facet at each 
+          starting point and continues until it hits a polygon specified
+          in this facet's record in C{facets}.
+
+        @note: When the above says "list", any repeatable iterable 
+          also accepted instead.
+        """
+
+        if markers:
+            assert len(markers) == len(facets)
+        if holelists is not None:
+            assert len(holelists) == len(facets)
+
+        self.facets.resize(len(facets))
+        for i_facet, poly_list in enumerate(facets):
+            facet = self.facets[i_facet]
+            polys = facet.polygons
+
+            polys.resize(len(poly_list))
+            for i_poly, vertex_list in enumerate(poly_list):
+                poly = facet.polygons[i_poly]
+
+                poly.vertices.resize(len(vertex_list))
+                for i_point, point in enumerate(vertex_list):
+                    poly.vertices[i_point] = point
+
+            if holelists is not None:
+                hole_list = holelists[i_facet]
+                facet_holes = facet.holes
+                facet_holes.resize(len(hole_list))
+                for i_hole, hole_start in enumerate(hole_list):
+                    for i_coordinate, co_value in enumerate(hole_start):
+                        facet_holes[i_hole, i_coordinate] = co_value
 
         if markers:
             self.facet_markers.setup()
@@ -149,22 +215,35 @@ EXT_CLOSED_IN_RZ = 2
 
 
 
+def _is_same_float(a, b, threshold=1e-10):
+    if abs(a) > abs(b):
+        a,b = b,a
+
+    # now abs(a) <= abs(b) always
+    return abs(b) < threshold or abs(a-b)<threshold*b
+
+
+
 def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN, 
         point_idx_offset=0, ring_point_indices=None,
-        ring_tags=None, rz_closure_tag=0, 
-        minus_z_closure_tag=0, plus_z_closure_tag=0):
+        ring_markers=None, rz_closure_marker=0, 
+        minus_z_closure_marker=0, plus_z_closure_marker=0):
     """Extrude a given connected C{base_shape} (a list of (x,y) points)
     along the z axis. For each step in the extrusion, the base shape
     is multiplied by a radius and shifted in the z direction. Radius
     and z offset are given by C{rz_points}, which is a list of
     (r, z) tuples.
 
-    Returns C{(points, facets, tags)}, where C{points} is a list of (3D) points
-    and facets is a list of tuples of indices into C{points}, 
-    each tuple specifying a polygon. If C{point_idx_offset} is not
-    zero, these indices start at that number. C{tags} is a list equal
-    in length to C{facets}, each specifying the facet tag of that
-    facet.
+    Returns C{(points, facets, markers, holelists)}, where C{points} is a list
+    of (3D) points and facets is a list of polygons. Each polygon is, in turn,
+    represented by a tuple of indices into C{points}. If C{point_idx_offset} is
+    not zero, these indices start at that number. C{markers} is a list equal in
+    length to C{facets}, each specifying the facet marker of that facet.
+    C{holelists} is also equal in length to C{facets}, each element is a list of
+    hole starting points for the corresponding facet.
+
+    Use L{MeshInfo.set_facets_ex} to add the extrusion to a L{MeshInfo}
+    structure.
 
     The extrusion proceeds by generating quadrilaterals connecting each
     ring.  If any given radius in C{rz_points} is 0, triangle fans are
@@ -184,12 +263,12 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
     If C{closure} is L{EXT_CLOSED_IN_RZ}, then a torus-like structure
     is assumed and the last ring is just connected to the first.
 
-    If C{ring_tags} is not None, it is an list of tags added to each
+    If C{ring_markers} is not None, it is an list of markers added to each
     ring. There should be len(rz_points)-1 entries in this list.
     If rings are added because of closure options, they receive the
-    corresponding C{XXX_closure_tag}.  If C{facet_markers} is given, this function 
-    returns (points, facets, tags), where tags is is a list containing 
-    a tag for each generated facet. Unspecified tags generally
+    corresponding C{XXX_closure_marker}.  If C{facet_markers} is given, this function 
+    returns (points, facets, markers), where markers is is a list containing 
+    a marker for each generated facet. Unspecified markers generally
     default to 0.
 
     If C{ring_point_indices} is given, it must be a list of the same 
@@ -197,13 +276,13 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
     or a list of point indices. This list must contain the same number
     of points as the C{base_shape}; it is taken as the indices of 
     pre-existing points that are to be used for the given ring, instead
-    of generating new points. If the corresponding r
+    of generating new points.
     """
 
     assert len(rz_points) > 0
     
-    if ring_tags is not None:
-        assert len(rz_points) == len(ring_tags)+1
+    if ring_markers is not None:
+        assert len(rz_points) == len(ring_markers)+1
 
     def gen_ring(ring_idx, r, z):
         p_indices = None
@@ -230,66 +309,97 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
         n = len(l)
         return [(l[i], l[(i+1)%n]) for i in range(n)]
 
-    def connect_ring(r, ring, prev_r, prev_ring):
-        if prev_r == 0:
-            # make opening fan
-            assert len(prev_ring) == 1
-            start_pt = prev_ring[0]
-            if r != 0:
-                return [(start_pt, succ, pt) 
-                        for pt, succ in pair_with_successor(ring)]
+    def add_polygons(new_polys, marker):
+        """Add several new facets, each polygon in new_polys corresponding
+        to a new facet.
+        """
+        facets.extend([poly] for poly in new_polys)
+        markers.extend(len(new_polys)*[marker])
+        holelists.extend(len(new_polys)*[[]])
+
+    def add_facet(facet_polygons, holestarts, marker):
+        """Add a single facet, with each polygon in C{facet_polygons} 
+        belonging to a single facet.
+        """
+        facets.append(facet_polygons)
+        markers.append(marker)
+        holelists.append(holestarts)
+
+    def connect_ring(r, z, ring, prev_r, prev_z, prev_ring, marker):
+        if _is_same_float(z, prev_z):
+            assert not _is_same_float(r, prev_r)
+            # we're moving purely outward--this doesn't need fans, only plane
+            # surfaces. Special casing this leads to more freedom for TetGen
+            # and hence better meshes.
+
+            if prev_r == 0:
+                # make opening surface
+                assert len(prev_ring) == 1
+                if r != 0:
+                    add_polygons(ring, marker=marker)
+            elif r == 0:
+                # make closing surface
+                assert len(ring) == 1
+                add_polygons(prev_ring, marker=marker)
             else:
-                return []
-        elif r == 0:
-            # make closing fan
-            assert len(ring) == 1
-            end_pt = ring[0]
-            return [(pt, succ, end_pt) 
-                    for pt, succ in pair_with_successor(prev_ring)]
+                # make single-surface interface with hole
+                add_facet([ring, prev_ring], holestarts=[(0,0,z)], marker=marker)
         else:
-            # make quad strip
-            prev_pairs = pair_with_successor(prev_ring)
-            my_pairs = pair_with_successor(ring)
-            return [(a, b, c, d) for ((a,b), (d,c)) in zip(prev_pairs, my_pairs)]
-
-
-    def add_polygons(new_polys, tag):
-        polygons.extend(new_polys)
-        tags.extend(len(new_polys)*[tag])
+            if prev_r == 0:
+                # make opening fan
+                assert len(prev_ring) == 1
+                start_pt = prev_ring[0]
+                if r != 0:
+                    add_polygons(
+                            [(start_pt, succ, pt) 
+                            for pt, succ in pair_with_successor(ring)],
+                            marker=marker)
+            elif r == 0:
+                # make closing fan
+                assert len(ring) == 1
+                end_pt = ring[0]
+                add_polygons(
+                        [(pt, succ, end_pt) 
+                        for pt, succ in pair_with_successor(prev_ring)],
+                        marker=marker)
+            else:
+                # make quad strip
+                prev_pairs = pair_with_successor(prev_ring)
+                my_pairs = pair_with_successor(ring)
+                add_polygons(
+                        [(a, b, c, d) for ((a,b), (d,c)) in zip(prev_pairs, my_pairs)],
+                        marker=marker)
 
     points = []
-    polygons = []
-    tags = []
+    facets = []
+    markers = []
+    holelists = []
 
-    first_r, z = rz_points[0]
-    first_ring = prev_ring = gen_ring(0, first_r, z)
-    prev_r = first_r
+    first_r, first_z = rz_points[0]
+    first_ring = prev_ring = gen_ring(0, first_r, first_z)
+    prev_r, prev_z = first_r, first_z
+
     if closure == EXT_CLOSE_IN_Z:
-        add_polygons([tuple(first_ring)], minus_z_closure_tag)
+        add_polygons([tuple(first_ring)], minus_z_closure_marker)
 
     for i, (r, z) in enumerate(rz_points[1:]):
         ring = gen_ring(i+1, r, z)
 
-        if ring_tags is not None:
-            ring_tag = ring_tags[i]
+        if ring_markers is not None:
+            ring_marker = ring_markers[i]
         else:
-            ring_tag = 0
-
-        add_polygons(
-                connect_ring(r, ring, prev_r, prev_ring),
-                ring_tag)
+            ring_marker = 0
+        connect_ring(r, z, ring, prev_r, prev_z, prev_ring, ring_marker)
 
         prev_ring = ring
-        prev_r = r
+        prev_r, prev_z = r, z
 
     if closure == EXT_CLOSE_IN_Z:
-        add_polygons([tuple(prev_ring[::-1])], plus_z_closure_tag)
+        add_polygons([tuple(prev_ring[::-1])], plus_z_closure_marker)
     if closure == EXT_CLOSED_IN_RZ:
-        add_polygons(connect_ring(
-            first_r, first_ring, prev_r, prev_ring),
-            rz_closure_tag)
+        connect_ring(first_r, first_ring, prev_r, prev_ring, rz_closure_marker)
 
-    return points, polygons, tags
+    return points, facets, markers, holelists
 
 
 
@@ -297,8 +407,8 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
 def generate_surface_of_revolution(rz_points, 
         closure=EXT_OPEN, radial_subdiv=16, 
         point_idx_offset=0, ring_point_indices=None,
-        ring_tags=None, rz_closure_tag=0, 
-        minus_z_closure_tag=0, plus_z_closure_tag=0):
+        ring_markers=None, rz_closure_marker=0, 
+        minus_z_closure_marker=0, plus_z_closure_marker=0):
     from math import sin, cos, pi
 
     dphi = 2*pi/radial_subdiv
@@ -306,6 +416,6 @@ def generate_surface_of_revolution(rz_points,
     return generate_extrusion(rz_points, base_shape, closure=closure,
             point_idx_offset=point_idx_offset, 
             ring_point_indices=ring_point_indices,
-            ring_tags=ring_tags, rz_closure_tag=rz_closure_tag,
-            minus_z_closure_tag=minus_z_closure_tag,
-            plus_z_closure_tag=plus_z_closure_tag)
+            ring_markers=ring_markers, rz_closure_marker=rz_closure_marker,
+            minus_z_closure_marker=minus_z_closure_marker,
+            plus_z_closure_marker=plus_z_closure_marker)
