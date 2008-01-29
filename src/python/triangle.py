@@ -1,3 +1,4 @@
+from __future__ import division
 from meshpy.common import MeshInfoBase, dump_array
 import meshpy._triangle as internals
 
@@ -69,11 +70,69 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
 
 
 
+def subdivide_facets(subdivisions, points, facets, facet_markers=None):
+    """Return a new facets array in which the original facets are
+    each subdivided into C{subdivisions} subfacets.
 
+    This routine is useful if you have to prohibit the insertion of Steiner
+    points on the boundary  of your triangulation to allow the mesh to conform
+    either to itself periodically or another given mesh. In this case, you may
+    use this routine to create the necessary resolution along the boundary
+    in a predefined way. 
 
+    @arg subdivisions: Either an C{int}, indicating a uniform number of subdivisions
+      throughout, or a list of the same length as C{facets}, specifying a subdivision
+      count for each individual facet.
+    @arg points: A list of points referred to from the facets list.
+    @arg facets: The list of old facets, in the form C{[(p1, p2), (p3,p4), ...]}.
+    @arg facet_markers: Either C{None} or a list of facet markers of the same length
+      as C{facets}.
+    @return: The new tuple C{(new_points, new_facets)}. 
+      (Or C{(new_points, new_facets, new_facet_markers)} if C{facet_markers} is not
+      C{None}.)
+    """
 
+    def intermediate_points(pa, pb, n):
+        for i in range(1, n):
+            tau = i/n
+            yield [pai*(1-tau) + tau*pbi for pai, pbi in zip(pa, pb)]
+
+    if isinstance(subdivisions, int):
+        from itertools import repeat
+        subdiv_it = repeat(subdivisions, len(facets))
+    else:
+        subdiv_it = subdivisions.__iter__()
+
+    new_points = points[:]
+    new_facets = []
+
+    if facet_markers is not None:
+        new_facet_markers = []
+
+    for facet_idx, ((pidx_a, pidx_b), subdiv) in enumerate(zip(facets, subdiv_it)):
+        facet_points = [pidx_a]
+        for p in intermediate_points(points[pidx_a], points[pidx_b], subdiv):
+            facet_points.append(len(new_points))
+            new_points.append(p)
+        facet_points.append(pidx_b)
+
+        for i, p1 in enumerate(facet_points[:-1]):
+            p2 = facet_points[i+1]
+            new_facets.append((p1, p2))
+
+            if facet_markers is not None:
+                new_facet_markers.append(facet_markers[facet_idx])
+
+    if facet_markers is not None:
+        return new_points, new_facets, new_facet_markers
+    else:
+        return new_points, new_facets
+
+        
+
+    
 def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
-        volume_constraints=True, max_volume=None):
+        volume_constraints=True, max_volume=None, allow_boundary_steiner=True):
     """Triangulate the domain given in `mesh_info'."""
     opts = "pzqj"
     if verbose:
@@ -93,6 +152,9 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
 
     if refinement_func is not None:
         opts += "u"
+
+    if not allow_boundary_steiner:
+        opts += "Y"
 
     mesh = MeshInfo()
     internals.triangulate(opts, mesh_info, mesh, MeshInfo(), refinement_func)
