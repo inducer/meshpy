@@ -101,12 +101,14 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
         from itertools import repeat
         subdiv_it = repeat(subdivisions, len(facets))
     else:
+        assert len(facets) == len(subdivisions)
         subdiv_it = subdivisions.__iter__()
 
     new_points = points[:]
     new_facets = []
 
     if facet_markers is not None:
+        assert len(facets) == len(facet_markers)
         new_facet_markers = []
 
     for facet_idx, ((pidx_a, pidx_b), subdiv) in enumerate(zip(facets, subdiv_it)):
