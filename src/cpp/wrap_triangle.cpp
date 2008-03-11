@@ -147,6 +147,18 @@ class tVertex : public boost::noncopyable
     {
     }
 
+    REAL operator[](unsigned i)
+    {
+      if (i >= 2)
+        PYTHON_ERROR(IndexError, "vertex index out of bounds");
+      return Data[i];
+    }
+
+    unsigned size()
+    {
+      return 2;
+    }
+
     REAL x() { return Data[0]; }
     REAL y() { return Data[1]; }
 };
@@ -160,8 +172,14 @@ int triunsuitable(vertex triorg, vertex tridest, vertex triapex, REAL area)
   tVertex org(triorg);
   tVertex dest(tridest);
   tVertex apex(triapex);
+
+
   return call<bool>(RefinementFunction,
-      boost::ref(org), boost::ref(dest), boost::ref(apex), area);
+      make_tuple(
+        object(boost::ref(org)), 
+        object(boost::ref(dest)), 
+        object(boost::ref(apex))
+        ), area);
 }
 
 
@@ -232,8 +250,13 @@ BOOST_PYTHON_MODULE(_triangle)
   exposePODForeignArray<REAL>("RealArray");
   exposePODForeignArray<int>("IntArray");
 
-  class_<tVertex, tVertex, boost::noncopyable>("Vertex", no_init)
-    .add_property("x", &tVertex::x)
-    .add_property("y", &tVertex::y)
-    ;
+  {
+    typedef tVertex cl;
+    class_<cl, boost::noncopyable>("Vertex", no_init)
+      .add_property("x", &cl::x)
+      .add_property("y", &cl::y)
+      .def("__len__", &cl::size)
+      .def("__getitem__", &cl::operator[])
+      ;
+  }
 }
