@@ -182,11 +182,16 @@ def refine(input_p, verbose=False, refinement_func=None):
 
 
 
-def write_gnuplot_mesh(filename, out_p):
-    gp_file = file(filename, "w")
+def write_gnuplot_mesh(filename, out_p, facets=False):
+    gp_file = open(filename, "w")
     
-    for points in out_p.elements:
+    if facets:
+        segments = out_p.facets
+    else:
+        segments = out_p.elements
+
+    for points in segments:
         for pt in points:
-            gp_file.write("%f %f 0\n" % tuple(out_p.points[pt]))
-        gp_file.write("%f %f 0\n\n" % tuple(out_p.points[points[0]]))
+            gp_file.write("%f %f\n" % tuple(out_p.points[pt]))
+        gp_file.write("%f %f\n\n" % tuple(out_p.points[points[0]]))
 
