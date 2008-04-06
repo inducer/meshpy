@@ -16,3 +16,4 @@ Makefile
 siteconf.py
 tags
 doc/html
+*.orig
