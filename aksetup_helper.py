@@ -273,7 +273,8 @@ class Option(object):
         return default 
 
     def add_to_configparser(self, parser, default=None):
-        default = self.value_to_str(default_or(default, self.default))
+        default = default_or(default, self.default)
+        default_str = self.value_to_str(default)
         parser.add_option(
             "--" + self.as_option(), dest=self.name, 
             default=default,
