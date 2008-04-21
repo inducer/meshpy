@@ -36,7 +36,7 @@ def main():
       ("SELF_CHECK", 1) ,
       ]
 
-    INCLUDE_DIRS = conf["BOOST_INC_DIR"]
+    INCLUDE_DIRS = conf["BOOST_INC_DIR"] + ["src/cpp"]
     LIBRARY_DIRS = conf["BOOST_LIB_DIR"]
     LIBRARIES = conf["BOOST_PYTHON_LIBNAME"]
 
