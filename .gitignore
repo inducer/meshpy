@@ -17,3 +17,5 @@ siteconf.py
 tags
 doc/html
 *.orig
+*.egg-info
+*.pyc
