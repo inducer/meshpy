@@ -43,11 +43,45 @@ def main():
     execfile("src/python/__init__.py", conf)
     setup(name="MeshPy",
           version=conf["version"],
-          description="A wrapper around the TetGen and Triangle",
+          description="Triangular and Tetrahedral Mesh Generator",
+          long_description="""
+          MeshPy offers quality triangular and tetrahedral mesh
+          generation for Python. Meshes of this type are chiefly used
+          in finite-element simulation codes, but also have many
+          other applications ranging from computer graphics to
+          robotics.
+
+          In order to generate 2D and 3D meshes, MeshPy provides
+          Python interfaces to two well-regarded mesh generators,
+          `Triangle <http://www.cs.cmu.edu/~quake/triangle.html>`_ by
+          J.  Shewchuk and `TetGen <http://tetgen.berlios.de/>`_ by
+          Hang Si. Both are included in the package in slightly
+          modified versions.
+
+          MeshPy uses `Boost.Python <http://www.boost.org>`_. 
+          """,
           author="Andreas Kloeckner",
           author_email="inform@tiker.net",
-          license = "BSD for the wrapper/non-commercial MIT for the meshers",
-          url="http://news.tiker.net/software/meshpy",
+          license = "MIT for the wrapper/non-commercial MIT for the meshers",
+          url="http://mathema.tician.de/software/meshpy",
+          classifiers=[
+            'Development Status :: 4 - Beta',
+            'Intended Audience :: Developers',
+            'Intended Audience :: Other Audience',
+            'Intended Audience :: Science/Research',
+            'License :: OSI Approved :: MIT License',
+            'License :: Free for non-commercial use',
+            'Natural Language :: English',
+            'Programming Language :: C++',
+            'Programming Language :: Python',
+            'Topic :: Multimedia :: Graphics :: 3D Modeling',
+            'Topic :: Scientific/Engineering',
+            'Topic :: Scientific/Engineering :: Mathematics',
+            'Topic :: Scientific/Engineering :: Physics',
+            'Topic :: Scientific/Engineering :: Visualization',
+            'Topic :: Software Development :: Libraries',
+            ],
+
           packages = [ "meshpy" ],
           package_dir={"meshpy": "src/python"},
           ext_modules = [
