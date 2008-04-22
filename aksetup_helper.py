@@ -1,3 +1,4 @@
+# dealings with ez_setup ------------------------------------------------------
 import ez_setup
 
 ez_setup.use_setuptools()
@@ -10,10 +11,50 @@ def setup(*args, **kwargs):
     try:
         setup(*args, **kwargs)
     except:
-        traceback.print_exc()
         print "--------------------------------------------------------------------------"
         print "Sorry, your build failed. Try rerunning configure with different options."
         print "--------------------------------------------------------------------------"
+        raise
+
+
+
+
+class NumpyExtension(Extension):
+    # nicked from 
+    # http://mail.python.org/pipermail/distutils-sig/2007-September/008253.html
+    # solution by Michael Hoffmann
+    def __init__(self, *args, **kwargs):
+        Extension.__init__(self, *args, **kwargs)
+        self._include_dirs = self.include_dirs
+        del self.include_dirs # restore overwritten property
+
+    def get_numpy_incpath(self):
+        from imp import find_module
+        # avoid actually importing numpy, it screws up distutils
+        file, pathname, descr = find_module("numpy")
+        from os.path import join
+        return join(pathname, "core", "include")
+
+    @property
+    def include_dirs(self):
+        return self._include_dirs + [self.get_numpy_incpath()]
+
+
+
+
+class PyUblasExtension(NumpyExtension):
+    def get_pyublas_incpath(self):
+        from imp import find_module
+        file, pathname, descr = find_module("pyublas")
+        from os.path import join
+        return join(pathname, "..", "include")
+
+    @property
+    def include_dirs(self):
+        return self._include_dirs + [
+                self.get_numpy_incpath(),
+                self.get_pyublas_incpath(),
+                ]
 
 
 

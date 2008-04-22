@@ -1,7 +1,5 @@
 include src/cpp/*.h
 include src/cpp/*.hpp
-include src/wrapper/*.h
-include src/wrapper/*.hpp
 include LICENSE
 include test/*.py
 include test/clean.sh
@@ -10,3 +8,4 @@ include ez_setup.py
 include configure
 include Makefile.in
 include aksetup_helper.py
+include README_SETUP.txt
