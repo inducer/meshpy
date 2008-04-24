@@ -23,7 +23,7 @@ def main():
             get_config, setup, Extension
 
     hack_distutils()
-    conf = get_config()
+    conf = get_config(get_config_schema())
 
     triangle_macros = [
       ( "EXTERNAL_TEST", 1 ),
