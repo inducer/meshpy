@@ -12,6 +12,8 @@ def get_config_schema():
 
         StringListOption("CXXFLAGS", [], 
             help="Any extra C++ compiler options to include"),
+        StringListOption("LDFLAGS", [], 
+            help="Any extra linker options to include"),
         ])
 
 
@@ -91,7 +93,9 @@ def main():
               include_dirs=INCLUDE_DIRS,
               library_dirs=LIBRARY_DIRS,
               libraries=LIBRARIES,
-              define_macros=triangle_macros
+              define_macros=triangle_macros,
+              extra_compile_args=conf["CXXFLAGS"],
+              extra_link_args=conf["LDFLAGS"],
               ),
             Extension(
               "meshpy._tetgen", 
@@ -99,7 +103,9 @@ def main():
               include_dirs=INCLUDE_DIRS,
               library_dirs=LIBRARY_DIRS,
               libraries=LIBRARIES,
-              define_macros=tetgen_macros
+              define_macros=tetgen_macros,
+              extra_compile_args=conf["CXXFLAGS"],
+              extra_link_args=conf["LDFLAGS"],
               ),
             ]
          )
