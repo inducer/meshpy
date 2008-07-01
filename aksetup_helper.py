@@ -47,9 +47,9 @@ class NumpyExtension(Extension):
 
 
 class PyUblasExtension(NumpyExtension):
-    def get_pyublas_incpath(self):
+    def get_module_include_path(self, name):
         from imp import find_module
-        file, pathname, descr = find_module("pyublas")
+        file, pathname, descr = find_module(name)
         from os.path import join
         return join(pathname, "..", "include")
 
@@ -57,7 +57,19 @@ class PyUblasExtension(NumpyExtension):
     def include_dirs(self):
         return self._include_dirs + [
                 self.get_numpy_incpath(),
-                self.get_pyublas_incpath(),
+                self.get_module_include_path("pyublas"),
+                ]
+
+
+
+
+class HedgeExtension(PyUblasExtension):
+    @property
+    def include_dirs(self):
+        return self._include_dirs + [
+                self.get_numpy_incpath(),
+                self.get_module_include_path("pyublas"),
+                self.get_module_include_path("hedge"),
                 ]
 
 
@@ -121,9 +133,18 @@ def get_config(schema=None):
 
 
 
-def hack_distutils(debug=False):
+def hack_distutils(debug=False, fast_link=True):
     # hack distutils.sysconfig to eliminate debug flags
     # stolen from mpi4py
+
+    def remove_prefixes(optlist, bad_prefixes):
+        for bad_prefix in bad_prefixes:
+            for i, flag in enumerate(optlist):
+                if flag.startswith(bad_prefix):
+                    optlist.pop(i)
+                    break
+        return optlist
+
     import sys
     if not sys.platform.lower().startswith("win"):
         from distutils import sysconfig
@@ -131,14 +152,8 @@ def hack_distutils(debug=False):
         cvars = sysconfig.get_config_vars()
         cflags = cvars.get('OPT')
         if cflags:
-            cflags = cflags.split()
-            for bad_prefix in ('-g', '-O', '-Wstrict-prototypes', '-DNDEBUG'):
-                for i, flag in enumerate(cflags):
-                    if flag.startswith(bad_prefix):
-                        cflags.pop(i)
-                        break
-                if flag in cflags:
-                    cflags.remove(flag)
+            cflags = remove_prefixes(cflags.split(),
+                    ['-g', '-O', '-Wstrict-prototypes', '-DNDEBUG'])
             if debug:
                 cflags.append("-g")
             else:
@@ -147,6 +162,13 @@ def hack_distutils(debug=False):
             cvars['OPT'] = str.join(' ', cflags)
             cvars["CFLAGS"] = cvars["BASECFLAGS"] + " " + cvars["OPT"]
 
+        if fast_link:
+            for varname in ["LDSHARED", "BLDSHARED"]:
+                ldsharedflags = cvars.get(varname)
+                if ldsharedflags:
+                    ldsharedflags = remove_prefixes(ldsharedflags.split(),
+                            ['-Wl,-O'])
+                    cvars[varname] = str.join(' ', ldsharedflags)
 
 
 
