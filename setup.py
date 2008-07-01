@@ -61,6 +61,11 @@ def main():
           modified versions.
 
           MeshPy uses `Boost.Python <http://www.boost.org>`_. 
+
+          Documentation
+          =============
+
+          See the `MeshPy Documentation <http://tiker.net/doc/meshpy>`_ page.
           """,
           author="Andreas Kloeckner",
           author_email="inform@tiker.net",

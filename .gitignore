@@ -19,3 +19,4 @@ doc/html
 *.orig
 *.egg-info
 *.pyc
+doc/.build
