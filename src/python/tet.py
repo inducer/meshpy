@@ -127,10 +127,18 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
 
 
 class Options(internals.Options):
-    def __init__(self, switches="pq"):
+    def __init__(self, switches="pq", **kwargs):
         internals.Options.__init__(self)
         self.parse_switches(switches)
         self.quiet = 1
+
+        for k, v in kwargs.iteritems():
+            try:
+                getattr(self, k)
+            except AttributeError:
+                raise ValueError, "invalid option: %s" % k
+            else:
+                setattr(self, k, v)
 
 
 

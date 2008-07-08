@@ -172,10 +172,14 @@ Some common notions
    :synopsis: Generate triangular meshes
 .. moduleauthor:: Andreas Klöckner <inform@tiker.net>
 
-.. class:: Options
+.. class:: Options(switches='pq', **kwargs)
 
     Run time switches for TetGen. See the TetGen documentation for the meaning of each
     switch.
+
+    Using the *kwargs* constructor argument, all the attributes defined
+    below can be set. This setting will occur after
+    :meth:`Options.parse_switches` is called with the *switches* parameter.
 
     .. attribute:: plc
     .. attribute:: quality
