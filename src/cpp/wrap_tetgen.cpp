@@ -173,6 +173,7 @@ namespace
       throw runtime_error("TetGen runtime error code "+boost::lexical_cast<string>(i));
     }
 
+    out.Elements.fixUnit(out.numberofcorners);
     out.PointAttributes.fixUnit(out.numberofpointattributes);
     out.PointMetricTensors.fixUnit(out.numberofpointmtrs);
     out.ElementAttributes.fixUnit(out.numberoftetrahedronattributes);
