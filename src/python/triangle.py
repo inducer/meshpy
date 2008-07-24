@@ -134,7 +134,8 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
 
     
 def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
-        volume_constraints=True, max_volume=None, allow_boundary_steiner=True):
+        volume_constraints=True, max_volume=None, allow_boundary_steiner=True,
+        generate_edges=False):
     """Triangulate the domain given in `mesh_info'."""
     opts = "pzqj"
     if verbose:
@@ -154,6 +155,9 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
 
     if refinement_func is not None:
         opts += "u"
+    
+    if generate_edges:
+        opts += "e"
 
     if not allow_boundary_steiner:
         opts += "Y"

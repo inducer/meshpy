@@ -167,52 +167,59 @@ class MeshInfoBase:
             raise ValueError, "invalid number of dimensions (%d)" % dim
 
         # actually output bc sections
-        assert self.faces.allocated # requires -f option in tetgen
+        if not self.faces.allocated:
+            from warnings import warn
+            warn("no exterior faces in mesh data structure, not writing boundary conditions")
+        else:
+            # requires -f option in tetgen, -e in triangle
 
-        for bc_marker in bc_markers:
-            face_indices = [i
-                    for i, face in enumerate(self.faces)
-                    if bc_marker == self.face_markers[i]]
+            for bc_marker in bc_markers:
+                face_indices = [i
+                        for i, face in enumerate(self.faces)
+                        if bc_marker == self.face_markers[i]]
 
-            outfile.write("BOUNDARY CONDITIONS 2.1.2\n")
-            if bc_marker in bc:
-                # regular BC
+                if not face_indices:
+                    continue
 
-                bc_name, bc_code = bc[bc_marker]
-                outfile.write("%s\t%d\t%d\t%d\t%d\n" 
-                        % (bc_name, 
-                            1, # face BC
-                            len(face_indices),
-                            0, # zero additional values per face,
-                            bc_code,
+                outfile.write("BOUNDARY CONDITIONS 2.1.2\n")
+                if bc_marker in bc:
+                    # regular BC
+
+                    bc_name, bc_code = bc[bc_marker]
+                    outfile.write("%s\t%d\t%d\t%d\t%d\n" 
+                            % (bc_name, 
+                                1, # face BC
+                                len(face_indices),
+                                0, # zero additional values per face,
+                                bc_code,
+                                )
                             )
-                        )
-            else:
-                # periodic BC
+                else:
+                    # periodic BC
 
-                outfile.write("periodic\t%s\t%d\t%d\t%d\n"
-                        % ("\t".join(repr(p) for p in periods),
-                            len(face_indices),
-                            0, # zero additional values per face,
-                            0,
+                    outfile.write("periodic\t%s\t%d\t%d\t%d\n"
+                            % ("\t".join(repr(p) for p in periods),
+                                len(face_indices),
+                                0, # zero additional values per face,
+                                0,
+                                )
                             )
-                        )
 
-            for i, fi in enumerate(face_indices):
-                face_nodes = frozenset(self.faces[fi])
-                adj_el = face2el[face_nodes]
-                assert len(adj_el) == 1
+                for i, fi in enumerate(face_indices):
+                    face_nodes = frozenset(self.faces[fi])
+                    adj_el = face2el[face_nodes]
+                    assert len(adj_el) == 1
 
-                el_index, el_face_number = adj_el[0]
+                    el_index, el_face_number = adj_el[0]
 
-                outfile.write("%d\t%d\t%d\n" % 
-                        (el_index+1, eltype, el_face_number))
+                    outfile.write("%d\t%d\t%d\n" % 
+                            (el_index+1, eltype, el_face_number))
 
-            outfile.write("ENDOFSECTION\n")
+                outfile.write("ENDOFSECTION\n")
 
-        outfile.close()
-        # FIXME curved boundaries?
-        # FIXME proper element group support
+            outfile.close()
+            # FIXME curved boundaries?
+            # FIXME proper element group support
 
 
 
