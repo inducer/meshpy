@@ -19,12 +19,18 @@ class _Table:
 
 
 
-def _linebreak_list(list, per_line=8):
+def _linebreak_list(list, per_line=10, pad=None):
+    def format(s):
+        if pad is None:
+            return str(s)
+        else:
+            return str(s).rjust(pad)
+
     result = ""
     while len(list) > per_line:
-        result += " ".join(list[:per_line]) + "\n"
+        result += " ".join(format(l) for l in list[:per_line]) + "\n"
         list = list[per_line:]
-    return result + " ".join(list)
+    return result + " ".join(format(l) for l in list)
         
 
 
@@ -114,10 +120,11 @@ class MeshInfoBase:
             eltype = 3
         else:
             eltype = 6
+
         for i, el in enumerate(self.elements):
-            outfile.write("%d %d %d %s\n" % 
+            outfile.write("%8d%3d%3d %s\n" % 
                     (i+1, eltype, len(el), 
-                        " ".join(str(p+1) for p in el)))
+                        "".join("%8d" % (p+1) for p in el)))
         outfile.write("ENDOFSECTION\n")
 
         # element groups ------------------------------------------------------
@@ -125,13 +132,14 @@ class MeshInfoBase:
         # FIXME
         i = 0
         grp_elements = range(len(self.elements))
-        material = 1.
+        material = 1
         flags = 0
-        outfile.write("GROUP: %d ELEMENTS: %d MATERIAL: %s NFLAGS: %d\n"
+        outfile.write("GROUP:%11d ELEMENTS:%11d MATERIAL:%11s NFLAGS: %11d\n"
                 % (1, len(grp_elements), repr(material), flags))
-        outfile.write("epsilon: %s\n" % material) # FIXME
+        outfile.write(("epsilon: %s\n" % material).rjust(32)) # FIXME
         outfile.write("0\n")
-        outfile.write(_linebreak_list([str(i+1) for i in grp_elements])
+        outfile.write(_linebreak_list([str(i+1) for i in grp_elements],
+            pad=8)
                 + "\n")
         outfile.write("ENDOFSECTION\n")
 
@@ -186,7 +194,7 @@ class MeshInfoBase:
                     # regular BC
 
                     bc_name, bc_code = bc[bc_marker]
-                    outfile.write("%s %d %d %d %d\n" 
+                    outfile.write("%32s%8d%8d%8d%8d\n" 
                             % (bc_name, 
                                 1, # face BC
                                 len(face_indices),
@@ -197,8 +205,8 @@ class MeshInfoBase:
                 else:
                     # periodic BC
 
-                    outfile.write("periodic %s %d %d %d\n"
-                            % (" ".join(repr(p) for p in periods),
+                    outfile.write("%s%s%8d%8d%8d\n"
+                            % ("periodic", " ".join(repr(p) for p in periods),
                                 len(face_indices),
                                 0, # zero additional values per face,
                                 0,
@@ -212,7 +220,7 @@ class MeshInfoBase:
 
                     el_index, el_face_number = adj_el[0]
 
-                    outfile.write("%d %d %d\n" % 
+                    outfile.write("%10d%5d%5d\n" % 
                             (el_index+1, eltype, el_face_number))
 
                 outfile.write("ENDOFSECTION\n")
