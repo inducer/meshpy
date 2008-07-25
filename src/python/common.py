@@ -22,9 +22,9 @@ class _Table:
 def _linebreak_list(list, per_line=8):
     result = ""
     while len(list) > per_line:
-        result += "\t".join(list[:per_line]) + "\n"
+        result += " ".join(list[:per_line]) + "\n"
         list = list[per_line:]
-    return result + "\t".join(list)
+    return result + " ".join(list)
         
 
 
@@ -104,8 +104,8 @@ class MeshInfoBase:
         # nodes ---------------------------------------------------------------
         outfile.write("NODAL COORDINATES 2.1.2\n")
         for i, pt in enumerate(self.points):
-            outfile.write("%d\t%s\n" % 
-                    (i+1, "\t".join(repr(c) for c in pt)))
+            outfile.write("%d %s\n" % 
+                    (i+1, " ".join(repr(c) for c in pt)))
         outfile.write("ENDOFSECTION\n")
 
         # elements ------------------------------------------------------------
@@ -115,9 +115,9 @@ class MeshInfoBase:
         else:
             eltype = 6
         for i, el in enumerate(self.elements):
-            outfile.write("%d\t%d\t%d\t%s\n" % 
+            outfile.write("%d %d %d %s\n" % 
                     (i+1, eltype, len(el), 
-                        "\t".join(str(p+1) for p in el)))
+                        " ".join(str(p+1) for p in el)))
         outfile.write("ENDOFSECTION\n")
 
         # element groups ------------------------------------------------------
@@ -186,7 +186,7 @@ class MeshInfoBase:
                     # regular BC
 
                     bc_name, bc_code = bc[bc_marker]
-                    outfile.write("%s\t%d\t%d\t%d\t%d\n" 
+                    outfile.write("%s %d %d %d %d\n" 
                             % (bc_name, 
                                 1, # face BC
                                 len(face_indices),
@@ -197,8 +197,8 @@ class MeshInfoBase:
                 else:
                     # periodic BC
 
-                    outfile.write("periodic\t%s\t%d\t%d\t%d\n"
-                            % ("\t".join(repr(p) for p in periods),
+                    outfile.write("periodic %s %d %d %d\n"
+                            % (" ".join(repr(p) for p in periods),
                                 len(face_indices),
                                 0, # zero additional values per face,
                                 0,
@@ -212,7 +212,7 @@ class MeshInfoBase:
 
                     el_index, el_face_number = adj_el[0]
 
-                    outfile.write("%d\t%d\t%d\n" % 
+                    outfile.write("%d %d %d\n" % 
                             (el_index+1, eltype, el_face_number))
 
                 outfile.write("ENDOFSECTION\n")
