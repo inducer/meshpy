@@ -65,8 +65,8 @@ class MeshInfoBase:
         
         outfile is a file-like object opened for writing.
 
-        bc is a dictionary mapping face markers to a tuple
-        (bc_name, bc_code).
+        bc is a dictionary mapping single face markers (or frozensets of them)
+        to a tuple (bc_name, bc_code).
 
         periodicity is either a tuple (face_marker, (px,py,..)) giving the 
         face marker of the periodic boundary and the period in each coordinate
@@ -182,9 +182,14 @@ class MeshInfoBase:
             # requires -f option in tetgen, -e in triangle
 
             for bc_marker in bc_markers:
-                face_indices = [i
-                        for i, face in enumerate(self.faces)
-                        if bc_marker == self.face_markers[i]]
+                if isinstance(bc_marker, frozenset):
+                    face_indices = [i
+                            for i, face in enumerate(self.faces)
+                            if self.face_markers[i] in bc_marker]
+                else:
+                    face_indices = [i
+                            for i, face in enumerate(self.faces)
+                            if bc_marker == self.face_markers[i]]
 
                 if not face_indices:
                     continue
