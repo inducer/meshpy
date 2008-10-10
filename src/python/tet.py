@@ -230,7 +230,7 @@ def _is_same_float(a, b, threshold=1e-10):
         a,b = b,a
 
     # now abs(a) <= abs(b) always
-    return abs(b) < threshold or abs(a-b)<threshold*b
+    return abs(b) < threshold or abs(a-b)<threshold*abs(b)
 
 
 
@@ -399,7 +399,9 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
                 if rz_points[i][0] == 0:
                     assert len(ring_points) == 1
                 else:
-                    assert len(ring_points) == len(base_shape)
+                    assert len(ring_points) == len(base_shape), \
+                            ("Ring points length (%d) does not match base shape length (%d)"
+                                    % (len(ring_points), len(base_shape)))
 
                 rings[i] = ring_points
 

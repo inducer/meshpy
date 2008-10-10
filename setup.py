@@ -112,8 +112,8 @@ def main():
               extra_compile_args=conf["CXXFLAGS"],
               extra_link_args=conf["LDFLAGS"],
               ),
-            ]
-         )
+            ],
+          zip_safe=False)
 
 
 
