@@ -17,7 +17,7 @@ def round_trip_connect(start, end):
   result.append((end, start))
   return result
 
-def needs_refinement((vert_origin, vert_destination, vert_apex), area ):
+def needs_refinement(vert_origin, vert_destination, vert_apex, area ):
   bary_x = (vert_origin.x + vert_destination.x + vert_apex.x) / 3
   bary_y = (vert_origin.y + vert_destination.y + vert_apex.y) / 3
 
