@@ -3,52 +3,20 @@ def main():
     import sys
     data = parse_ply(sys.argv[1])
 
-    from meshpy.tet import MeshInfo, build, Options
+    from meshpy.geometry import GeometryBuilder
 
-    #points, facets, facet_holestarts, markers =
+    builder = GeometryBuilder()
+    builder.add_geometry(
+            points=[pt[:3] for pt in data["vertex"].data],
+            facets=[fd[0] for fd in data["face"].data])
+    builder.wrap_in_box(1)
 
-    
-    import numpy
-    ply_points = numpy.array([pt[:3] for pt in data["vertex"].data])
-    ply_facets = numpy.array([fd[0] for fd in data["face"].data])
-    a, b = numpy.min(ply_points, axis=0), numpy.max(ply_points, axis=0)
-
-    a = a - 1
-    b = b + 1
-
-    #    7--------6
-    #   /|       /|
-    #  4--------5 |  z
-    #  | |      | |  ^
-    #  | 3------|-2  | y
-    #  |/       |/   |/
-    #  0--------1    +--->x
-
-    bbox_points = [
-            (a[0],a[1],a[2]),
-            (b[0],a[1],a[2]),
-            (b[0],b[1],a[2]),
-            (a[0],b[1],a[2]),
-            (a[0],a[1],b[2]),
-            (b[0],a[1],b[2]),
-            (b[0],b[1],b[2]),
-            (a[0],b[1],b[2]),
-            ]
-
-    bbox_facets = [
-            (0,1,2,3),
-            (0,1,5,4),
-            (1,2,6,5),
-            (7,6,2,3),
-            (7,3,0,4),
-            (4,5,6,7)
-            ]
-
+    from meshpy.tet import MeshInfo, build
     mi = MeshInfo()
-    mi.set_points(bbox_points+list(ply_points))
-    mi.set_facets(bbox_facets+list((ply_facets + len(bbox_points))))
-    mi.set_holes([(a+b)/2])
+    builder.set(mi)
+    mi.set_holes([builder.center()])
     mesh = build(mi)
+    print "%d elements" % len(mesh.elements)
     mesh.write_vtk("out.vtk")
 
 
