@@ -11,8 +11,27 @@ def bounding_box(points):
 
 
 
+def is_multi_polygon(facets):
+    if not facets:
+        return False
+
+    try:
+        facets[0][0][0] # facet 0, poly 0, point 0
+    except TypeError:
+        return False
+    else:
+        return True
+
+
+
+
 def offset_point_indices(facets, offset):
-    return [tuple(p_i+offset for p_i in facet) for facet in facets]
+    if is_multi_polygon(facets):
+        return [[tuple(p_i+offset for p_i in poly) 
+            for poly in facet]
+            for facet in facets]
+    else:
+        return [tuple(p_i+offset for p_i in facet) for facet in facets]
 
 
 
@@ -27,25 +46,28 @@ class GeometryBuilder(object):
 
     def add_geometry(self, points, facets, facet_hole_starts=None, facet_markers=None,
             point_markers=None):
-        """If C{facet_hole_starts} is not None, it indicates that C{facets} is a list
-        of (potentially) multi-polygon facets. Otherwise, facets is seen as a list
-        of single-facet polygons."""
+        if isinstance(facet_markers, int):
+            facet_markers = len(facets) * [facet_markers]
 
         if facet_hole_starts and not self.facet_hole_starts:
             self.facet_hole_starts = len(self.facets) * []
-            self.facets = [[facet] for facet in self.facets]
         if facet_markers and not self.facet_markers:
             self.facet_markers = len(self.facets) * [0]
         if point_markers and not self.point_markers:
             self.point_markers = len(self.points) * [0]
 
         if not facet_hole_starts and self.facet_hole_starts:
-            facet_hole_starts = len(facets) * []
-            facets = [[facet] for facet in facets]
+            facet_hole_starts = len(facets) * [[]]
         if not facet_markers and self.facet_markers:
             facet_markers = len(facets) * [0]
         if not point_markers and self.point_markers:
             point_markers = len(points) * [0]
+
+        if is_multi_polygon(facets) and not is_multi_polygon(self.facets):
+            self.facets = [[facet] for facet in self.facets]
+            
+        if not is_multi_polygon(facets) and is_multi_polygon(self.facets):
+            facets = [[facet] for facet in facets]
 
         self.facets.extend(offset_point_indices(facets, len(self.points)))
         self.points.extend(points)
@@ -62,8 +84,9 @@ class GeometryBuilder(object):
 
     def set(self, mesh_info):
         mesh_info.set_points(self.points, self.point_markers)
-        if not self.facet_hole_starts:
-            mesh_info.set_facets(self.facets, self.facet_markers)
+        if self.facet_hole_starts or is_multi_polygon(self.facets):
+            mesh_info.set_facets_ex(self.facets, 
+                    self.facet_hole_starts, self.facet_markers)
         else:
             mesh_info.set_facets(self.facets, self.facet_markers)
 
@@ -132,7 +155,7 @@ def make_box(a, b):
 
 
 
-def make_ball_geometry(r, subdivisions=10):
+def make_ball(r, subdivisions=10):
     from math import pi, cos, sin
 
     dphi = pi/subdivisions
@@ -166,6 +189,10 @@ def make_cylinder(radius, height, radial_subdivisions=10,
     return generate_surface_of_revolution(rz,
             closure=EXT_OPEN, radial_subdiv=radial_subdivisions,
             ring_markers=ring_markers)
+
+
+
+
 # extrusions ------------------------------------------------------------------
 def _is_same_float(a, b, threshold=1e-10):
     if abs(a) > abs(b):
