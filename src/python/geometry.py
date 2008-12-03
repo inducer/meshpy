@@ -101,6 +101,9 @@ class GeometryBuilder(object):
         a, b = bounding_box(self.points)
         bbox_points, bbox_facets, _ = make_box(a-distance, b+distance)
         self.add_geometry(bbox_points, bbox_facets)
+
+    def apply_transform(self, f):
+        self.points = [f(x) for x in self.points]
             
 
 
