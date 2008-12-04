@@ -134,7 +134,7 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
 
     
 def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
-        volume_constraints=True, max_volume=None, allow_boundary_steiner=True,
+        volume_constraints=False, max_volume=None, allow_boundary_steiner=True,
         generate_edges=False):
     """Triangulate the domain given in `mesh_info'."""
     opts = "pzqj"
@@ -149,9 +149,9 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
     if volume_constraints:
         opts += "a"
         if max_volume:
-            raise ValueError, "cannot specify both area_constraints and max_area"
+            raise ValueError, "cannot specify both volume_constraints and max_area"
     elif max_volume:
-        opts += "a%s" % repr(max_area)
+        opts += "a%s" % repr(max_volume)
 
     if refinement_func is not None:
         opts += "u"

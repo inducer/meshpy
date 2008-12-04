@@ -82,6 +82,9 @@ class GeometryBuilder(object):
             self.point_markers.extend(point_markers)
             assert len(points) == len(point_markers)
 
+    def dimensions(self):
+        return len(self.points[0])
+
     def set(self, mesh_info):
         mesh_info.set_points(self.points, self.point_markers)
         if self.facet_hole_starts or is_multi_polygon(self.facets):
@@ -89,6 +92,17 @@ class GeometryBuilder(object):
                     self.facet_hole_starts, self.facet_markers)
         else:
             mesh_info.set_facets(self.facets, self.facet_markers)
+
+    def mesher_module(self):
+        dim = self.dimensions()
+        if dim == 2:
+            import meshpy.triangle
+            return meshpy.triangle
+        elif dim == 3:
+            import meshpy.tet
+            return meshpy.tet
+        else:
+            raise ValueError, "unsupported dimensionality %d" % dim
 
     def bounding_box(self):
         return bounding_box(self.points)
@@ -122,36 +136,54 @@ class Marker:
 
 
 def make_box(a, b):
-    #    7--------6
-    #   /|       /|
-    #  4--------5 |  z
-    #  | |      | |  ^
-    #  | 3------|-2  | y
-    #  |/       |/   |/
-    #  0--------1    +--->x
+    assert len(a) == len(b)
+    if len(a) == 2:
+        points = [
+                (a[0],a[1]),
+                (b[0],a[1]),
+                (b[0],b[1]),
+                (a[0],b[1]),
+                ]
 
-    points = [
-            (a[0],a[1],a[2]),
-            (b[0],a[1],a[2]),
-            (b[0],b[1],a[2]),
-            (a[0],b[1],a[2]),
-            (a[0],a[1],b[2]),
-            (b[0],a[1],b[2]),
-            (b[0],b[1],b[2]),
-            (a[0],b[1],b[2]),
-            ]
+        facets = [(0,1), (1,2), (2,3), (3,0)]
 
-    facets = [
-            (0,1,2,3),
-            (0,1,5,4),
-            (1,2,6,5),
-            (7,6,2,3),
-            (7,3,0,4),
-            (4,5,6,7)
-            ]
+        facet_markers = [
+                Marker.MINUS_Y, Marker.PLUS_X, 
+                Marker.PLUS_Y, Marker.MINUS_X]
 
-    facet_markers = [Marker.MINUS_Z, Marker.MINUS_Y, Marker.PLUS_X, 
-            Marker.PLUS_Y, Marker.MINUS_X, Marker.PLUS_Z]
+    elif len(a) == 3:
+        #    7--------6
+        #   /|       /|
+        #  4--------5 |  z
+        #  | |      | |  ^
+        #  | 3------|-2  | y
+        #  |/       |/   |/
+        #  0--------1    +--->x
+
+        points = [
+                (a[0],a[1],a[2]),
+                (b[0],a[1],a[2]),
+                (b[0],b[1],a[2]),
+                (a[0],b[1],a[2]),
+                (a[0],a[1],b[2]),
+                (b[0],a[1],b[2]),
+                (b[0],b[1],b[2]),
+                (a[0],b[1],b[2]),
+                ]
+
+        facets = [
+                (0,1,2,3),
+                (0,1,5,4),
+                (1,2,6,5),
+                (7,6,2,3),
+                (7,3,0,4),
+                (4,5,6,7)
+                ]
+
+        facet_markers = [Marker.MINUS_Z, Marker.MINUS_Y, Marker.PLUS_X, 
+                Marker.PLUS_Y, Marker.MINUS_X, Marker.PLUS_Z]
+    else:
+        raise ValueError, "unsupported dimension count: %d" %  len(a)
 
     return points, facets, facet_markers
 
