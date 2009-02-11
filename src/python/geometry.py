@@ -210,7 +210,7 @@ def make_ball(r, subdivisions=10):
 
 
 def make_cylinder(radius, height, radial_subdivisions=10, 
-        heigh_subdivisions=1):
+        height_subdivisions=1):
     from math import pi, cos, sin
 
     dz = height/height_subdivisions
