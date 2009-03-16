@@ -122,11 +122,26 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             "Mesh")
         vtkelements.tofile(filename)
 
+    def set_elements(self, elements):
+        self.elements.resize(len(elements))
+        
+        for i, element in enumerate(elements):
+            self.elements[i] = element[:4]
+            
+    def set_element_constraints(self, element_constraints):
+        self.element_volumes.setup()
+        
+        for i in xrange(len(self.element_volumes)):
+            if i in element_contraints:
+                self.element_volumes[i] = element_contraints[i]
+            else:
+                self.element_volumes[i] = -1
+
 
 
 
 class Options(internals.Options):
-    def __init__(self, switches="pq", **kwargs):
+    def __init__(self, switches, **kwargs):
         internals.Options.__init__(self)
         self.parse_switches(switches)
         self.quiet = 1
@@ -144,9 +159,8 @@ class Options(internals.Options):
 
 
 def _PBCGroup_get_transmat(self):
-    import pylinear.array as num
-
-    return num.array(
+    import numpy
+    return numpy.array(
             [[self.get_transmat_entry(i,j) 
                 for j in xrange(4)]
                 for i in xrange(4)])
@@ -155,8 +169,6 @@ def _PBCGroup_get_transmat(self):
 
 
 def _PBCGroup_set_transmat(self, matrix):
-    import pylinear.array as num
-
     for i in xrange(4):
         for j in xrange(4):
             self.set_transmat_entry(i, j, matrix[i,j])
@@ -194,11 +206,16 @@ internals.PBCGroup.set_transform = _PBCGroup_set_transform
 
 
 
-def build(mesh_info, options=Options(), verbose=False, 
+def tetrahedralize(mesh_info, options):
+    mesh = MeshInfo()
+    internals.tetrahedralize(options, mesh_info, mesh)
+    return mesh
+
+
+
+def build(mesh_info, options=Options("pq"), verbose=False, 
         attributes=False, volume_constraints=False, max_volume=None,
         diagnose=False):
-    mesh = MeshInfo()
-
     if not verbose:
         options.quiet = 1
 
@@ -212,5 +229,5 @@ def build(mesh_info, options=Options(), verbose=False,
     if diagnose:
         options.diagnose = 1
 
-    internals.tetrahedralize(options, mesh_info, mesh)
-    return mesh
+    return tetrahedralize(mesh_info, options)
+
