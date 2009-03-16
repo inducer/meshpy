@@ -132,8 +132,8 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
         self.element_volumes.setup()
         
         for i in xrange(len(self.element_volumes)):
-            if i in element_contraints:
-                self.element_volumes[i] = element_contraints[i]
+            if i in element_constraints:
+                self.element_volumes[i] = element_constraints[i]
             else:
                 self.element_volumes[i] = -1
 
