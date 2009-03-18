@@ -1,7 +1,9 @@
 def main():
     from math import pi, cos, sin
-    from meshpy.tet import MeshInfo, build, generate_surface_of_revolution,\
-            EXT_OPEN
+    from meshpy.tet import MeshInfo, build
+    from meshpy.geometry import \
+            generate_surface_of_revolution, EXT_OPEN, \
+            GeometryBuilder
 
     r = 3
 
@@ -16,12 +18,13 @@ def main():
 
     rz = [(truncate(r*sin(i*dphi)), r*cos(i*dphi)) for i in range(points+1)]
 
-    mesh_info = MeshInfo()
-    points, facets = generate_surface_of_revolution(rz,
-            closure=EXT_OPEN, radial_subdiv=10)
+    geob = GeometryBuilder()
+    geob.add_geometry(*generate_surface_of_revolution(rz,
+            closure=EXT_OPEN, radial_subdiv=10))
 
-    mesh_info.set_points(points)
-    mesh_info.set_facets(facets, [1 for i in range(len(facets))])
+    mesh_info = MeshInfo()
+    geob.set(mesh_info)
+
     mesh = build(mesh_info)
     mesh.write_vtk("ball.vtk")
 

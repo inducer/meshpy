@@ -1,20 +1,27 @@
-from meshpy.tet import MeshInfo, build, generate_surface_of_revolution
 
 
 
 
 def main():
+    from meshpy.tet import MeshInfo, build
+    from meshpy.geometry import \
+            generate_surface_of_revolution, \
+            GeometryBuilder
+
     simple_rz = [
         (0,0),
         (1,1),
         (1,2),
         (0,3),
         ]
-    mesh_info = MeshInfo()
-    points, facets = generate_surface_of_revolution(simple_rz)
 
-    mesh_info.set_points(points)
-    mesh_info.set_facets(facets, [0 for i in range(len(facets))])
+
+    geob = GeometryBuilder()
+    geob.add_geometry(*generate_surface_of_revolution(simple_rz))
+
+    mesh_info = MeshInfo()
+    geob.set(mesh_info)
+
     #mesh_info.save_nodes("test")
     #mesh_info.save_poly("test")
     #mesh_info.load_poly("test")
