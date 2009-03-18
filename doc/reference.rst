@@ -119,6 +119,11 @@ Some common notions
     .. attribute:: normals
 
     .. attribute:: number_of_point_attributes
+    .. attribute:: number_of_element_vertices
+
+        Defautls to 4 for linear tetrahedra. Change to 10 for second-order 
+        tetrahedra.
+
     .. attribute:: number_of_element_attributes
     
     Convenient setters:

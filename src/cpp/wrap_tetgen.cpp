@@ -19,6 +19,9 @@ namespace
 {
   struct tMeshInfo : public tetgenio, public boost::noncopyable
   {
+    private:
+      typedef tetgenio super;
+
     public:
       tForeignArray<REAL>		        Points; // in/out
       tForeignArray<REAL>		        PointAttributes; // in/out
@@ -55,7 +58,7 @@ namespace
           PointMetricTensors(pointmtrlist, numberofpoints, 0, &Points),
           PointMarkers(pointmarkerlist, numberofpoints, 1, &Points),
 
-          Elements(tetrahedronlist, numberoftetrahedra, 4),
+          Elements(tetrahedronlist, numberoftetrahedra, 0),
           ElementAttributes(tetrahedronattributelist, 
               numberoftetrahedra, 0, &Elements),
           ElementVolumes(tetrahedronvolumelist, numberoftetrahedra, 1, &Elements),
@@ -80,6 +83,7 @@ namespace
           Edges(edgelist, numberofedges, 2),
           EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges)
       {
+        Elements.fixUnit(numberofcorners);
       } 
       
       unsigned numberOfPointAttributes() const
@@ -90,6 +94,11 @@ namespace
       unsigned numberOfPointMetricTensors() const
       {
         return numberofpointmtrs;
+      }
+
+      unsigned numberOfElementVertices() const
+      {
+        return numberofcorners;
       }
 
       unsigned numberOfElementAttributes() const
@@ -109,11 +118,46 @@ namespace
         numberofpointmtrs = mtrs;
       }
 
+      void setNumberOfElementVertices(unsigned verts)
+      {
+        Elements.setUnit(verts);
+        numberofcorners = verts;
+      }
+
       void setNumberOfElementAttributes(unsigned attrs)
       {
         ElementAttributes.setUnit(attrs);
         numberoftetrahedronattributes = attrs;
       }
+
+#define OVERRIDE_LOAD_WITH_ERROR_CHECK(WHAT, POSTPROC) \
+      void load_##WHAT(char* filename) \
+      { \
+        if (!super::load_##WHAT(filename)) \
+          throw std::runtime_error("load_" #WHAT " failed"); \
+        POSTPROC; \
+      }
+
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(node,);
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(pbc,);
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(var,);
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(mtr,);
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(poly,);
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(off,);
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(ply,);
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(stl,);
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(medit,);
+
+      void load_plc(char* filename, int object)
+      {
+        if (!super::load_plc(filename, object))
+          throw std::runtime_error("load_plc failed");
+      }
+
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(tetmesh,
+          Elements.fixUnit(numberofcorners);
+          );
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(voronoi,);
 
       /*
       tTriangulationParameters &operator=(const tTriangulationParameters &src)
@@ -303,6 +347,9 @@ BOOST_PYTHON_MODULE(_tetgen)
       .add_property("number_of_point_attributes", 
           &cl::numberOfPointAttributes,
           &cl::setNumberOfPointAttributes)
+      .add_property("number_of_element_vertices", 
+          &cl::numberOfElementVertices,
+          &cl::setNumberOfElementVertices)
       .add_property("number_of_element_attributes", 
           &cl::numberOfElementAttributes,
           &cl::setNumberOfElementAttributes)
