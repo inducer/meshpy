@@ -126,7 +126,7 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
         self.elements.resize(len(elements))
         
         for i, element in enumerate(elements):
-            self.elements[i] = element[:4]
+            self.elements[i] = element
             
     def set_element_constraints(self, element_constraints):
         self.element_volumes.setup()
@@ -143,6 +143,9 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
 class Options(internals.Options):
     def __init__(self, switches, **kwargs):
         internals.Options.__init__(self)
+        if len(switches) == 0:
+            from warnings import warn
+            warn("Recommend non-empty 'switches' for crash-free meshing")
         self.parse_switches(switches)
         self.quiet = 1
 
