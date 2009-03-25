@@ -1,7 +1,8 @@
 def main():
     from math import pi, cos, sin
-    from meshpy.tet import MeshInfo, build, generate_surface_of_revolution,\
-            EXT_CLOSED_IN_RZ
+    from meshpy.tet import MeshInfo, build
+    from meshpy.geometry import generate_surface_of_revolution,\
+            EXT_CLOSED_IN_RZ, GeometryBuilder
 
     big_r = 3
     little_r = 2.9
@@ -12,12 +13,13 @@ def main():
     rz = [(big_r+little_r*cos(i*dphi), little_r*sin(i*dphi))
             for i in range(points)]
 
-    mesh_info = MeshInfo()
-    points, facets = generate_surface_of_revolution(rz,
-            closure=EXT_CLOSED_IN_RZ, radial_subdiv=20)
+    geob = GeometryBuilder()
+    geob.add_geometry(*generate_surface_of_revolution(rz,
+            closure=EXT_CLOSED_IN_RZ, radial_subdiv=20))
 
-    mesh_info.set_points(points)
-    mesh_info.set_facets(facets, len(facets) *[1])
+    mesh_info = MeshInfo()
+    geob.set(mesh_info)
+
     mesh_info.save_nodes("torus")
     mesh_info.save_poly("torus")
     mesh = build(mesh_info)
