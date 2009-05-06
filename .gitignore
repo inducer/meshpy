@@ -20,3 +20,5 @@ doc/html
 *.egg-info
 *.pyc
 doc/.build
+*.pyd
+*.so

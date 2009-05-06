@@ -40,7 +40,7 @@ def main():
     LIBRARY_DIRS = conf["BOOST_LIB_DIR"]
     LIBRARIES = conf["BOOST_PYTHON_LIBNAME"]
 
-    execfile("src/python/__init__.py", conf)
+    execfile("meshpy/__init__.py", conf)
     setup(name="MeshPy",
           version=conf["version"],
           description="Triangular and Tetrahedral Mesh Generator",
@@ -88,7 +88,6 @@ def main():
             ],
 
           packages = [ "meshpy" ],
-          package_dir={"meshpy": "src/python"},
           ext_modules = [
             Extension(
               "meshpy._triangle", 
