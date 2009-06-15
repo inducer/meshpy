@@ -39,5 +39,5 @@ def main():
 
     triangle.write_gnuplot_mesh("triangles.dat", mesh_2)
 
-if __name__ == "__main__:
+if __name__ == "__main__":
     main()
