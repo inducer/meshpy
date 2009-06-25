@@ -4,18 +4,16 @@ import numpy
 
 
 
-class four_digits_sym:
-    def __init__(self, length, thickness):
-        self.length = length
+class four_digits_symmetric:
+    def __init__(self, thickness, coeff_4):
         self.thickness = thickness
+        self.coeff_4 = coeff_4
     
     def __call__(self, x, side):
-        l = self.length
         t = self.thickness
-        x_rel = x / l
 
-        y = l * t * 5 * (0.2969 * numpy.sqrt(x_rel) + ((((-0.1015 * x_rel + 
-            0.2843) * x_rel - 0.3516) * x_rel) - 0.126) * x_rel)
+        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.coeff_4 * x + 
+            0.2843) * x - 0.3516) * x) - 0.126) * x)
 
         if side == "upper":
             return numpy.array([self.x_upper(x), self.y_upper(y)])
@@ -40,34 +38,34 @@ class four_digits_sym:
 
 
 
-class four_digits_cam:
-    def __init__(self, length, thickness, max_camber, max_camber_loc):
-        self.length = length
+class four_digits_cambered:
+    def __init__(self, thickness, max_camber, max_camber_loc, coeff_4):
         self.thickness = thickness
         self.max_camber = max_camber
         self.max_camber_loc = max_camber_loc
+        self.coeff_4 = coeff_4
 
     def __call__(self, x, side):
-        l = self.length
         t = self.thickness
         m = self.max_camber
         p = self.max_camber_loc
-        x_rel = x / l
 
-        y = l * t * 5 * (0.2969 * numpy.sqrt(x_rel) + ((((-0.1015 * x_rel + 
-            0.2843) * x_rel - 0.3516) * x_rel) -0.126) * x_rel)
+        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.coeff_4 * x + 
+            0.2843) * x - 0.3516) * x) -0.126) * x)
 
-        if x_rel <= p:
-            y_c = m * x_rel * l / p ** 2 * (2 * p - x_rel)
-            theta = numpy.arctan(2 * m / p ** 2 * (p - x_rel))
+        if x <= p:
+            y_c = m * x / p ** 2 * (2 * p - x)
+            theta = numpy.arctan(2 * m / p ** 2 * (p - x))
         else:
-            y_c = m * l * (1 - x_rel) / (1 - p) ** 2 * (1 + x_rel - 2 * p)
-            theta = numpy.arctan(m / (1 - p) ** 2 * (2 * p - 2 * x_rel))
+            y_c = m * (1 - x) / (1 - p) ** 2 * (1 + x - 2 * p)
+            theta = numpy.arctan(m / (1 - p) ** 2 * (2 * p - 2 * x))
 
         if side == "upper":
-            return numpy.array([self.x_upper(x, y, theta), self.y_upper(y_c, y, theta)])
+            return numpy.array([self.x_upper(x, y, theta), 
+                self.y_upper(y_c, y, theta)])
         elif side == "lower":
-            return numpy.array([self.x_lower(x, y, theta), self.y_lower(y_c, y, theta)])
+            return numpy.array([self.x_lower(x, y, theta), 
+                self.y_lower(y_c, y, theta)])
         else:
             print "Neither upper nor lower side selected in the call!"
             print "------------------------"
@@ -91,12 +89,13 @@ def main():
     """
     Program to calculate the coordinates of NACA 4-digit series airfoils.
 
-    Set the digits, the number of points to represent the upper and lower 
-    side of the airfoil and the length of the airfoil in the following lines.
+    Set the digits and the number of points to represent the upper and lower
+    side of the airfoil in the following lines. Also decide, whether you 
+    want a sharp or blunt trailing edge.
     """
-    naca_digits = "0012"
+    naca_digits = "2312"
     number_of_points = 1000
-    length = 1
+    sharp_trailing_edge = True
 
     print "----------------------------"
 
@@ -110,26 +109,33 @@ def main():
     max_camber_loc = (digits_int % 1000) - thickness
     max_camber = (digits_int % 10000) - max_camber_loc - thickness
 
-    thickness = thickness / 100
-    max_camber_loc = max_camber_loc / 1000
-    max_camber = max_camber / 100000
+    thickness = thickness / 1e2
+    max_camber_loc = max_camber_loc / 1e3
+    max_camber = max_camber / 1e5
 
     print "Airfoil: NACA-%s" %(naca_digits)
-    print "Length:", length
-    print "Thickness:", thickness * length
-    print "Location of maximum camber:", max_camber_loc * length
-    print "Maximum camber:", max_camber * length
+    print "Thickness:", thickness
+    print "Location of maximum camber:", max_camber_loc
+    print "Maximum camber:", max_camber
 
-    x = numpy.arange(0, length+length/number_of_points, length/number_of_points)
+    if sharp_trailing_edge == True:
+        print "Sharp trailing edge"
+        edge_coeff = 0.1036
+    else:
+        print "Blunt trailing edge"
+        edge_coeff = 0.1015
+
+    x = numpy.arange(0, 1+1/number_of_points, 1/number_of_points)
     points_upper = numpy.zeros((len(x),2))
     points_lower = numpy.zeros((len(x),2))
 
     if max_camber == 0 and max_camber_loc == 0:
         print "Symmetric airfoil"
-        points = four_digits_sym(length, thickness)
+        points = four_digits_symmetric(thickness, edge_coeff)
     elif max_camber != 0 and max_camber_loc != 0:
         print "Cambered airfoil"
-        points = four_digits_cam(length, thickness, max_camber, max_camber_loc)
+        points = four_digits_cambered(thickness, max_camber, max_camber_loc, 
+                edge_coeff)
     else:
         print "You must decide whether your airfoil shall be cambered or not!"
         print "----------------------------"
