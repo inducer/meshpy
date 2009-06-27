@@ -12,6 +12,3 @@ licensed under the GNU GPL.
 (C) Flightgear Developers & Contributors
 (C) Andreas Kloeckner
 -------------------------------------------------------------------------------
-naca*.txt:
-We're not quite sure about licensing for these files.
--------------------------------------------------------------------------------

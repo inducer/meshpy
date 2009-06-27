@@ -32,7 +32,7 @@ class FourDigitsSymmetric:
         elif side == "lower":
             return numpy.array([x_lower(x), y_lower(y)])
         else:
-            raise ValueError("Neither upper nor lower side selected in the call!")
+            raise ValueError("Neither upper nor lower side selected in the call.")
 
 
 
@@ -77,8 +77,7 @@ class FourDigitsCambered:
         elif side == "lower":
             return numpy.array([x_lower(x, y, theta), y_lower(y_c, y, theta)])
         else:
-            print "Neither upper nor lower side selected in the call!"
-            print "------------------------"
+            raise ValueError("Neither upper nor lower side selected in the call.")
 
 
 
@@ -124,8 +123,7 @@ class FiveDigits:
         elif side == "lower":
             return numpy.array([x_lower(x, y, theta), y_lower(y_c, y, theta)])
         else:
-            print "Neither upper nor lower side selected in the call!"
-            print "------------------------"
+            raise ValueError("Neither upper nor lower side selected in the call.")
 
 
 
@@ -162,12 +160,12 @@ def generate_naca(naca_digits, number_of_points=100,
 
     digits_int = int(naca_digits)
     if uniform_distribution == True:
-        explain("Uniformal distribution of points")
+        explain("Uniform distribution of points")
         x = numpy.arange(0, 1+1/number_of_points, 1/number_of_points)
     else:
-        explain("Non-uniformal distribution of points")
-        n = number_of_points/10
-        n1 = 1/n
+        explain("Non-uniform distribution of points")
+        n = number_of_points // 10
+        n1 = 1 / n
         x = numpy.hstack((
             numpy.linspace(0, 0.0001-0.0001*n1, n), 
             numpy.linspace(0.0001, 0.001-0.0009*n1, n),
