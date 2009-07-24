@@ -23,3 +23,4 @@ doc/html
 doc/.build
 *.pyd
 *.so
+setuptools*egg
