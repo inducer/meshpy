@@ -134,10 +134,6 @@ def generate_naca(naca_digits, number_of_points=100,
     """
     Program to calculate the coordinates of NACA 4-digit and 5-digit series
     airfoils.
-
-    Set the digits and the number of points to represent the upper and lower
-    side of the airfoil in the following lines. Also decide, whether you 
-    want a sharp or blunt trailing edge.
     """
 
     if verbose:
