@@ -135,7 +135,7 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
     
 def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
         volume_constraints=False, max_volume=None, allow_boundary_steiner=True,
-        generate_edges=False):
+        generate_edges=None, generate_faces=False):
     """Triangulate the domain given in `mesh_info'."""
     opts = "pzqj"
     if verbose:
@@ -156,7 +156,12 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
     if refinement_func is not None:
         opts += "u"
     
-    if generate_edges:
+    if generate_edges is not None:
+        from warnings import warn
+        warn("generate_edges is deprecated--use generate_faces instead")
+        generate_faces = generate_edges
+
+    if generate_faces:
         opts += "e"
 
     if not allow_boundary_steiner:
