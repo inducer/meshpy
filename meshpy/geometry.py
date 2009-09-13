@@ -113,10 +113,17 @@ class GeometryBuilder(object):
         a, b = bounding_box(self.points)
         return (a+b)/2
 
-    def wrap_in_box(self, distance):
+    def wrap_in_box(self, distance, subdivisions=None):
+        """
+        :param subdivisions: is a tuple of integers specifying
+          the number of subdivisions along each axis.
+        """
+
         a, b = bounding_box(self.points)
-        bbox_points, bbox_facets, _ = make_box(a-distance, b+distance)
-        self.add_geometry(bbox_points, bbox_facets)
+        points, facets, facet_markers = \
+                make_box(a-distance, b+distance, subdivisions)
+
+        self.add_geometry(points, facets, facet_markers=facet_markers)
 
     def apply_transform(self, f):
         self.points = [f(x) for x in self.points]
@@ -134,12 +141,24 @@ class Marker:
     PLUS_Z = 6
     SHELL = 100
 
+    FIRST_USER_MARKER = 1000
 
 
 
-def make_box(a, b):
+
+def make_box(a, b, subdivisions=None):
+    """
+    :param subdivisions: is a tuple of integers specifying
+      the number of subdivisions along each axis.
+    """
+
     assert len(a) == len(b)
-    if len(a) == 2:
+
+    dimensions = len(a)
+    if dimensions == 2:
+        # CAUTION: Do not change point or facet order here.
+        # Other code depends on this staying the way it is.
+
         points = [
                 (a[0],a[1]),
                 (b[0],a[1]),
@@ -153,7 +172,7 @@ def make_box(a, b):
                 Marker.MINUS_Y, Marker.PLUS_X, 
                 Marker.PLUS_Y, Marker.MINUS_X]
 
-    elif len(a) == 3:
+    elif dimensions == 3:
         #    7--------6
         #   /|       /|
         #  4--------5 |  z
@@ -186,6 +205,18 @@ def make_box(a, b):
                 Marker.PLUS_Y, Marker.MINUS_X, Marker.PLUS_Z]
     else:
         raise ValueError, "unsupported dimension count: %d" %  len(a)
+
+    if subdivisions is not None:
+        if dimensions != 2:
+            raise NotImplementedError(
+                    "subdivision not implemented for any "
+                    "dimension count other than 2")
+
+        from meshpy.triangle import subdivide_facets
+        points, facets, facet_markers = subdivide_facets(
+                [subdivisions[0], subdivisions[1], 
+                    subdivisions[0], subdivisions[1]],
+                points, facets, facet_markers)
 
     return points, facets, facet_markers
 
