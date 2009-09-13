@@ -6,7 +6,9 @@ import numpy
 
 # geometry building -----------------------------------------------------------
 def bounding_box(points):
-    return numpy.min(points, axis=0), numpy.max(points, axis=0)
+    return (
+            numpy.asarray(numpy.min(points, axis=0), dtype=numpy.float64), 
+            numpy.asarray(numpy.max(points, axis=0), dtype=numpy.float64))
 
 
 
