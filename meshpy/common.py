@@ -35,6 +35,23 @@ def _linebreak_list(list, per_line=10, pad=None):
 
 
 class MeshInfoBase:
+    @property
+    def face_vertex_indices_to_face_marker(self):
+        try:
+            return self._fvi2fm
+        except AttributeError:
+            result = {}
+
+            for i, face in enumerate(self.faces):
+                result[frozenset(face)] = self.face_markers[i]
+
+            self._fvi2fm = result
+            return result
+
+
+
+
+
     def set_points(self, points, point_markers=None):
         if point_markers is not None:
             assert len(point_markers) == len(point_markers)

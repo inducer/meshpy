@@ -91,19 +91,6 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             for i, mark in enumerate(markers):
                 self.facet_markers[i] = mark
 
-    @property
-    def face_vertex_indices_to_face_marker(self):
-        try:
-            return self._fvi2fm
-        except AttributeError:
-            result = {}
-
-            for i, face in enumerate(self.faces):
-                result[frozenset(face)] = self.face_markers[i]
-
-            self._fvi2fm = result
-            return result
-
     def dump(self):
         for name in ["points"]:
             dump_array(name, getattr(self, name))
