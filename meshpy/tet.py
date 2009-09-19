@@ -6,17 +6,17 @@ import meshpy._tetgen as internals
 
 class MeshInfo(internals.MeshInfo, MeshInfoBase):
     def set_facets(self, facets, markers=None):
-        """Set a list of simple, single-polygon factes. Unlike L{set_facets_ex},
-        C{set_facets} does not allow hole and only lets you use a single
+        """Set a list of simple, single-polygon factes. Unlike :meth:`set_facets_ex`,
+        :meth:`set_facets` does not allow hole and only lets you use a single
         polygon per facet.
 
-        @param facets: a list of facets, where each facet is a single 
+        :param facets: a list of facets, where each facet is a single 
           polygons, represented by a list of point indices.
-        @param markers: Either None or a list of integers of the same
-          length as C{facets}. Each integer is the facet marker assigned
+        :param markers: Either None or a list of integers of the same
+          length as *facets*. Each integer is the facet marker assigned
           to its corresponding facet.
 
-        @note: When the above says "list", any repeatable iterable 
+        :note: When the above says "list", any repeatable iterable 
           also accepted instead.
         """
 
@@ -40,23 +40,23 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
                 self.facet_markers[i] = mark
 
     def set_facets_ex(self, facets, facet_holestarts=None, markers=None):
-        """Set a list of complicated factes. Unlike L{set_facets},
-        C{set_facets_ex()} allows holes and multiple polygons per
+        """Set a list of complicated factes. Unlike :meth:`set_facets`,
+        :meth:`set_facets_ex` allows holes and multiple polygons per
         facet.
 
-        @param facets: a list of facets, where each facet is a list
+        :param facets: a list of facets, where each facet is a list
           of polygons, and each polygon is represented by a list
           of point indices.
-        @param facet_holestarts: Either None or a list of hole starting points
+        :param facet_holestarts: Either None or a list of hole starting points
           for each facet. Each facet may have several hole starting points.
           The mesh generator starts "eating" a hole into the facet at each 
           starting point and continues until it hits a polygon specified
-          in this facet's record in C{facets}.
-        @param markers: Either None or a list of integers of the same
-          length as C{facets}. Each integer is the facet marker assigned
+          in this facet's record in *facets*.
+        :param markers: Either None or a list of integers of the same
+          length as *facets*. Each integer is the facet marker assigned
           to its corresponding facet.
 
-        @note: When the above says "list", any repeatable iterable 
+        :note: When the above says "list", any repeatable iterable 
           also accepted instead.
         """
 
