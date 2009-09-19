@@ -127,7 +127,7 @@ class GeometryBuilder(object):
 
     def apply_transform(self, f):
         self.points = [f(x) for x in self.points]
-            
+
 
 
 
