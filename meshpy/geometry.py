@@ -84,6 +84,17 @@ class GeometryBuilder(object):
             self.point_markers.extend(point_markers)
             assert len(points) == len(point_markers)
 
+    def add_cycle(self, points, facet_markers=None, point_markers=None):
+        def make_facets():
+            end = len(points)-1
+            for i in range(end):
+                yield i, i+1
+            yield end, 0
+
+        self.add_geometry(points, list(make_facets()),
+                facet_markers=facet_markers,
+                point_markers=point_markers)
+
     def dimensions(self):
         return len(self.points[0])
 
