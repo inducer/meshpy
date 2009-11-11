@@ -129,10 +129,12 @@ class FiveDigits:
 
 
 
-def generate_naca(naca_digits, number_of_points=100,
-        sharp_trailing_edge=True, uniform_distribution=False,  verbose=True):
+def get_naca_points(naca_digits, number_of_points=100,
+        sharp_trailing_edge=True, 
+        abscissa_map=lambda x: 0.03*x+0.97*x**2, 
+        verbose=False):
     """
-    Program to calculate the coordinates of NACA 4-digit and 5-digit series
+    Return a list of coordinates of NACA 4-digit and 5-digit series
     airfoils.
     """
 
@@ -143,8 +145,6 @@ def generate_naca(naca_digits, number_of_points=100,
         def explain(*s):
             pass
 
-
-    explain("----------------------------")
     explain("Airfoil: NACA-%s" %(naca_digits))
 
     if sharp_trailing_edge == True:
@@ -154,27 +154,13 @@ def generate_naca(naca_digits, number_of_points=100,
         explain("Blunt trailing edge")
         edge_coeff = 0.1015
 
-    digits_int = int(naca_digits)
-    if uniform_distribution == True:
-        explain("Uniform distribution of points")
-        x = numpy.arange(0, 1+1/number_of_points, 1/number_of_points)
-    else:
-        explain("Non-uniform distribution of points")
-        n = number_of_points // 10
-        n1 = 1 / n
-        x = numpy.hstack((
-            numpy.linspace(0, 0.0001-0.0001*n1, n), 
-            numpy.linspace(0.0001, 0.001-0.0009*n1, n),
-            numpy.linspace(0.001, 0.01-0.009*n1, n),
-            numpy.linspace(0.01, 0.05-0.04*n1, n),
-            numpy.linspace(0.05, 0.1-0.05*n1, n),
-            numpy.linspace(0.1, 0.2-0.1*n1, n),
-            numpy.linspace(0.2, 0.4-0.2*n1, n),
-            numpy.linspace(0.4, 0.6-0.2*n1, n),
-            numpy.linspace(0.6, 0.8-0.2*n1, n),
-            numpy.linspace(0.8, 1, n+1)
-            ))
 
+    raw_abscissae = numpy.linspace(0, 1, number_of_points, endpoint=True)
+    abscissae = numpy.empty_like(raw_abscissae)
+    for i in xrange(number_of_points):
+        abscissae[i] = abscissa_map(raw_abscissae[i])
+
+    digits_int = int(naca_digits)
     if len(naca_digits) == 4:
         thickness = (digits_int % 100)
         max_camber_pos = (digits_int % 1000) - thickness
@@ -235,12 +221,12 @@ def generate_naca(naca_digits, number_of_points=100,
         raise NotImplementedError(
                 "Only the 4-digit and 5-digit series are implemented!")
 
-    points_upper = numpy.zeros((len(x),2))
-    points_lower = numpy.zeros((len(x),2))
+    points_upper = numpy.zeros((len(abscissae),2))
+    points_lower = numpy.zeros((len(abscissae),2))
 
-    for i in range(len(x)):
-        points_upper[i] = points(x[i], "upper")
-        points_lower[i] = points(x[i], "lower")
+    for i in range(len(abscissae)):
+        points_upper[i] = points(abscissae[i], "upper")
+        points_lower[i] = points(abscissae[i], "lower")
 
     if sharp_trailing_edge == True:
         return list(points_upper)[1:-1] + list(points_lower[::-1])
