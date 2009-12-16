@@ -198,7 +198,24 @@ internals.PBCGroup.set_transform = _PBCGroup_set_transform
 
 def tetrahedralize(mesh_info, options):
     mesh = MeshInfo()
-    internals.tetrahedralize(options, mesh_info, mesh)
+
+    # restore "C" locale--otherwise tetgen might mis-parse stuff like "a0.01"
+    try:
+        import locale
+    except ImportErorr:
+        have_locale = False
+    else:
+        have_locale = True
+        prev_num_locale = locale.getlocale(locale.LC_NUMERIC)
+        locale.setlocale(locale.LC_NUMERIC, "C")
+
+    try:
+        internals.tetrahedralize(options, mesh_info, mesh)
+    finally:
+        # restore previous locale if we've changed it
+        if have_locale:
+            locale.setlocale(locale.LC_NUMERIC, prev_num_locale)
+
     return mesh
 
 

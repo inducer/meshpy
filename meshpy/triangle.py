@@ -6,15 +6,15 @@ import meshpy._triangle as internals
 
 
 class MeshInfo(internals.MeshInfo, MeshInfoBase):
-    _constituents = [ 
-            "points", "point_attributes", "point_markers", 
-            "elements", "element_attributes", "element_volumes", 
-            "neighbors", 
-            "facets", "facet_markers", 
-            "holes", 
-            "regions", 
-            "faces", "face_markers", 
-            "normals", 
+    _constituents = [
+            "points", "point_attributes", "point_markers",
+            "elements", "element_attributes", "element_volumes",
+            "neighbors",
+            "facets", "facet_markers",
+            "holes",
+            "regions",
+            "faces", "face_markers",
+            "normals",
             ]
 
     def __getstate__(self):
@@ -54,7 +54,7 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
 
     def set_facets(self, facets, facet_markers=None):
         self.facets.resize(len(facets))
-        
+
         for i, facet in enumerate(facets):
             self.facets[i] = facet
 
@@ -78,7 +78,7 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
     points on the boundary  of your triangulation to allow the mesh to conform
     either to itself periodically or another given mesh. In this case, you may
     use this routine to create the necessary resolution along the boundary
-    in a predefined way. 
+    in a predefined way.
 
     @arg subdivisions: Either an C{int}, indicating a uniform number of subdivisions
       throughout, or a list of the same length as C{facets}, specifying a subdivision
@@ -87,7 +87,7 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
     @arg facets: The list of old facets, in the form C{[(p1, p2), (p3,p4), ...]}.
     @arg facet_markers: Either C{None} or a list of facet markers of the same length
       as C{facets}.
-    @return: The new tuple C{(new_points, new_facets)}. 
+    @return: The new tuple C{(new_points, new_facets)}.
       (Or C{(new_points, new_facets, new_facet_markers)} if C{facet_markers} is not
       C{None}.)
     """
@@ -130,9 +130,9 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
     else:
         return new_points, new_facets
 
-        
 
-    
+
+
 def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
         volume_constraints=False, max_volume=None, allow_boundary_steiner=True,
         generate_edges=None, generate_faces=False):
@@ -155,7 +155,7 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
 
     if refinement_func is not None:
         opts += "u"
-    
+
     if generate_edges is not None:
         from warnings import warn
         warn("generate_edges is deprecated--use generate_faces instead")
@@ -167,8 +167,24 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
     if not allow_boundary_steiner:
         opts += "Y"
 
-    mesh = MeshInfo()
-    internals.triangulate(opts, mesh_info, mesh, MeshInfo(), refinement_func)
+    # restore "C" locale--otherwise triangle might mis-parse stuff like "a0.01"
+    try:
+        import locale
+    except ImportErorr:
+        have_locale = False
+    else:
+        have_locale = True
+        prev_num_locale = locale.getlocale(locale.LC_NUMERIC)
+        locale.setlocale(locale.LC_NUMERIC, "C")
+
+    try:
+        mesh = MeshInfo()
+        internals.triangulate(opts, mesh_info, mesh, MeshInfo(), refinement_func)
+    finally:
+        # restore previous locale if we've changed it
+        if have_locale:
+            locale.setlocale(locale.LC_NUMERIC, prev_num_locale)
+
     return mesh
 
 
@@ -193,7 +209,7 @@ def refine(input_p, verbose=False, refinement_func=None):
 
 def write_gnuplot_mesh(filename, out_p, facets=False):
     gp_file = open(filename, "w")
-    
+
     if facets:
         segments = out_p.facets
     else:
