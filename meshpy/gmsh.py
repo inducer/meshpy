@@ -27,11 +27,13 @@ class _TempDirManager(object):
 
 
 class GmshRunner(object):
-    def __init__(self, source, dimensions, order=None, other_options=[],
+    def __init__(self, source, dimensions, order=None, 
+            incomplete_elements=None, other_options=[],
             extension="geo", gmsh_executable="gmsh"):
         self.source = source
         self.dimensions = dimensions
         self.order = order
+        self.incomplete_elements = incomplete_elements
         self.other_options = other_options
         self.extension = extension
         self.gmsh_executable = gmsh_executable
@@ -61,6 +63,10 @@ class GmshRunner(object):
 
             if self.order is not None:
                 cmdline.extend(["-order", str(self.order)])
+
+            if self.incomplete_elements is not None:
+                cmdline.extend(["-string", 
+                    "Mesh.SecondOrderIncomplete = %d;" % int(self.incomplete_elements)])
 
             cmdline.extend(self.other_options)
             cmdline.append(source_file_name)
