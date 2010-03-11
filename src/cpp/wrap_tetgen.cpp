@@ -147,7 +147,6 @@ namespace
       OVERRIDE_LOAD_WITH_ERROR_CHECK(ply,);
       OVERRIDE_LOAD_WITH_ERROR_CHECK(stl,);
       OVERRIDE_LOAD_WITH_ERROR_CHECK(medit,);
-      OVERRIDE_LOAD_WITH_ERROR_CHECK(vtk,);
 
       void load_plc(char* filename, int object)
       {
@@ -158,6 +157,7 @@ namespace
       OVERRIDE_LOAD_WITH_ERROR_CHECK(tetmesh,
           Elements.fixUnit(numberofcorners);
           );
+      OVERRIDE_LOAD_WITH_ERROR_CHECK(voronoi,);
 
       /*
       tTriangulationParameters &operator=(const tTriangulationParameters &src)
@@ -362,6 +362,7 @@ BOOST_PYTHON_MODULE(_tetgen)
       .DEF_METHOD(save_poly)
 
       .DEF_METHOD(load_node)
+      .DEF_METHOD(load_pbc)
       .DEF_METHOD(load_var)
       .DEF_METHOD(load_mtr)
       .DEF_METHOD(load_poly)
