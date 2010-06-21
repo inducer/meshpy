@@ -1,3 +1,8 @@
+class GmshError(RuntimeError):
+    pass
+
+
+
 # tools -----------------------------------------------------------------------
 def _erase_dir(dir):
     from os import listdir, unlink, rmdir
@@ -72,7 +77,24 @@ class GmshRunner(object):
             cmdline.append(source_file_name)
 
             from pytools.prefork import call_capture_output
-            call_capture_output(cmdline, working_dir)
+            retcode, stdout, stderr = call_capture_output(
+                    cmdline, working_dir)
+
+            if stderr and "error" in stderr.lower():
+                msg = "gmsh execution failed with message:\n\n"
+                if stdout:
+                    msg += stdout+"\n"
+                msg += stderr+"\n"
+                raise GmshError(msg)
+
+            if stderr:
+                from warnings import warn
+
+                msg = "gmsh issued the following messages:\n\n"
+                if stdout:
+                    msg += stdout+"\n"
+                msg += stderr+"\n"
+                warn(msg)
 
             self.output_file = open(output_file_name, "r")
 
