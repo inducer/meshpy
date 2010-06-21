@@ -71,8 +71,8 @@ class GmshRunner(object):
             cmdline.extend(self.other_options)
             cmdline.append(source_file_name)
 
-            from pytools.prefork import call_capture_stdout
-            call_capture_stdout(cmdline, working_dir)
+            from pytools.prefork import call_capture_output
+            call_capture_output(cmdline, working_dir)
 
             self.output_file = open(output_file_name, "r")
 
