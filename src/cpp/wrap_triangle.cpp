@@ -16,50 +16,50 @@ using namespace std;
 struct tMeshInfo : public triangulateio, public boost::noncopyable
 {
   public:
-    tForeignArray<REAL>		Points; // in/out
-    tForeignArray<REAL>		PointAttributes; // in/out
-    tForeignArray<int>		PointMarkers; // in/out
+    tForeignArray<REAL>         Points; // in/out
+    tForeignArray<REAL>         PointAttributes; // in/out
+    tForeignArray<int>          PointMarkers; // in/out
 
-    tForeignArray<int>		Elements; // in/out
-    tForeignArray<REAL>		ElementAttributes; // in/out
-    tForeignArray<REAL>		ElementVolumes; // in only
-    tForeignArray<int>		Neighbors; // out only
+    tForeignArray<int>          Elements; // in/out
+    tForeignArray<REAL>         ElementAttributes; // in/out
+    tForeignArray<REAL>         ElementVolumes; // in only
+    tForeignArray<int>          Neighbors; // out only
 
-    tForeignArray<int>		Facets; // in/out
-    tForeignArray<int>		FacetMarkers; // in/out
-    
-    tForeignArray<REAL>		Holes; // in only
+    tForeignArray<int>          Facets; // in/out
+    tForeignArray<int>          FacetMarkers; // in/out
 
-    tForeignArray<REAL>		Regions; // in only
+    tForeignArray<REAL>         Holes; // in only
 
-    tForeignArray<int>		Faces; // out only
-    tForeignArray<int>		FaceMarkers; // out only
-    tForeignArray<REAL>		Normals; // out only
+    tForeignArray<REAL>         Regions; // in only
+
+    tForeignArray<int>          Faces; // out only
+    tForeignArray<int>          FaceMarkers; // out only
+    tForeignArray<REAL>         Normals; // out only
 
   public:
     tMeshInfo()
       : Points(pointlist, numberofpoints, 2, NULL, true),
         PointAttributes(pointattributelist, numberofpoints, 0, &Points, true),
-	PointMarkers(pointmarkerlist, numberofpoints, 1, &Points, true),
+        PointMarkers(pointmarkerlist, numberofpoints, 1, &Points, true),
 
-	Elements(trianglelist, numberoftriangles, 3, NULL, true),
-	ElementAttributes(triangleattributelist, 
+        Elements(trianglelist, numberoftriangles, 3, NULL, true),
+        ElementAttributes(triangleattributelist,
             numberoftriangles, 0, &Elements, true),
-	ElementVolumes(trianglearealist, 
+        ElementVolumes(trianglearealist,
             numberoftriangles, 1, &Elements, true),
-	Neighbors(neighborlist, 
+        Neighbors(neighborlist,
             numberoftriangles, 3, &Elements, true),
 
-	Facets(segmentlist, numberofsegments, 2, NULL, true),
-	FacetMarkers(segmentmarkerlist, numberofsegments, 1, &Facets, true),
+        Facets(segmentlist, numberofsegments, 2, NULL, true),
+        FacetMarkers(segmentmarkerlist, numberofsegments, 1, &Facets, true),
 
-	Holes(holelist, numberofholes, 2, NULL, true),
+        Holes(holelist, numberofholes, 2, NULL, true),
 
-	Regions(regionlist, numberofregions, 4, NULL, true),
+        Regions(regionlist, numberofregions, 4, NULL, true),
 
-	Faces(edgelist, numberofedges, 2, NULL, true),
-	FaceMarkers(edgemarkerlist, numberofedges, 1, &Faces, true),
-	Normals(normlist, numberofedges, 2, &Faces, true)
+        Faces(edgelist, numberofedges, 2, NULL, true),
+        FaceMarkers(edgemarkerlist, numberofedges, 1, &Faces, true),
+        Normals(normlist, numberofedges, 2, &Faces, true)
     {
       numberofpointattributes = 0;
       numberofcorners = 3;
@@ -139,7 +139,7 @@ PyObject *RefinementFunction;
 class tVertex : public boost::noncopyable
 {
   public:
-    REAL	*Data;
+    REAL        *Data;
 
   public:
     tVertex(REAL *data)
@@ -173,19 +173,37 @@ int triunsuitable(vertex triorg, vertex tridest, vertex triapex, REAL area)
   tVertex dest(tridest);
   tVertex apex(triapex);
 
-
-  return call<bool>(RefinementFunction,
-      make_tuple(
-        object(boost::ref(org)), 
-        object(boost::ref(dest)), 
-        object(boost::ref(apex))
-        ), area);
+  try
+  {
+    return call<bool>(RefinementFunction,
+        make_tuple(
+          object(boost::ref(org)),
+          object(boost::ref(dest)),
+          object(boost::ref(apex))
+          ), area);
+  }
+  catch (error_already_set)
+  {
+    std::cout << "[MeshPy warning] A Python exception occurred in "
+      "a Python refinement query:" << std::endl;
+    PyErr_Print();
+    std::cout << "[MeshPy] Aborting now." << std::endl;
+    abort();
+  }
+  catch (std::exception &e)
+  {
+    std::cout << "[MeshPy warning] An exception occurred in "
+      "a Python refinement query:" << std::endl
+      << e.what() << std::endl;
+    std::cout << "[MeshPy] Aborting now." << std::endl;
+    abort();
+  }
 }
 
 
 
 
-void triangulateWrapper(char *options, tMeshInfo &in, 
+void triangulateWrapper(char *options, tMeshInfo &in,
     tMeshInfo &out,
     tMeshInfo &voronoi,
     PyObject *refinement_func)
@@ -235,10 +253,10 @@ BOOST_PYTHON_MODULE(_triangle)
 
       .def_readonly("normals", &cl::Normals)
 
-      .add_property("number_of_point_attributes", 
+      .add_property("number_of_point_attributes",
           &cl::numberOfPointAttributes,
           &cl::setNumberOfPointAttributes)
-      .add_property("number_of_element_attributes", 
+      .add_property("number_of_element_attributes",
           &cl::numberOfElementAttributes,
           &cl::setNumberOfElementAttributes)
 
@@ -246,7 +264,7 @@ BOOST_PYTHON_MODULE(_triangle)
       .enable_pickling()
       ;
   }
-  
+
   exposePODForeignArray<REAL>("RealArray");
   exposePODForeignArray<int>("IntArray");
 
