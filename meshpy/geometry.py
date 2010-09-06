@@ -67,7 +67,7 @@ class GeometryBuilder(object):
 
         if is_multi_polygon(facets) and not is_multi_polygon(self.facets):
             self.facets = [[facet] for facet in self.facets]
-            
+
         if not is_multi_polygon(facets) and is_multi_polygon(self.facets):
             facets = [[facet] for facet in facets]
 
@@ -230,6 +230,26 @@ def make_box(a, b, subdivisions=None):
                 points, facets, facet_markers)
 
     return points, facets, facet_markers
+
+
+
+
+def make_circle(r, center=(0,0), subdivisions=40):
+    def round_trip_connect(seq):
+        result = []
+        for i in range(len(seq)):
+            result.append((i, (i+1)%len(seq)))
+        return result
+
+    phi = numpy.linspace(0, 2*numpy.pi, num=subdivisions, endpoint=False)
+    cx, cy = center
+    x = numpy.cos(phi) + cx
+    y = numpy.sin(phi) + cy
+
+    return ([numpy.array(pt) for pt in zip(x, y)],
+            round_trip_connect(range(subdivisions)),
+            subdivisions*[Marker.SHELL])
+
 
 
 
