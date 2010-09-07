@@ -68,6 +68,8 @@ def main():
 
           MeshPy uses `Boost.Python <http://www.boost.org>`_. 
 
+          As of Version 0.91.2, MeshPy also works with Python 3.
+
           Documentation
           =============
 
@@ -87,6 +89,7 @@ def main():
             'Natural Language :: English',
             'Programming Language :: C++',
             'Programming Language :: Python',
+            'Programming Language :: Python 3',
             'Topic :: Multimedia :: Graphics :: 3D Modeling',
             'Topic :: Scientific/Engineering',
             'Topic :: Scientific/Engineering :: Mathematics',
