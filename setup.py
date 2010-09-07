@@ -40,7 +40,15 @@ def main():
     LIBRARY_DIRS = conf["BOOST_LIB_DIR"]
     LIBRARIES = conf["BOOST_PYTHON_LIBNAME"]
 
-    execfile("meshpy/__init__.py", conf)
+    init_filename = "meshpy/__init__.py"
+    exec(compile(open(init_filename, "r").read(), init_filename, "exec"), conf)
+
+    try:
+        from distutils.command.build_py import build_py_2to3 as build_py
+    except ImportError:
+        # 2.x
+        from distutils.command.build_py import build_py
+
     setup(name="MeshPy",
           version=conf["version"],
           description="Triangular and Tetrahedral Mesh Generator",
@@ -110,6 +118,9 @@ def main():
               extra_link_args=conf["LDFLAGS"],
               ),
             ],
+
+          # 2to3 invocation
+          cmdclass={'build_py': build_py},
           )
 
 

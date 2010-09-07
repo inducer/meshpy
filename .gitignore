@@ -23,5 +23,6 @@ doc/html
 doc/.build
 *.pyd
 *.so
-setuptools*egg
-setuptools*pth
+distribute*egg
+distribute*pth
+distribute*tar.gz
