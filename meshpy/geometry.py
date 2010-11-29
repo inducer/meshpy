@@ -234,7 +234,7 @@ def make_box(a, b, subdivisions=None):
 
 
 
-def make_circle(r, center=(0,0), subdivisions=40):
+def make_circle(r, center=(0,0), subdivisions=40, marker=Marker.SHELL):
     def round_trip_connect(seq):
         result = []
         for i in range(len(seq)):
@@ -249,7 +249,7 @@ def make_circle(r, center=(0,0), subdivisions=40):
     return ([numpy.array(pt) for pt in zip(x, y)],
             round_trip_connect(range(subdivisions)),
             None,
-            subdivisions*[Marker.SHELL])
+            subdivisions*[marker])
 
 
 
