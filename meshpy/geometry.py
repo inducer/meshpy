@@ -243,8 +243,8 @@ def make_circle(r, center=(0,0), subdivisions=40):
 
     phi = numpy.linspace(0, 2*numpy.pi, num=subdivisions, endpoint=False)
     cx, cy = center
-    x = numpy.cos(phi) + cx
-    y = numpy.sin(phi) + cy
+    x = r*numpy.cos(phi) + cx
+    y = r*numpy.sin(phi) + cy
 
     return ([numpy.array(pt) for pt in zip(x, y)],
             round_trip_connect(range(subdivisions)),
