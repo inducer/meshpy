@@ -7,7 +7,7 @@ import numpy
 # geometry building -----------------------------------------------------------
 def bounding_box(points):
     return (
-            numpy.asarray(numpy.min(points, axis=0), dtype=numpy.float64), 
+            numpy.asarray(numpy.min(points, axis=0), dtype=numpy.float64),
             numpy.asarray(numpy.max(points, axis=0), dtype=numpy.float64))
 
 
@@ -29,7 +29,7 @@ def is_multi_polygon(facets):
 
 def offset_point_indices(facets, offset):
     if is_multi_polygon(facets):
-        return [[tuple(p_i+offset for p_i in poly) 
+        return [[tuple(p_i+offset for p_i in poly)
             for poly in facet]
             for facet in facets]
     else:
@@ -101,7 +101,7 @@ class GeometryBuilder(object):
     def set(self, mesh_info):
         mesh_info.set_points(self.points, self.point_markers)
         if self.facet_hole_starts or is_multi_polygon(self.facets):
-            mesh_info.set_facets_ex(self.facets, 
+            mesh_info.set_facets_ex(self.facets,
                     self.facet_hole_starts, self.facet_markers)
         else:
             mesh_info.set_facets(self.facets, self.facet_markers)
@@ -131,7 +131,7 @@ class GeometryBuilder(object):
         """
 
         a, b = bounding_box(self.points)
-        points, facets, facet_markers = \
+        points, facets, _, facet_markers = \
                 make_box(a-distance, b+distance, subdivisions)
 
         self.add_geometry(points, facets, facet_markers=facet_markers)
@@ -180,7 +180,7 @@ def make_box(a, b, subdivisions=None):
         facets = [(0,1), (1,2), (2,3), (3,0)]
 
         facet_markers = [
-                Marker.MINUS_Y, Marker.PLUS_X, 
+                Marker.MINUS_Y, Marker.PLUS_X,
                 Marker.PLUS_Y, Marker.MINUS_X]
 
     elif dimensions == 3:
@@ -212,7 +212,7 @@ def make_box(a, b, subdivisions=None):
                 (4,5,6,7)
                 ]
 
-        facet_markers = [Marker.MINUS_Z, Marker.MINUS_Y, Marker.PLUS_X, 
+        facet_markers = [Marker.MINUS_Z, Marker.MINUS_Y, Marker.PLUS_X,
                 Marker.PLUS_Y, Marker.MINUS_X, Marker.PLUS_Z]
     else:
         raise ValueError, "unsupported dimension count: %d" %  len(a)
@@ -225,11 +225,11 @@ def make_box(a, b, subdivisions=None):
 
         from meshpy.triangle import subdivide_facets
         points, facets, facet_markers = subdivide_facets(
-                [subdivisions[0], subdivisions[1], 
+                [subdivisions[0], subdivisions[1],
                     subdivisions[0], subdivisions[1]],
                 points, facets, facet_markers)
 
-    return points, facets, facet_markers
+    return points, facets, None, facet_markers
 
 
 
@@ -248,6 +248,7 @@ def make_circle(r, center=(0,0), subdivisions=40):
 
     return ([numpy.array(pt) for pt in zip(x, y)],
             round_trip_connect(range(subdivisions)),
+            None,
             subdivisions*[Marker.SHELL])
 
 
@@ -273,7 +274,7 @@ def make_ball(r, subdivisions=10):
 
 
 
-def make_cylinder(radius, height, radial_subdivisions=10, 
+def make_cylinder(radius, height, radial_subdivisions=10,
         height_subdivisions=1):
     from math import pi, cos, sin
 
@@ -308,7 +309,7 @@ EXT_CLOSED_IN_RZ = 1
 
 
 
-def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN, 
+def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
         point_idx_offset=0, ring_point_indices=None,
         ring_markers=None, rz_closure_marker=0):
     """Extrude a given connected C{base_shape} (a list of (x,y) points)
@@ -333,7 +334,7 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
     produced instead of quads to provide non-degenerate closure.
 
     If C{closure} is L{EXT_OPEN}, no efforts are made to put end caps on the
-    extrusion. 
+    extrusion.
 
     If C{closure} is L{EXT_CLOSED_IN_RZ}, then a torus-like structure
     is assumed and the last ring is just connected to the first.
@@ -341,21 +342,21 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
     If C{ring_markers} is not None, it is an list of markers added to each
     ring. There should be len(rz_points)-1 entries in this list.
     If rings are added because of closure options, they receive the
-    corresponding C{XXX_closure_marker}.  If C{facet_markers} is given, this function 
-    returns (points, facets, markers), where markers is is a list containing 
+    corresponding C{XXX_closure_marker}.  If C{facet_markers} is given, this function
+    returns (points, facets, markers), where markers is is a list containing
     a marker for each generated facet. Unspecified markers generally
     default to 0.
 
-    If C{ring_point_indices} is given, it must be a list of the same 
+    If C{ring_point_indices} is given, it must be a list of the same
     length as C{rz_points}. Each entry in the list may either be None,
     or a list of point indices. This list must contain the same number
-    of points as the C{base_shape}; it is taken as the indices of 
+    of points as the C{base_shape}; it is taken as the indices of
     pre-existing points that are to be used for the given ring, instead
     of generating new points.
     """
 
     assert len(rz_points) > 0
-    
+
     if ring_markers is not None:
         assert len(rz_points) == len(ring_markers)+1
 
@@ -371,7 +372,7 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
             p_indices = ring_point_indices[ring_idx]
 
         first_idx = point_idx_offset+len(points)
-        
+
         r, z = rz_points[ring_idx]
 
         if r == 0:
@@ -397,7 +398,7 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
         holelists.extend(len(new_polys)*[[]])
 
     def add_facet(facet_polygons, holestarts, marker):
-        """Add a single facet, with each polygon in C{facet_polygons} 
+        """Add a single facet, with each polygon in C{facet_polygons}
         belonging to a single facet.
         """
         facets.append(facet_polygons)
@@ -424,9 +425,9 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
             else:
                 # make single-surface interface with hole
                 add_facet([
-                    get_ring(ring1_idx), 
-                    get_ring(ring2_idx), 
-                    ], 
+                    get_ring(ring1_idx),
+                    get_ring(ring2_idx),
+                    ],
                     holestarts=[(0,0,z1)], marker=marker)
         else:
             ring1 = get_ring(ring1_idx)
@@ -438,7 +439,7 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
 
                 if r2 != 0:
                     add_polygons(
-                            [(start_pt, succ, pt) 
+                            [(start_pt, succ, pt)
                             for pt, succ in pair_with_successor(ring2)],
                             marker=marker)
             elif r2 == 0:
@@ -446,7 +447,7 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
                 assert len(ring2) == 1
                 end_pt = ring2[0]
                 add_polygons(
-                        [(pt, succ, end_pt) 
+                        [(pt, succ, end_pt)
                         for pt, succ in pair_with_successor(ring1)],
                         marker=marker)
             else:
@@ -495,8 +496,8 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
 
 
 
-def generate_surface_of_revolution(rz_points, 
-        closure=EXT_OPEN, radial_subdiv=16, 
+def generate_surface_of_revolution(rz_points,
+        closure=EXT_OPEN, radial_subdiv=16,
         point_idx_offset=0, ring_point_indices=None,
         ring_markers=None, rz_closure_marker=0):
     from math import sin, cos, pi
@@ -504,7 +505,7 @@ def generate_surface_of_revolution(rz_points,
     dphi = 2*pi/radial_subdiv
     base_shape = [(cos(dphi*i), sin(dphi*i)) for i in range(radial_subdiv)]
     return generate_extrusion(rz_points, base_shape, closure=closure,
-            point_idx_offset=point_idx_offset, 
+            point_idx_offset=point_idx_offset,
             ring_point_indices=ring_point_indices,
             ring_markers=ring_markers, rz_closure_marker=rz_closure_marker,
             )

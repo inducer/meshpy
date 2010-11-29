@@ -8,7 +8,7 @@ def main():
 
     box_marker = Marker.FIRST_USER_MARKER
     extent_small = 0.1*numpy.ones(3, dtype=numpy.float64)
-    points, facets, _ = \
+    points, facets, _, _ = \
             make_box(-extent_small, extent_small)
 
     geob.add_geometry(points, facets, facet_markers=box_marker)
@@ -16,7 +16,7 @@ def main():
     # make small "separator box" for region attribute
     geob.wrap_in_box(0.3)
 
-    points, facets, facet_markers = \
+    points, facets, _, facet_markers = \
             make_box(numpy.array([-1,-1,-1]), numpy.array([1,1,5]))
 
     geob.add_geometry(points, facets, facet_markers=facet_markers)

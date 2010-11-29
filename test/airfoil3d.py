@@ -48,7 +48,7 @@ def main():
 
     geob.apply_transform(deform_wing)
 
-    points, facets, facet_markers = make_box(
+    points, facets, _, facet_markers = make_box(
             numpy.array([-wing_length-1,-1,-1.5]), 
             numpy.array([wing_length+1,1,3]))
 
