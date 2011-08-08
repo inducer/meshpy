@@ -10,6 +10,7 @@
 
 
 using namespace boost::python;
+namespace py = boost::python;
 using namespace std;
 
 
@@ -206,11 +207,12 @@ namespace
 
 
 
-  void tetrahedralizeWrapper(tetgenbehavior &bhv, tMeshInfo &in, tMeshInfo &out)
+  void tetrahedralizeWrapper(tetgenbehavior &bhv, tMeshInfo &in, tMeshInfo &out,
+      tMeshInfo *addin)
   {
     try
     {
-      tetrahedralize(&bhv, &in, &out);
+      tetrahedralize(&bhv, &in, &out, addin);
     }
     catch (int &i)
     {
@@ -308,7 +310,8 @@ namespace
 
 BOOST_PYTHON_MODULE(_tetgen)
 {
-  def("tetrahedralize", tetrahedralizeWrapper);
+  def("tetrahedralize", tetrahedralizeWrapper,
+      (py::args("behavior", "in", "out"), py::arg("addin")=py::object()));
 
   {
     typedef tMeshInfo cl;

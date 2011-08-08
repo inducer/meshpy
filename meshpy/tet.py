@@ -10,13 +10,13 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
         :meth:`set_facets` does not allow hole and only lets you use a single
         polygon per facet.
 
-        :param facets: a list of facets, where each facet is a single 
+        :param facets: a list of facets, where each facet is a single
           polygons, represented by a list of point indices.
         :param markers: Either None or a list of integers of the same
           length as *facets*. Each integer is the facet marker assigned
           to its corresponding facet.
 
-        :note: When the above says "list", any repeatable iterable 
+        :note: When the above says "list", any repeatable iterable
           also accepted instead.
         """
 
@@ -49,14 +49,14 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
           of point indices.
         :param facet_holestarts: Either None or a list of hole starting points
           for each facet. Each facet may have several hole starting points.
-          The mesh generator starts "eating" a hole into the facet at each 
+          The mesh generator starts "eating" a hole into the facet at each
           starting point and continues until it hits a polygon specified
           in this facet's record in *facets*.
         :param markers: Either None or a list of integers of the same
           length as *facets*. Each integer is the facet marker assigned
           to its corresponding facet.
 
-        :note: When the above says "list", any repeatable iterable 
+        :note: When the above says "list", any repeatable iterable
           also accepted instead.
         """
 
@@ -104,20 +104,20 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
         import pyvtk
         vtkelements = pyvtk.VtkData(
             pyvtk.UnstructuredGrid(
-              self.points, 
+              self.points,
               tetra=self.elements),
             "Mesh")
         vtkelements.tofile(filename)
 
     def set_elements(self, elements):
         self.elements.resize(len(elements))
-        
+
         for i, element in enumerate(elements):
             self.elements[i] = element
-            
+
     def set_element_constraints(self, element_constraints):
         self.element_volumes.setup()
-        
+
         for i in xrange(len(self.element_volumes)):
             if i in element_constraints:
                 self.element_volumes[i] = element_constraints[i]
@@ -151,7 +151,7 @@ class Options(internals.Options):
 def _PBCGroup_get_transmat(self):
     import numpy
     return numpy.array(
-            [[self.get_transmat_entry(i,j) 
+            [[self.get_transmat_entry(i,j)
                 for j in xrange(4)]
                 for i in xrange(4)])
 
@@ -186,7 +186,7 @@ def _PBCGroup_set_transform(self, matrix=None, translation=None):
             self.set_transmat_entry(i, 3, translation[i])
 
 
-    
+
 
 internals.PBCGroup.matrix = property(
         _PBCGroup_get_transmat,
@@ -220,11 +220,14 @@ def tetrahedralize(mesh_info, options):
 
 
 
-def build(mesh_info, options=Options("pq"), verbose=False, 
+def build(mesh_info, options=Options("pq"), verbose=False,
         attributes=False, volume_constraints=False, max_volume=None,
-        diagnose=False):
+        diagnose=False, insert_points=None):
     if not verbose:
         options.quiet = 1
+
+    if insert_points is not None:
+        options.insertaddpoints = 1
 
     if attributes:
         options.regionattrib = 1

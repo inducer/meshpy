@@ -355,7 +355,9 @@ Some common notions
     .. method:: load_plc(filename)
     .. method:: load_tetmesh(filename)
 
-.. function:: build(mesh_info, options=Options(), verbose=False, attributes=False, volume_constraints=False, max_volume=None, diagnose=False)
+.. function:: build(mesh_info, options=Options("pq"), verbose=False, attributes=False, volume_constraints=False, max_volume=None, diagnose=False, insert_points=None)
+
+    :param insert_points: a :class:`MeshInfo` object specifying additional points to be inserted
 
 .. data:: EXT_OPEN
 .. data:: EXT_CLOSED_IN_RZ
