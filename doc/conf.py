@@ -35,8 +35,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = 'MeshPy'
-copyright = '2008, Andreas Klöckner'
+project = "MeshPy"
+copyright = u"2008, Andreas Klöckner"
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -44,7 +44,7 @@ copyright = '2008, Andreas Klöckner'
 # The short X.Y version.
 def get_version():
     conf = {}
-    execfile("../src/python/__init__.py", conf)
+    execfile("../meshpy/__init__.py", conf)
     return conf["version"]
 
 version = get_version()
