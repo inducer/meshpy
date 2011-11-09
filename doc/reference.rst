@@ -164,7 +164,7 @@ Some common notions
     or *(new_points, new_facets, new_facet_markers)* if *facet_markers* is not
     *None*.
 
-.. function:: build(mesh_info, verbose=False, refinement_func=None, attributes=False, volume_constraints=True, max_volume=None, allow_boundary_steiner=True, generate_edges=None, generate_faces=False, min_angle=None)
+.. function:: build(mesh_info, verbose=False, refinement_func=None, attributes=False, volume_constraints=True, max_volume=None, allow_boundary_steiner=True, allow_volume_steiner=True, generate_edges=None, generate_faces=False, min_angle=None)
 
 .. function:: refine(input_p, verbose=False, refinement_func=None)
 

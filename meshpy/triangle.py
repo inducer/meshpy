@@ -135,6 +135,7 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
 
 def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
         volume_constraints=False, max_volume=None, allow_boundary_steiner=True,
+        allow_volume_steiner=True,
         generate_edges=None, generate_faces=False, min_angle=None):
     """Triangulate the domain given in `mesh_info'."""
     opts = "pzj"
@@ -168,8 +169,14 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
     if generate_faces:
         opts += "e"
 
-    if not allow_boundary_steiner:
-        opts += "Y"
+    if not allow_volume_steiner:
+        opts += "YY"
+        if allow_boundary_steiner:
+            raise ValueError("cannot allow boundary Steiner points when volume "
+                    "Steiner points are forbidden")
+    else:
+        if not allow_boundary_steiner:
+            opts += "Y"
 
     # restore "C" locale--otherwise triangle might mis-parse stuff like "a0.01"
     try:
