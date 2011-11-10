@@ -135,14 +135,16 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
 
 def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
         volume_constraints=False, max_volume=None, allow_boundary_steiner=True,
-        allow_volume_steiner=True,
+        allow_volume_steiner=True, quality_meshing=True,
         generate_edges=None, generate_faces=False, min_angle=None):
     """Triangulate the domain given in `mesh_info'."""
     opts = "pzj"
-    if min_angle is not None:
-        opts += "q%f" % min_angle
-    else:
-        opts += "q"
+    if quality_meshing:
+        if min_angle is not None:
+            opts += "q%f" % min_angle
+        else:
+            opts += "q"
+
     if verbose:
         opts += "VV"
     else:
