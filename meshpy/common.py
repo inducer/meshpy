@@ -31,7 +31,7 @@ def _linebreak_list(list, per_line=10, pad=None):
         result += " ".join(format(l) for l in list[:per_line]) + "\n"
         list = list[per_line:]
     return result + " ".join(format(l) for l in list)
-        
+
 
 
 class MeshInfoBase:
@@ -60,8 +60,9 @@ class MeshInfoBase:
 
         for i, pt in enumerate(points):
             self.points[i] = pt
-      
+
         if point_markers is not None:
+            self.point_markers.setup()
             for i, mark in enumerate(point_markers):
                 self.point_markers[i] = mark
 
@@ -79,13 +80,13 @@ class MeshInfoBase:
 
     def write_neu(self, outfile, bc={}, periodicity=None, description="MeshPy Output"):
         """Write the mesh out in (an approximation to) Gambit neutral mesh format.
-        
+
         outfile is a file-like object opened for writing.
 
         bc is a dictionary mapping single face markers (or frozensets of them)
         to a tuple (bc_name, bc_code).
 
-        periodicity is either a tuple (face_marker, (px,py,..)) giving the 
+        periodicity is either a tuple (face_marker, (px,py,..)) giving the
         face marker of the periodic boundary and the period in each coordinate
         direction (0 if none) or the value None for no periodicity.
         """
@@ -99,12 +100,12 @@ class MeshInfoBase:
         outfile.write("%s\n" % description)
         outfile.write("PROGRAM: MeshPy VERSION: %s\n" % version)
         outfile.write("%s\n" % datetime.now().ctime())
-        
+
         bc_markers = bc.keys()
         if periodicity:
             periodic_marker, periods = periodicity
             bc_markers.append(periodic_marker)
-            
+
         assert len(self.points)
 
         dim = len(self.points[0])
@@ -127,7 +128,7 @@ class MeshInfoBase:
         # nodes ---------------------------------------------------------------
         outfile.write("NODAL COORDINATES 2.1.2\n")
         for i, pt in enumerate(self.points):
-            outfile.write("%d %s\n" % 
+            outfile.write("%d %s\n" %
                     (i+1, " ".join(repr(c) for c in pt)))
         outfile.write("ENDOFSECTION\n")
 
@@ -139,8 +140,8 @@ class MeshInfoBase:
             eltype = 6
 
         for i, el in enumerate(self.elements):
-            outfile.write("%8d%3d%3d %s\n" % 
-                    (i+1, eltype, len(el), 
+            outfile.write("%8d%3d%3d %s\n" %
+                    (i+1, eltype, len(el),
                         "".join("%8d" % (p+1) for p in el)))
         outfile.write("ENDOFSECTION\n")
 
@@ -216,8 +217,8 @@ class MeshInfoBase:
                     # regular BC
 
                     bc_name, bc_code = bc[bc_marker]
-                    outfile.write("%32s%8d%8d%8d%8d\n" 
-                            % (bc_name, 
+                    outfile.write("%32s%8d%8d%8d%8d\n"
+                            % (bc_name,
                                 1, # face BC
                                 len(face_indices),
                                 0, # zero additional values per face,
@@ -242,7 +243,7 @@ class MeshInfoBase:
 
                     el_index, el_face_number = adj_el[0]
 
-                    outfile.write("%10d%5d%5d\n" % 
+                    outfile.write("%10d%5d%5d\n" %
                             (el_index+1, eltype, el_face_number))
 
                 outfile.write("ENDOFSECTION\n")
