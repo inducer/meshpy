@@ -1,5 +1,5 @@
 from __future__ import division
-import numpy
+import numpy as np
 
 
 
@@ -7,19 +7,23 @@ import numpy
 # geometry building -----------------------------------------------------------
 def bounding_box(points):
     return (
-            numpy.asarray(numpy.min(points, axis=0), dtype=numpy.float64),
-            numpy.asarray(numpy.max(points, axis=0), dtype=numpy.float64))
+            np.asarray(np.min(points, axis=0), dtype=np.float64),
+            np.asarray(np.max(points, axis=0), dtype=np.float64))
 
 
 
 
 def is_multi_polygon(facets):
-    if not facets:
+    if not len(facets):
         return False
 
     try:
         facets[0][0][0] # facet 0, poly 0, point 0
     except TypeError:
+        # pure python raises this
+        return False
+    except IndexError:
+        # numpy raises this
         return False
     else:
         return True
@@ -163,6 +167,9 @@ def make_box(a, b, subdivisions=None):
       the number of subdivisions along each axis.
     """
 
+    a = [float(ai) for ai in a]
+    b = [float(bi) for bi in b]
+
     assert len(a) == len(b)
 
     dimensions = len(a)
@@ -241,12 +248,12 @@ def make_circle(r, center=(0,0), subdivisions=40, marker=Marker.SHELL):
             result.append((i, (i+1)%len(seq)))
         return result
 
-    phi = numpy.linspace(0, 2*numpy.pi, num=subdivisions, endpoint=False)
+    phi = np.linspace(0, 2*np.pi, num=subdivisions, endpoint=False)
     cx, cy = center
-    x = r*numpy.cos(phi) + cx
-    y = r*numpy.sin(phi) + cy
+    x = r*np.cos(phi) + cx
+    y = r*np.sin(phi) + cy
 
-    return ([numpy.array(pt) for pt in zip(x, y)],
+    return ([np.array(pt) for pt in zip(x, y)],
             round_trip_connect(range(subdivisions)),
             None,
             subdivisions*[marker])
