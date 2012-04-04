@@ -166,7 +166,7 @@ Some common notions
 
 .. function:: build(mesh_info, verbose=False, refinement_func=None, attributes=False, volume_constraints=True, max_volume=None, allow_boundary_steiner=True, allow_volume_steiner=True, quality_meshing=True, generate_edges=None, generate_faces=False, min_angle=None)
 
-.. function:: refine(input_p, verbose=False, refinement_func=None)
+.. function:: refine(input_p, verbose=False, refinement_func=None,  quality_meshing=True, min_angle=None)
 
 .. function:: write_gnuplot_mesh(filename, out_p, facets=False)
 

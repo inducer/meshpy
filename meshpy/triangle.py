@@ -203,8 +203,15 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
 
 
 
-def refine(input_p, verbose=False, refinement_func=None):
+def refine(input_p, verbose=False, refinement_func=None,  quality_meshing=True, min_angle=None):
     opts = "razj"
+
+    if quality_meshing:
+        if min_angle is not None:
+            opts += "q%f" % min_angle
+        else:
+            opts += "q"
+
     if len(input_p.faces) != 0:
         opts += "p"
     if verbose:
@@ -213,6 +220,7 @@ def refine(input_p, verbose=False, refinement_func=None):
         opts += "Q"
     if refinement_func is not None:
         opts += "u"
+
     output_p = MeshInfo()
     internals.triangulate(opts, input_p, output_p, MeshInfo(), refinement_func)
     return output_p
