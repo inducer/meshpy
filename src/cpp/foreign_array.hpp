@@ -259,9 +259,9 @@ class tForeignArray : public tReadOnlyForeignArray<ElementT>
       if (this->SlaveTo)
         assert(src.size() == this->SlaveTo->size());
       else
-        setSize(src.size());
+        this->setSize(src.size());
 
-      setUnit(src.Unit);
+      this->setUnit(src.Unit);
 
       if (src.Contents)
         memcpy(this->Contents, src.Contents, sizeof(ElementT) * this->Unit * src.size());
