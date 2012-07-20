@@ -31,14 +31,17 @@ from pytools import memoize_method, Record, single_valued
 
 # {{{ receiver interface
 
-class GmshMeshReceiver:
-    def __init__(self):
+class GmshMeshReceiverBase(object):
+    def set_up_nodes(self, count):
         pass
 
     def add_node(self, node_nr, point):
         pass
 
     def finalize_nodes(self):
+        pass
+
+    def set_up_elements(self, count):
         pass
 
     def add_element(self, element_nr, element_type, vertex_nrs,
@@ -151,7 +154,7 @@ class GmshElementBase(object):
                 for i, tup in enumerate(self.gmsh_node_tuples()))
 
         return np.array([gmsh_tup_to_index[tup]
-                for tup in self.node_tuples()],
+                for tup in self.lexicographic_node_tuples()],
                 dtype=np.intp)
 
     @memoize_method
@@ -167,6 +170,10 @@ class GmshElementBase(object):
 
 class GmshPoint(GmshElementBase):
     dimensions = 0
+
+    @memoize_method
+    def gmsh_node_tuples(self):
+        return [()]
 
 
 
@@ -325,7 +332,7 @@ def generate_gmsh(receiver, source, dimensions, order=None, other_options=[],
 def parse_gmsh(receiver, line_iterable, force_dimension=None):
     """
     :arg receiver: This object will be fed the entities encountered in reading the
-        GMSH file. See :class:`GmshMeshReceiver` for the interface this object needs
+        GMSH file. See :class:`GmshMeshReceiverBase` for the interface this object needs
         to conform to.
     :param force_dimension: if not None, truncate point coordinates to this many
         dimensions.
@@ -370,6 +377,8 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
 
         elif section_name == "Nodes":
             node_count = int(feeder.get_next_line())
+            receiver.set_up_nodes(node_count)
+
             node_idx = 1
 
             while True:
@@ -391,7 +400,7 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
                     point = [float(x) for x in parts[1:]]
 
                 receiver.add_node(
-                        node_idx,
+                        node_idx-1,
                         np.array(point, dtype=np.float64))
 
                 node_idx += 1
@@ -403,6 +412,8 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
 
         elif section_name == "Elements":
             element_count = int(feeder.get_next_line())
+            receiver.set_up_elements(element_count)
+
             element_idx = 1
             while True:
                 next_line = feeder.get_next_line()
