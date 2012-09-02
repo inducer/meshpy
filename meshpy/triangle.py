@@ -18,15 +18,6 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             ]
 
     def __getstate__(self):
-        def dump_array(array):
-            try:
-                return [
-                    [array[i,j] for j in range(array.unit)]
-                    for i in range(len(array))]
-            except RuntimeError:
-                # not allocated
-                return None
-
         return self.number_of_point_attributes, \
                self.number_of_element_attributes, \
                [(name, dump_array(getattr(self, name))) for name in self._constituents]
