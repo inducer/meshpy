@@ -486,7 +486,7 @@ class StringListOption(Option):
         if default is None:
             return None
 
-        return ",".join([str(el) for el in default])
+        return ",".join([str(el).replace(",", r"\,") for el in default])
 
     def get_help(self, default):
         return Option.get_help(self, default) + " (several ok)"
@@ -497,7 +497,11 @@ class StringListOption(Option):
             return None
         else:
             if opt:
-                return opt.split(",")
+                import re
+                sep = re.compile(r"(?<!\\),")
+                result = sep.split(opt)
+                result = [i.replace(r"\,", ",") for i in result]
+                return result
             else:
                 return []
 
@@ -605,6 +609,7 @@ def set_up_shipped_boost_if_requested(project_name, conf):
                     "BOOST_THREAD_BUILD_DLL": 1,
 
                     "BOOST_MULTI_INDEX_DISABLE_SERIALIZATION": 1,
+                    "BOOST_THREAD_DONT_USE_CHRONO": 1,
                     "BOOST_PYTHON_SOURCE": 1,
                     "boost": '%sboost' % project_name
                     }
