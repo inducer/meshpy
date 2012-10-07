@@ -5,7 +5,7 @@ Some common notions
 -------------------
 
 .. class:: ForeignArray
-    
+
     Almost all input and output data in MeshPy can be accessed using the
     :class:`ForeignArray` interface.  It is called "foreign" because it
     provides access to an area of memory accessible by a pointer managed by an
@@ -43,7 +43,7 @@ Some common notions
 
     .. method:: setup()
 
-        Set up (i.e. allocate) storage for the array. This only works on arrays 
+        Set up (i.e. allocate) storage for the array. This only works on arrays
         whose size is tied to that of other arrays, such as an array of point
         markers, which necessarily has the same size as the associated array of
         points, if it is allocated.
@@ -55,7 +55,7 @@ Some common notions
     .. method:: __getitem__(index)
                 __setitem__(index, value)
 
-        Get and set entries in the array. If this foreign array is 2D 
+        Get and set entries in the array. If this foreign array is 2D
         (see :attr:`ForeignArray.unit`), index may be a 2-tuple of integers, as in::
 
             points[2,1] = 17
@@ -73,7 +73,7 @@ Some common notions
 .. class:: MeshInfo
 
     :class:`MeshInfo` objects are picklable.
-    
+
     .. attribute:: points
 
         A 2D :class:`ForeignArray` of :class:`float` with dimension *(N,2)*,
@@ -121,11 +121,11 @@ Some common notions
     .. attribute:: number_of_point_attributes
     .. attribute:: number_of_element_vertices
 
-        Defautls to 4 for linear tetrahedra. Change to 10 for second-order 
+        Defautls to 4 for linear tetrahedra. Change to 10 for second-order
         tetrahedra.
 
     .. attribute:: number_of_element_attributes
-    
+
     Convenient setters:
 
     .. method:: set_points(points, point_markers=None)
@@ -135,7 +135,7 @@ Some common notions
     Other functionality:
 
     .. method:: copy()
-      
+
         Return a duplicate copy of this object.
 
 .. function:: subdivide_facets(subdivisions, points, facets, facet_markers)
@@ -146,17 +146,17 @@ Some common notions
     points on the boundary  of your triangulation to allow the mesh to conform
     either to itself periodically or another given mesh. In this case, you may
     use this routine to create the necessary resolution along the boundary
-    in a predefined way. 
+    in a predefined way.
 
     *subdivisions* is either an :class:`int`, indicating a uniform number of
     subdivisions throughout, or a list of the same length as *facets*,
     specifying a subdivision count for each individual facet.
 
-    *points* 
+    *points*
         a list of points referred to from the facets list.
-    *facets* 
+    *facets*
         a list of old facets, in the form *[(p1, p2), (p3,p4), ...]*.
-    *facet_markers* 
+    *facet_markers*
         either *None* or a list of facet markers of the same length
         as *facets*.
 
@@ -292,16 +292,16 @@ Some common notions
         only lets you use a single polygon per facet.
 
         *facets*
-            a list of facets, where each facet is a single 
+            a list of facets, where each facet is a single
             polygons, represented by a list of point indices.
         *markers*
             Either None or a list of integers of the same
             length as facets. Each integer is the facet marker assigned
             to its corresponding facet.
 
-        .. note:: 
+        .. note::
 
-            When the above says "list", any repeatable iterable 
+            When the above says "list", any repeatable iterable
             also accepted instead.
 
     .. method:: set_facets_ex(facets, facet_holestarts=None, markers=None)
@@ -309,24 +309,24 @@ Some common notions
         Set a list of complicated facets. Unlike :meth:`MeshInfo.set_facets`,
         this method allows holes and multiple polygons per facet.
 
-        *facets* 
+        *facets*
             a list of facets, where each facet is a list
             of polygons, and each polygon is represented by a list
             of point indices.
         *facet_holestarts*
             Either None or a list of hole starting points
             for each facet. Each facet may have several hole starting points.
-            The mesh generator starts "eating" a hole into the facet at each 
+            The mesh generator starts "eating" a hole into the facet at each
             starting point and continues until it hits a polygon specified
             in this facet's record in *facets*.
-        *markers* 
+        *markers*
             Either None or a list of integers of the same
             length as *facets*. Each integer is the facet marker assigned
             to its corresponding facet.
 
-        .. note:: 
+        .. note::
 
-            When the above says "list", any repeatable iterable 
+            When the above says "list", any repeatable iterable
             also accepted instead.
 
     Other functionality:
@@ -386,7 +386,7 @@ Some common notions
     produced instead of quads to provide non-degenerate closure.
 
     If *closure* is :data:`EXT_OPEN`, no efforts are made to put end caps on the
-    extrusion. 
+    extrusion.
 
     If *closure* is :data:`EXT_CLOSED_IN_RZ`, then a torus-like structure
     is assumed and the last ring is just connected to the first.
@@ -394,15 +394,15 @@ Some common notions
     If *ring_markers* is not None, it is an list of markers added to each
     ring. There should be len(rz_points)-1 entries in this list.
     If rings are added because of closure options, they receive the
-    corresponding *XXX_closure_marker*.  If *facet_markers* is given, this function 
-    returns (points, facets, markers), where markers is is a list containing 
+    corresponding *XXX_closure_marker*.  If *facet_markers* is given, this function
+    returns (points, facets, markers), where markers is is a list containing
     a marker for each generated facet. Unspecified markers generally
     default to 0.
 
-    If *ring_point_indices* is given, it must be a list of the same 
+    If *ring_point_indices* is given, it must be a list of the same
     length as *rz_points*. Each entry in the list may either be None,
     or a list of point indices. This list must contain the same number
-    of points as the *base_shape*; it is taken as the indices of 
+    of points as the *base_shape*; it is taken as the indices of
     pre-existing points that are to be used for the given ring, instead
     of generating new points.
 
