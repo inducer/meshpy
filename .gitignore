@@ -27,3 +27,4 @@ distribute*egg
 distribute*pth
 distribute*tar.gz
 setuptools*pth
+.sw[op]
