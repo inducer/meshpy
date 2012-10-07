@@ -217,6 +217,7 @@ void triangulateWrapper(char *options, tMeshInfo &in,
   out.regionlist = NULL;
   out.numberofregions = 0;
 
+  out.Elements.fixUnit(out.numberofcorners);
   out.PointAttributes.fixUnit(out.numberofpointattributes);
   out.ElementAttributes.fixUnit(out.numberoftriangleattributes);
 }

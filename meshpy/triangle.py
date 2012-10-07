@@ -20,7 +20,7 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
     def __getstate__(self):
         return self.number_of_point_attributes, \
                self.number_of_element_attributes, \
-               [(name, dump_array(getattr(self, name))) for name in self._constituents]
+               [(name, getattr(self, name)) for name in self._constituents]
 
     def __setstate__(self, (p_attr_count, e_attr_count, state)):
         self.number_of_point_attributes = p_attr_count
@@ -127,7 +127,8 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
 def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
         volume_constraints=False, max_volume=None, allow_boundary_steiner=True,
         allow_volume_steiner=True, quality_meshing=True,
-        generate_edges=None, generate_faces=False, min_angle=None):
+        generate_edges=None, generate_faces=False, min_angle=None,
+        mesh_order=None):
     """Triangulate the domain given in `mesh_info'."""
     opts = "pzj"
     if quality_meshing:
@@ -135,6 +136,9 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
             opts += "q%f" % min_angle
         else:
             opts += "q"
+
+    if mesh_order is not None:
+        opts += "o%d" % mesh_order
 
     if verbose:
         opts += "VV"
@@ -174,7 +178,7 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
     # restore "C" locale--otherwise triangle might mis-parse stuff like "a0.01"
     try:
         import locale
-    except ImportErorr:
+    except ImportError:
         have_locale = False
     else:
         have_locale = True
