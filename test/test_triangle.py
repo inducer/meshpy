@@ -1,9 +1,8 @@
 def main():
     import meshpy.triangle as triangle
     import math
-    import pickle
 
-    segments = 50
+    segments = 10
 
     points = [ (1,0),(1,1),(-1,1),(-1,-1),(1,-1),(1,0) ]
 
@@ -34,10 +33,16 @@ def main():
 
     mesh = triangle.build(info, refinement_func=needs_refinement)
 
-    pickled = pickle.dumps(mesh)
-    mesh_2 = pickle.loads(pickled)
+    import numpy as np
+    #np.set_printoptions(threshold=100000)
+    print repr(np.array(mesh.points))
+    print repr(np.array(mesh.elements))
 
-    triangle.write_gnuplot_mesh("triangles.dat", mesh_2)
+    #import pickle
+    #pickled = pickle.dumps(mesh)
+    #mesh_2 = pickle.loads(pickled)
+
+    triangle.write_gnuplot_mesh("triangles.dat", mesh)
 
 if __name__ == "__main__":
     main()
