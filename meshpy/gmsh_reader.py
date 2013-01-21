@@ -29,36 +29,6 @@ import numpy.linalg as la
 from pytools import memoize_method, Record, single_valued
 
 
-# {{{ receiver interface
-
-class GmshMeshReceiverBase(object):
-    def set_up_nodes(self, count):
-        pass
-
-    def add_node(self, node_nr, point):
-        pass
-
-    def finalize_nodes(self):
-        pass
-
-    def set_up_elements(self, count):
-        pass
-
-    def add_element(self, element_nr, element_type, vertex_nrs,
-            lexicographic_nodes, tag_numbers):
-        pass
-
-    def finalize_elements(self):
-        pass
-
-    def add_tag(self, name, index, dimension):
-        pass
-
-    def finalize_tags(self):
-        pass
-
-# }}}
-
 # {{{ tools
 
 def generate_triangle_vertex_tuples(order):
@@ -225,7 +195,7 @@ class GmshTriangularElement(GmshElementBase):
 
 
 class GmshTetrahedralElement(GmshElementBase):
-    vertex_count = 4
+    dimensions = 3
 
     @memoize_method
     def gmsh_node_tuples(self):
@@ -264,27 +234,58 @@ class GmshTetrahedralElement(GmshElementBase):
 
 
 
-GMSH_ELEMENT_TYPE_TO_INFO_MAP = {
-        1:  GmshIntervalElement(1),
-        2:  GmshTriangularElement(1),
-        4:  GmshTetrahedralElement(1),
-        8:  GmshIntervalElement(2),
-        9:  GmshTriangularElement(2),
-        11: GmshTetrahedralElement(2),
-        15: GmshPoint(0),
-        20: GmshIncompleteTriangularElement(3),
-        21: GmshTriangularElement(3),
-        22: GmshIncompleteTriangularElement(4),
-        23: GmshTriangularElement(4),
-        24: GmshIncompleteTriangularElement(5),
-        25: GmshTriangularElement(5),
-        26: GmshIntervalElement(3),
-        27: GmshIntervalElement(4),
-        28: GmshIntervalElement(5),
-        29: GmshTetrahedralElement(3),
-        30: GmshTetrahedralElement(4),
-        31: GmshTetrahedralElement(5)
-        }
+
+# }}}
+
+# {{{ receiver interface
+
+class GmshMeshReceiverBase(object):
+    gmsh_element_type_to_info_map = {
+            1:  GmshIntervalElement(1),
+            2:  GmshTriangularElement(1),
+            4:  GmshTetrahedralElement(1),
+            8:  GmshIntervalElement(2),
+            9:  GmshTriangularElement(2),
+            11: GmshTetrahedralElement(2),
+            15: GmshPoint(0),
+            20: GmshIncompleteTriangularElement(3),
+            21: GmshTriangularElement(3),
+            22: GmshIncompleteTriangularElement(4),
+            23: GmshTriangularElement(4),
+            24: GmshIncompleteTriangularElement(5),
+            25: GmshTriangularElement(5),
+            26: GmshIntervalElement(3),
+            27: GmshIntervalElement(4),
+            28: GmshIntervalElement(5),
+            29: GmshTetrahedralElement(3),
+            30: GmshTetrahedralElement(4),
+            31: GmshTetrahedralElement(5)
+            }
+
+    def set_up_nodes(self, count):
+        pass
+
+    def add_node(self, node_nr, point):
+        pass
+
+    def finalize_nodes(self):
+        pass
+
+    def set_up_elements(self, count):
+        pass
+
+    def add_element(self, element_nr, element_type, vertex_nrs,
+            lexicographic_nodes, tag_numbers):
+        pass
+
+    def finalize_elements(self):
+        pass
+
+    def add_tag(self, name, index, dimension):
+        pass
+
+    def finalize_tags(self):
+        pass
 
 # }}}
 
@@ -320,7 +321,7 @@ def generate_gmsh(receiver, source, dimensions, order=None, other_options=[],
 
     runner.__enter__()
     try:
-        result = parse_gmsh(receiver, runner.output_file)
+        result = parse_gmsh(receiver, runner.output_file, force_dimension=force_dimension)
     finally:
         runner.__exit__(None, None, None)
 
@@ -339,7 +340,6 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
     """
 
     feeder = LineFeeder(line_iterable)
-    element_type_map = GMSH_ELEMENT_TYPE_TO_INFO_MAP
 
     # collect the mesh information
 
@@ -431,7 +431,7 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
 
                 el_type_num = parts[1]
                 try:
-                    element_type = element_type_map[el_type_num]
+                    element_type = receiver.gmsh_element_type_to_info_map[el_type_num]
                 except KeyError:
                     raise GmshFileFormatError("unexpected element type %d"
                             % el_type_num)
