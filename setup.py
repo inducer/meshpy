@@ -105,6 +105,10 @@ def main():
             ],
 
           packages = [ "meshpy" ],
+          install_requires=[
+                  "pytools>=2011.2",
+                  "pytest>=2",
+                  ],
           ext_modules = [
             Extension(
               "meshpy._triangle", 
