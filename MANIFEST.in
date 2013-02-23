@@ -1,11 +1,16 @@
 include src/cpp/*.h
 include src/cpp/*.hpp
+include README.rst
 include LICENSE
 include test/*.py
-include test/clean.sh
+include examples/clean.sh
+include examples/clean.sh
 
 include distribute_setup.py
 include configure.py
 include Makefile.in
 include aksetup_helper.py
 include README_SETUP.txt
+
+recursive-include bpl-subset/bpl_subset/boost *.h *.hpp *.cpp *.html *.inl *.ipp *.pl *.txt
+recursive-include bpl-subset/bpl_subset/libs *.h *.hpp *.cpp *.html *.inl *.ipp *.pl *.txt

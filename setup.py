@@ -58,29 +58,7 @@ def main():
     setup(name="MeshPy",
           version=conf["version"],
           description="Triangular and Tetrahedral Mesh Generator",
-          long_description="""
-          MeshPy offers quality triangular and tetrahedral mesh
-          generation for Python. Meshes of this type are chiefly used
-          in finite-element simulation codes, but also have many
-          other applications ranging from computer graphics to
-          robotics.
-
-          In order to generate 2D and 3D meshes, MeshPy provides
-          Python interfaces to two well-regarded mesh generators,
-          `Triangle <http://www.cs.cmu.edu/~quake/triangle.html>`_ by
-          J.  Shewchuk and `TetGen <http://tetgen.berlios.de/>`_ by
-          Hang Si. Both are included in the package in slightly
-          modified versions.
-
-          MeshPy uses `Boost.Python <http://www.boost.org>`_. 
-
-          As of Version 0.91.2, MeshPy also works with Python 3.
-
-          Documentation
-          =============
-
-          See the `MeshPy Documentation <http://tiker.net/doc/meshpy>`_ page.
-          """,
+          long_description=open("README.rst", "rtu").read(),
           author="Andreas Kloeckner",
           author_email="inform@tiker.net",
           license = "MIT for the wrapper/non-commercial MIT for the meshers",
