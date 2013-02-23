@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 def get_config_schema():
-    from aksetup_helper import ConfigSchema, Option, \
-            IncludeDir, LibraryDir, Libraries, BoostLibraries, \
-            Switch, StringListOption, make_boost_base_options
+    from aksetup_helper import (ConfigSchema,
+            BoostLibraries, Switch, StringListOption, make_boost_base_options)
 
     return ConfigSchema(make_boost_base_options() + [
         BoostLibraries("python"),
+
+        Switch("USE_SHIPPED_BOOST", True, "Use included Boost library"),
 
         StringListOption("CXXFLAGS", [], 
             help="Any extra C++ compiler options to include"),
@@ -18,23 +19,28 @@ def get_config_schema():
 
 
 def main():
-    import glob
-    from aksetup_helper import hack_distutils, \
-            get_config, setup, Extension
+    from aksetup_helper import (hack_distutils,
+            get_config, setup, Extension, set_up_shipped_boost_if_requested,
+            check_git_submodules)
+
+    check_git_submodules()
 
     hack_distutils()
     conf = get_config(get_config_schema())
+
+    TRI_EXTRA_OBJECTS, TRI_EXTRA_DEFINES = set_up_shipped_boost_if_requested("meshpy_tri_", conf)
+    TET_EXTRA_OBJECTS, TET_EXTRA_DEFINES = set_up_shipped_boost_if_requested("meshpy_tet_", conf)
 
     triangle_macros = [
       ( "EXTERNAL_TEST", 1 ),
       ( "ANSI_DECLARATORS", 1 ),
       ( "TRILIBRARY", 1 ) ,
-      ]
+      ] + list(TRI_EXTRA_DEFINES.iteritems())
 
     tetgen_macros = [
       ("TETLIBRARY", 1),
       ("SELF_CHECK", 1) ,
-      ]
+      ] + list(TET_EXTRA_DEFINES.iteritems())
 
     INCLUDE_DIRS = conf["BOOST_INC_DIR"] + ["src/cpp"]
     LIBRARY_DIRS = conf["BOOST_LIB_DIR"]
@@ -102,7 +108,8 @@ def main():
           ext_modules = [
             Extension(
               "meshpy._triangle", 
-              ["src/cpp/wrap_triangle.cpp","src/cpp/triangle.c"],
+              ["src/cpp/wrap_triangle.cpp","src/cpp/triangle.c"]
+              + TRI_EXTRA_OBJECTS,
               include_dirs=INCLUDE_DIRS,
               library_dirs=LIBRARY_DIRS,
               libraries=LIBRARIES,
@@ -112,7 +119,8 @@ def main():
               ),
             Extension(
               "meshpy._tetgen", 
-              ["src/cpp/tetgen.cpp", "src/cpp/predicates.cpp", "src/cpp/wrap_tetgen.cpp"],
+              ["src/cpp/tetgen.cpp", "src/cpp/predicates.cpp", "src/cpp/wrap_tetgen.cpp"]
+              + TET_EXTRA_OBJECTS,
               include_dirs=INCLUDE_DIRS,
               library_dirs=LIBRARY_DIRS,
               libraries=LIBRARIES,
