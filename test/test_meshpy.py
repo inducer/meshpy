@@ -60,11 +60,9 @@ def test_triangle_refine():
     info.set_holes([(0,0)])
     info.set_facets(round_trip_connect(0, len(points)-1))
 
-    mesh = triangle.build(info, refinement_func=needs_refinement,
-            )
+    mesh = triangle.build(info, refinement_func=needs_refinement)
 
     triangle.write_gnuplot_mesh("triangles-unrefined.dat", mesh)
-    print len(mesh.elements)
 
     mesh.element_volumes.setup()
 
