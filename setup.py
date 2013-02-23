@@ -35,12 +35,12 @@ def main():
       ( "EXTERNAL_TEST", 1 ),
       ( "ANSI_DECLARATORS", 1 ),
       ( "TRILIBRARY", 1 ) ,
-      ] + list(TRI_EXTRA_DEFINES.iteritems())
+      ] + list(TRI_EXTRA_DEFINES.items())
 
     tetgen_macros = [
       ("TETLIBRARY", 1),
       ("SELF_CHECK", 1) ,
-      ] + list(TET_EXTRA_DEFINES.iteritems())
+      ] + list(TET_EXTRA_DEFINES.items())
 
     INCLUDE_DIRS = conf["BOOST_INC_DIR"] + ["src/cpp"]
     LIBRARY_DIRS = conf["BOOST_LIB_DIR"]
