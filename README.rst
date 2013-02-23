@@ -6,7 +6,7 @@ In order to generate 2D and 3D meshes, MeshPy provides Python interfaces to
 three well-regarded mesh generators, `Triangle
 <http://www.cs.cmu.edu/~quake/triangle.html>`_ by J.  Shewchuk, `TetGen
 <http://tetgen.berlios.de/>`_ by Hang Si, and `gmsh
-<http://www.geuz.org/gmsh/>`_ by Christophe Geuzaine and Jean-François Remacle.
+<http://www.geuz.org/gmsh/>`_ by Christophe Geuzaine and Jean-Francois Remacle.
 The former two are included in the package in slightly modified versions. A
 generic mesh reader for the latter is included, as is an easy way to run `gmsh`
 from a Python script.
