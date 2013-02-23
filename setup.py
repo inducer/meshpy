@@ -55,10 +55,11 @@ def main():
         # 2.x
         from distutils.command.build_py import build_py
 
+    import codecs
     setup(name="MeshPy",
           version=conf["version"],
           description="Triangular and Tetrahedral Mesh Generator",
-          long_description=open("README.rst", "rtu").read(),
+          long_description=codecs.open("README.rst", "r", "utf-8").read(),
           author="Andreas Kloeckner",
           author_email="inform@tiker.net",
           license = "MIT for the wrapper/non-commercial MIT for the meshers",

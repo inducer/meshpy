@@ -16,8 +16,6 @@ to two well-regarded mesh generators, `Triangle
 <http://tetgen.berlios.de/>`_ by Hang Si. Both are included in the package in
 slightly modified versions.
 
-MeshPy requires `Boost.Python <http://www.boost.org>`_. 
-
 Show me! I need examples!
 -------------------------
 This simple code generates a mesh of a "brick"::
