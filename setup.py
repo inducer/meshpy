@@ -87,6 +87,7 @@ def main():
           install_requires=[
                   "pytools>=2011.2",
                   "pytest>=2",
+                  "numpy>=1.6",
                   ],
           ext_modules = [
             Extension(
