@@ -28,8 +28,8 @@ def main():
     hack_distutils()
     conf = get_config(get_config_schema())
 
-    TRI_EXTRA_OBJECTS, TRI_EXTRA_DEFINES = set_up_shipped_boost_if_requested("meshpy_tri_", conf)
-    TET_EXTRA_OBJECTS, TET_EXTRA_DEFINES = set_up_shipped_boost_if_requested("meshpy_tet_", conf)
+    TRI_EXTRA_OBJECTS, TRI_EXTRA_DEFINES = set_up_shipped_boost_if_requested("meshpy", conf)
+    TET_EXTRA_OBJECTS, TET_EXTRA_DEFINES = TRI_EXTRA_OBJECTS, TRI_EXTRA_DEFINES
 
     triangle_macros = [
       ( "EXTERNAL_TEST", 1 ),
