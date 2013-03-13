@@ -6,6 +6,10 @@ Some common notions
 
 .. class:: ForeignArray
 
+    Note that :class:`ForeignArray` instances are not usually created by users,
+    and :class:`ForeignArray`  is not a class name available in MeshPy. It is
+    just used to explain the interface provided.
+
     Almost all input and output data in MeshPy can be accessed using the
     :class:`ForeignArray` interface.  It is called "foreign" because it
     provides access to an area of memory accessible by a pointer managed by an

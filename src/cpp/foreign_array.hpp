@@ -11,6 +11,8 @@
 
 
 
+namespace {
+
 class tSizeChangeNotifier;
 
 
@@ -41,7 +43,7 @@ class tSizeChangeNotifier
       tNotificationReceiverList::iterator first = NotificationReceivers.begin(),
       last = NotificationReceivers.end();
       while (first != last)
-	(*first++)->notifySizeChange(this, size);
+        (*first++)->notifySizeChange(this, size);
     }
 
     void registerForNotification(tSizeChangeNotificationReceiver *rec)
@@ -55,12 +57,12 @@ class tSizeChangeNotifier
       last = NotificationReceivers.end();
       while (first != last)
       {
-	if (rec == *first)
-	{
-	  NotificationReceivers.erase(first);
-	  return;
-	}
-	first++;
+        if (rec == *first)
+        {
+          NotificationReceivers.erase(first);
+          return;
+        }
+        first++;
       }
     }
 };
@@ -68,14 +70,14 @@ class tSizeChangeNotifier
 
 
 
-template<class ElementT> 
+template<class ElementT>
 class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNotificationReceiver,
   public boost::noncopyable
 {
   protected:
-    ElementT	                *&Contents;
-    int		                &NumberOf;
-    unsigned	                Unit;
+    ElementT                    *&Contents;
+    int                         &NumberOf;
+    unsigned                    Unit;
     tSizeChangeNotifier         *SlaveTo;
     bool                        AssumeOwnership;
 
@@ -85,7 +87,7 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
     tReadOnlyForeignArray(
         ElementT *&cts, int &number_of, unsigned unit=1, tSizeChangeNotifier *slave_to=NULL,
         bool assume_ownership=false)
-      : Contents(cts), NumberOf(number_of), Unit(unit), SlaveTo(slave_to), 
+      : Contents(cts), NumberOf(number_of), Unit(unit), SlaveTo(slave_to),
       AssumeOwnership(assume_ownership)
     {
       if (AssumeOwnership)
@@ -93,8 +95,8 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
 
       if (SlaveTo)
       {
-	SlaveTo->registerForNotification(this);
-	setSizeInternal(SlaveTo->size());
+        SlaveTo->registerForNotification(this);
+        setSizeInternal(SlaveTo->size());
       }
       else
       {
@@ -106,7 +108,7 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
     ~tReadOnlyForeignArray()
     {
       if (SlaveTo)
-	SlaveTo->unregisterForNotification(this);
+        SlaveTo->unregisterForNotification(this);
 
       if (AssumeOwnership)
       {
@@ -135,22 +137,22 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
     void deallocate()
     {
       if (Contents != NULL)
-	delete[] Contents;
+        delete[] Contents;
       Contents = NULL;
     }
 
     void setSize(unsigned size)
     {
       if (SlaveTo)
-	throw std::runtime_error("sizes of slave arrays cannot be changed");
+        throw std::runtime_error("sizes of slave arrays cannot be changed");
       else
-	setSizeInternal(size);
+        setSizeInternal(size);
     }
-    
+
     void setup()
     {
       if (!SlaveTo)
-	throw std::runtime_error("cannot setup non-slave array");
+        throw std::runtime_error("cannot setup non-slave array");
       else
       {
         if (!Contents)
@@ -161,7 +163,7 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
     void notifySizeChange(tSizeChangeNotifier *master, unsigned size)
     {
       if (!SlaveTo)
-	throw std::runtime_error("non-slave array should not get size notifications");
+        throw std::runtime_error("non-slave array should not get size notifications");
 
       // only perform size change if we actually existed
       if (Contents)
@@ -171,18 +173,18 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
     void setSizeInternal(unsigned size)
     {
       if (!SlaveTo)
-	NumberOf = size;
-      
+        NumberOf = size;
+
       if (Contents != NULL)
-	free(Contents);
+        free(Contents);
 
       if (size == 0 || Unit == 0)
-	Contents = NULL;
+        Contents = NULL;
       else
       {
-	Contents = new ElementT[Unit*size];
-	if (Contents == NULL)
-	  throw std::bad_alloc();
+        Contents = new ElementT[Unit*size];
+        if (Contents == NULL)
+          throw std::bad_alloc();
       }
 
       tSizeChangeNotifier::setSize(size);
@@ -210,9 +212,9 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
     ElementT &get(unsigned index)
     {
       if (index >= NumberOf * Unit)
-	throw std::runtime_error("index out of bounds");
+        throw std::runtime_error("index out of bounds");
       if (!Contents)
-	throw std::runtime_error("Array unallocated");
+        throw std::runtime_error("Array unallocated");
       return Contents[ index ];
     }
 
@@ -226,14 +228,14 @@ class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNoti
 
 
 
-template<class ElementT> 
+template<class ElementT>
 class tForeignArray : public tReadOnlyForeignArray<ElementT>
 {
     typedef tReadOnlyForeignArray<ElementT> super;
 
   public:
     tForeignArray(
-        ElementT *&cts, int &number_of, unsigned unit=1, 
+        ElementT *&cts, int &number_of, unsigned unit=1,
         tSizeChangeNotifier *slave_to=NULL,
         bool assume_ownership=false)
       : super(cts, number_of, unit, slave_to, assume_ownership)
@@ -243,9 +245,9 @@ class tForeignArray : public tReadOnlyForeignArray<ElementT>
     void set(unsigned index, ElementT value)
     {
       if (index >= this->NumberOf * this->Unit)
-	throw std::runtime_error("index out of bounds");
+        throw std::runtime_error("index out of bounds");
       if (!this->Contents)
-	throw std::runtime_error("Array unallocated");
+        throw std::runtime_error("Array unallocated");
       this->Contents[ index ] = value;
     }
 
@@ -271,6 +273,8 @@ class tForeignArray : public tReadOnlyForeignArray<ElementT>
       return *this;
     }
 };
+
+}
 
 
 
