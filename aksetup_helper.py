@@ -39,7 +39,6 @@ if not hasattr(setuptools, "_distribute"):
 
 def setup(*args, **kwargs):
     from setuptools import setup
-    import traceback
     try:
         setup(*args, **kwargs)
     except KeyboardInterrupt:
@@ -85,17 +84,8 @@ class NumpyExtension(Extension):
 
 class PyUblasExtension(NumpyExtension):
     def get_module_include_path(self, name):
-        from imp import find_module
-        file, pathname, descr = find_module(name)
-        from os.path import join, exists
-        installed_path = join(pathname, "..", "include")
-        development_path = join(pathname, "..", "src", "cpp")
-        if exists(installed_path):
-            return installed_path
-        elif exists(development_path):
-            return development_path
-        else:
-            raise RuntimeError("could not find C include path for module '%s'" % name)
+        from pkg_resources import Requirement, resource_filename
+        return resource_filename(Requirement.parse(name), "%s/include" % name)
 
     @property
     def include_dirs(self):
@@ -525,9 +515,16 @@ class Libraries(StringListOption):
                 % (human_name or humanize(lib_name))))
 
 class BoostLibraries(Libraries):
-    def __init__(self, lib_base_name):
+    def __init__(self, lib_base_name, default_lib_name=None):
+        if default_lib_name is None:
+            if lib_base_name == "python":
+                import sys
+                default_lib_name = "boost_python-py%d%d" % sys.version_info[:2]
+            else:
+                default_lib_name = "boost_%s" % lib_base_name
+
         Libraries.__init__(self, "BOOST_%s" % lib_base_name.upper(),
-                ["boost_%s" % lib_base_name],
+                [default_lib_name],
                 help="Library names for Boost C++ %s library (without lib or .so)"
                     % humanize(lib_base_name))
 
