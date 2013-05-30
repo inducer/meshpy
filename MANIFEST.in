@@ -6,6 +6,12 @@ include test/*.py
 include examples/clean.sh
 include examples/clean.sh
 
+include doc/source/*.rst
+include doc/source/conf.py
+include doc/Makefile
+include doc/source/_static/*.css
+include doc/source/_templates/*.html
+
 include distribute_setup.py
 include configure.py
 include Makefile.in
