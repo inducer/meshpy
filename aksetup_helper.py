@@ -545,8 +545,7 @@ def set_up_shipped_boost_if_requested(project_name, conf):
             print("------------------------------------------------------------------------")
             print("If you got this package from git, you probably want to do")
             print("")
-            print(" $ git submodule init")
-            print(" $ git submodule update")
+            print(" $ git submodule update --init")
             print("")
             print("to fetch what you are presently missing. If you got this from")
             print("a distributed package on the net, that package is broken and")
@@ -723,23 +722,16 @@ def substitute(substitutions, fname):
     chmod(fname, infile_stat_res.st_mode)
 
 
-
-
-def check_git_submodules():
-    from os.path import isdir
-    if not isdir(".git"):
-        # not a git repository
-        return
-
+def _run_git_command(cmd):
     git_error = None
     from subprocess import Popen, PIPE
     try:
-        popen = Popen(["git", "--version"], stdout=PIPE)
-        stdout_data, _ = popen.communicate()
+        popen = Popen(["git"] + cmd, stdout=PIPE)
+        stdout, stderr = popen.communicate()
         if popen.returncode != 0:
-            git_error = "git returned error code %d" % popen.returncode
+            git_error = "git returned error code %d: %s" % (popen.returncode, stderr)
     except OSError:
-        git_error = "(os error, likely git not found)"
+        git_error = "(OS error, likely git not found)"
 
     if git_error is not None:
         print("-------------------------------------------------------------------------")
@@ -753,17 +745,22 @@ def check_git_submodules():
         print("Hit Ctrl-C now if you'd like to think about the situation.")
         print("-------------------------------------------------------------------------")
         count_down_delay(delay=5)
+    return stdout.decode("ascii"), git_error
+
+
+def check_git_submodules():
+    from os.path import isdir
+    if not isdir(".git"):
+        # not a git repository
         return
 
-    popen = Popen(["git", "submodule", "status"], stdout=PIPE)
-    stdout_data, _ = popen.communicate()
-    stdout_data = stdout_data.decode("ascii")
-    if popen.returncode != 0:
-        git_error = "git returned error code %d" % popen.returncode
+    stdout, git_error = _run_git_command(["submodule", "status"])
+    if git_error is not None:
+        return
 
     pkg_warnings = []
 
-    lines = stdout_data.split("\n")
+    lines = stdout.split("\n")
     for l in lines:
         if not l.strip():
             continue
@@ -793,8 +790,7 @@ def check_git_submodules():
             print("-------------------------------------------------------------------------")
             print("If this makes no sense, you probably want to say")
             print("")
-            print(" $ git submodule init")
-            print(" $ git submodule update")
+            print(" $ git submodule update --init")
             print("")
             print("to fetch what you are presently missing and move on with your life.")
             print("If you got this from a distributed package on the net, that package is")
@@ -804,7 +800,7 @@ def check_git_submodules():
             for w in pkg_warnings:
                 print("  %s" % w)
             print("")
-            print("I will try to continue after a short wait, fingers crossed.")
+            print("I will try to initialize the submodules for you after a short wait.")
             print("-------------------------------------------------------------------------")
             print("Hit Ctrl-C now if you'd like to think about the situation.")
             print("-------------------------------------------------------------------------")
@@ -812,12 +808,8 @@ def check_git_submodules():
             from os.path import exists
             if not exists(".dirty-git-ok"):
                 count_down_delay(delay=10)
-
-
-
-
-
-
-
-
-
+                stdout, git_error = _run_git_command(["submodule", "update", "--init"])
+                if git_error is None:
+                    print("-------------------------------------------------------------------------")
+                    print("git submodules initialized successfully")
+                    print("-------------------------------------------------------------------------")
