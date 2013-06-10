@@ -23,8 +23,8 @@ doc/html
 doc/.build
 *.pyd
 *.so
-distribute*egg
-distribute*pth
-distribute*tar.gz
+setuptools*egg
+setuptools*pth
+setuptools*tar.gz
 setuptools*pth
 .sw[op]
