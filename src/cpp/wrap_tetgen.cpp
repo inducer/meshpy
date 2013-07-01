@@ -16,7 +16,7 @@ using namespace std;
 
 
 
-namespace 
+namespace
 {
   struct tMeshInfo : public tetgenio, public boost::noncopyable
   {
@@ -24,17 +24,17 @@ namespace
       typedef tetgenio super;
 
     public:
-      tForeignArray<REAL>		        Points; // in/out
-      tForeignArray<REAL>		        PointAttributes; // in/out
-      tForeignArray<REAL>		        PointMetricTensors; // in/out
-      tForeignArray<int>		        PointMarkers; // in/out
+      tForeignArray<REAL>                       Points; // in/out
+      tForeignArray<REAL>                       PointAttributes; // in/out
+      tForeignArray<REAL>                       PointMetricTensors; // in/out
+      tForeignArray<int>                        PointMarkers; // in/out
 
-      tForeignArray<int>		        Elements; // in/out
-      tForeignArray<REAL>		        ElementAttributes; // in/out
-      tForeignArray<REAL>		        ElementVolumes; // out
-      tForeignArray<int>		        Neighbors; // out
+      tForeignArray<int>                        Elements; // in/out
+      tForeignArray<REAL>                       ElementAttributes; // in/out
+      tForeignArray<REAL>                       ElementVolumes; // out
+      tForeignArray<int>                        Neighbors; // out
 
-      tForeignArray<tetgenio::facet>	  Facets;
+      tForeignArray<tetgenio::facet>      Facets;
       tForeignArray<int>                  FacetMarkers;
 
       tForeignArray<REAL>                 Holes;
@@ -60,7 +60,7 @@ namespace
           PointMarkers(pointmarkerlist, numberofpoints, 1, &Points),
 
           Elements(tetrahedronlist, numberoftetrahedra, 0),
-          ElementAttributes(tetrahedronattributelist, 
+          ElementAttributes(tetrahedronattributelist,
               numberoftetrahedra, 0, &Elements),
           ElementVolumes(tetrahedronvolumelist, numberoftetrahedra, 1, &Elements),
           Neighbors(neighborlist, numberoftetrahedra, 4, &Elements),
@@ -85,8 +85,8 @@ namespace
           EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges)
       {
         Elements.fixUnit(numberofcorners);
-      } 
-      
+      }
+
       unsigned numberOfPointAttributes() const
       {
         return numberofpointattributes;
@@ -347,13 +347,13 @@ BOOST_PYTHON_MODULE(_tetgen)
       .def_readonly("edges", &cl::Edges)
       .def_readonly("edge_markers", &cl::EdgeMarkers)
 
-      .add_property("number_of_point_attributes", 
+      .add_property("number_of_point_attributes",
           &cl::numberOfPointAttributes,
           &cl::setNumberOfPointAttributes)
-      .add_property("number_of_element_vertices", 
+      .add_property("number_of_element_vertices",
           &cl::numberOfElementVertices,
           &cl::setNumberOfElementVertices)
-      .add_property("number_of_element_attributes", 
+      .add_property("number_of_element_attributes",
           &cl::numberOfElementAttributes,
           &cl::setNumberOfElementAttributes)
 
@@ -387,9 +387,9 @@ BOOST_PYTHON_MODULE(_tetgen)
   {
     typedef tetgenio::facet cl;
     class_<cl, boost::noncopyable>("Facet", no_init)
-      .add_property("polygons", 
+      .add_property("polygons",
           make_function(facet_get_polygons, manage_new_internal_reference<>()))
-      .add_property("holes", 
+      .add_property("holes",
           make_function(facet_get_holes, manage_new_internal_reference<>()))
       ;
   }
@@ -397,7 +397,7 @@ BOOST_PYTHON_MODULE(_tetgen)
   {
     typedef tetgenio::polygon cl;
     class_<cl, boost::noncopyable>("Polygon", no_init)
-      .add_property("vertices", 
+      .add_property("vertices",
           make_function(polygon_get_vertices, manage_new_internal_reference<>()))
       ;
   }
@@ -409,7 +409,7 @@ BOOST_PYTHON_MODULE(_tetgen)
       .def_readwrite("facet_marker_2", &cl::fmark2)
       .def("get_transmat_entry", pbcgroup_get_transmat_entry)
       .def("set_transmat_entry", pbcgroup_set_transmat_entry)
-      .add_property("point_pairs", 
+      .add_property("point_pairs",
           make_function(pbcgroup_get_pointpairs, manage_new_internal_reference<>()))
       ;
   }
