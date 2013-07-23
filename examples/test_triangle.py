@@ -4,11 +4,13 @@ import meshpy.triangle as triangle
 import numpy as np
 import numpy.linalg as la
 
+
 def round_trip_connect(start, end):
-  return [(i, i+1) for i in range(start, end)] + [(end, start)]
+    return [(i, i+1) for i in range(start, end)] + [(end, start)]
+
 
 def main():
-    points = [(1,0),(1,1),(-1,1),(-1,-1),(1,-1),(1,0)]
+    points = [(1, 0), (1, 1), (-1, 1), (-1, -1), (1, -1), (1, 0)]
     facets = round_trip_connect(0, len(points)-1)
 
     circ_start = len(points)
@@ -25,7 +27,7 @@ def main():
 
     info = triangle.MeshInfo()
     info.set_points(points)
-    info.set_holes([(0,0)])
+    info.set_holes([(0, 0)])
     info.set_facets(facets)
 
     mesh = triangle.build(info, refinement_func=needs_refinement)
