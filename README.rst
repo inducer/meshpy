@@ -1,3 +1,6 @@
+.. image:: https://badge.fury.io/py/meshpy.png
+    :target: http://pypi.python.org/pypi/meshpy
+
 MeshPy offers quality triangular and tetrahedral mesh generation for Python.
 Meshes of this type are chiefly used in finite-element simulation codes, but
 also have many other applications ranging from computer graphics to robotics.
