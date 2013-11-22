@@ -303,7 +303,7 @@ def read_gmsh(receiver, filename, force_dimension=None):
     """
     mesh_file = open(filename, 'rt')
     try:
-        result = parse_gmsh(receiver, mesh_file)
+        result = parse_gmsh(receiver, mesh_file, force_dimension=force_dimension)
     finally:
         mesh_file.close()
 
