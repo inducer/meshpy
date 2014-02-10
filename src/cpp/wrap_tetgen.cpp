@@ -43,8 +43,6 @@ namespace
       tForeignArray<REAL>                 FacetConstraints;
       tForeignArray<REAL>                 SegmentConstraints;
 
-      tForeignArray<pbcgroup>             PBCGroups;
-
       tForeignArray<int>                  Faces;
       tForeignArray<int>                  AdjacentElements;
       tForeignArray<int>                  FaceMarkers;
@@ -74,8 +72,6 @@ namespace
 
           FacetConstraints(facetconstraintlist, numberoffacetconstraints, 2),
           SegmentConstraints(facetconstraintlist, numberofsegmentconstraints, 3),
-
-          PBCGroups(pbcgrouplist, numberofpbcgroups),
 
           Faces(trifacelist, numberoftrifaces, 3),
           AdjacentElements(adjtetlist, numberoftrifaces, 2, &Faces),
@@ -140,14 +136,12 @@ namespace
       }
 
       OVERRIDE_LOAD_WITH_ERROR_CHECK(node,);
-      OVERRIDE_LOAD_WITH_ERROR_CHECK(pbc,);
       OVERRIDE_LOAD_WITH_ERROR_CHECK(var,);
       OVERRIDE_LOAD_WITH_ERROR_CHECK(mtr,);
       OVERRIDE_LOAD_WITH_ERROR_CHECK(poly,);
       OVERRIDE_LOAD_WITH_ERROR_CHECK(off,);
       OVERRIDE_LOAD_WITH_ERROR_CHECK(ply,);
       OVERRIDE_LOAD_WITH_ERROR_CHECK(stl,);
-      OVERRIDE_LOAD_WITH_ERROR_CHECK(medit,);
       OVERRIDE_LOAD_WITH_ERROR_CHECK(vtk,);
 
       void load_plc(char* filename, int object)
@@ -156,9 +150,18 @@ namespace
           throw std::runtime_error("load_plc failed");
       }
 
-      OVERRIDE_LOAD_WITH_ERROR_CHECK(tetmesh,
-          Elements.fixUnit(numberofcorners);
-          );
+      void load_medit(char* filename, int object)
+      {
+        if (!super::load_medit(filename, object))
+          throw std::runtime_error("load_tetmesh failed");
+      }
+
+      void load_tetmesh(char* filename, int object)
+      {
+        if (!super::load_tetmesh(filename, object))
+          throw std::runtime_error("load_tetmesh failed");
+        Elements.fixUnit(numberofcorners);
+      }
 
       /*
       tTriangulationParameters &operator=(const tTriangulationParameters &src)
@@ -260,43 +263,6 @@ namespace
   {
     return new tForeignArray<int>(self.vertexlist, self.numberofvertices);
   }
-
-
-
-
-
-  REAL pbcgroup_get_transmat_entry(tetgenio::pbcgroup &self, long i, long j)
-  {
-    if (i < 0) i += 4;
-    if (j < 0) j += 4;
-
-    if (i < 0 || i >= 4 || j < 0 || j >= 4)
-      PYTHON_ERROR(IndexError, "transform matrix index out of bounds");
-    return self.transmat[i][j];
-  }
-
-
-
-
-
-  void pbcgroup_set_transmat_entry(tetgenio::pbcgroup &self, long i, long j, REAL value)
-  {
-    if (i < 0) i += 4;
-    if (j < 0) j += 4;
-
-    if (i < 0 || i >= 4 || j < 0 || j >= 4)
-      PYTHON_ERROR(IndexError, "transform matrix index out of bounds");
-    self.transmat[i][j] = value;
-  }
-
-
-
-
-
-  tForeignArray<int> *pbcgroup_get_pointpairs(tetgenio::pbcgroup &self)
-  {
-    return new tForeignArray<int>(self.pointpairlist, self.numberofpointpairs, 2);
-  }
 }
 
 
@@ -337,8 +303,6 @@ BOOST_PYTHON_MODULE(_tetgen)
 
       .def_readonly("facet_constraints", &cl::FacetConstraints)
       .def_readonly("segment_constraints", &cl::SegmentConstraints)
-
-      .def_readonly("pbc_groups", &cl::PBCGroups)
 
       .def_readonly("faces", &cl::Faces)
       .def_readonly("adjacent_elements", &cl::AdjacentElements)
@@ -402,70 +366,79 @@ BOOST_PYTHON_MODULE(_tetgen)
   }
 
   {
-    typedef tetgenio::pbcgroup cl;
-    class_<cl, boost::noncopyable>("PBCGroup", no_init)
-      .def_readwrite("facet_marker_1", &cl::fmark1)
-      .def_readwrite("facet_marker_2", &cl::fmark2)
-      .def("get_transmat_entry", pbcgroup_get_transmat_entry)
-      .def("set_transmat_entry", pbcgroup_set_transmat_entry)
-      .add_property("point_pairs",
-          make_function(pbcgroup_get_pointpairs, manage_new_internal_reference<>()))
-      ;
-  }
-
-  {
     typedef tetgenbehavior cl;
     class_<cl, boost::noncopyable>("Options", init<>())
       .DEF_RW_MEMBER(plc)
-      .DEF_RW_MEMBER(quality)
+      .DEF_RW_MEMBER(psc)
       .DEF_RW_MEMBER(refine)
-      .DEF_RW_MEMBER(coarse)
+      .DEF_RW_MEMBER(quality)
+      .DEF_RW_MEMBER(nobisect)
+      .DEF_RW_MEMBER(coarsen)
+      .DEF_RW_MEMBER(weighted)
+      .DEF_RW_MEMBER(brio_hilbert)
+      .DEF_RW_MEMBER(incrflip)
+      .DEF_RW_MEMBER(flipinsert)
       .DEF_RW_MEMBER(metric)
       .DEF_RW_MEMBER(varvolume)
       .DEF_RW_MEMBER(fixedvolume)
-      .DEF_RW_MEMBER(insertaddpoints)
       .DEF_RW_MEMBER(regionattrib)
-      .DEF_RW_MEMBER(offcenter)
-      .DEF_RW_MEMBER(conformdel)
+      .DEF_RW_MEMBER(conforming)
+      .DEF_RW_MEMBER(insertaddpoints)
       .DEF_RW_MEMBER(diagnose)
+      .DEF_RW_MEMBER(convex)
+      .DEF_RW_MEMBER(nomergefacet)
+      .DEF_RW_MEMBER(nomergevertex)
+      .DEF_RW_MEMBER(noexact)
+      .DEF_RW_MEMBER(nostaticfilter)
       .DEF_RW_MEMBER(zeroindex)
-      .DEF_RW_MEMBER(optlevel)
-      .DEF_RW_MEMBER(optpasses)
-      .DEF_RW_MEMBER(order)
       .DEF_RW_MEMBER(facesout)
       .DEF_RW_MEMBER(edgesout)
       .DEF_RW_MEMBER(neighout)
       .DEF_RW_MEMBER(voroout)
       .DEF_RW_MEMBER(meditview)
-      .DEF_RW_MEMBER(gidview)
-      .DEF_RW_MEMBER(geomview)
+      .DEF_RW_MEMBER(vtkview)
       .DEF_RW_MEMBER(nobound)
       .DEF_RW_MEMBER(nonodewritten)
       .DEF_RW_MEMBER(noelewritten)
       .DEF_RW_MEMBER(nofacewritten)
       .DEF_RW_MEMBER(noiterationnum)
-      .DEF_RW_MEMBER(nomerge)
-      .DEF_RW_MEMBER(nobisect)
-      .DEF_RW_MEMBER(noflip)
       .DEF_RW_MEMBER(nojettison)
-      .DEF_RW_MEMBER(steiner)
-      .DEF_RW_MEMBER(fliprepair)
-      .DEF_RW_MEMBER(offcenter)
+      .DEF_RW_MEMBER(reversetetori)
       .DEF_RW_MEMBER(docheck)
       .DEF_RW_MEMBER(quiet)
       .DEF_RW_MEMBER(verbose)
-      .DEF_RW_MEMBER(useshelles)
-      .DEF_RW_MEMBER(minratio)
-      .DEF_RW_MEMBER(goodratio)
-      .DEF_RW_MEMBER(minangle)
-      .DEF_RW_MEMBER(goodangle)
+
+      .DEF_RW_MEMBER(vertexperblock)
+      .DEF_RW_MEMBER(tetrahedraperblock)
+      .DEF_RW_MEMBER(shellfaceperblock)
+      .DEF_RW_MEMBER(nobisect_param)
+      .DEF_RW_MEMBER(addsteiner_algo)
+      .DEF_RW_MEMBER(coarsen_param)
+      .DEF_RW_MEMBER(weighted_param)
+      .DEF_RW_MEMBER(fliplinklevel)
+      .DEF_RW_MEMBER(flipstarsize)
+      .DEF_RW_MEMBER(fliplinklevelinc)
+      .DEF_RW_MEMBER(reflevel)
+      .DEF_RW_MEMBER(optlevel)
+      .DEF_RW_MEMBER(optscheme)
+      .DEF_RW_MEMBER(delmaxfliplevel)
+      .DEF_RW_MEMBER(order)
+      .DEF_RW_MEMBER(steinerleft)
+      .DEF_RW_MEMBER(no_sort)
+      .DEF_RW_MEMBER(hilbert_order)
+      .DEF_RW_MEMBER(hilbert_limit)
+      .DEF_RW_MEMBER(brio_threshold)
+      .DEF_RW_MEMBER(brio_ratio)
+      .DEF_RW_MEMBER(facet_ang_tol)
       .DEF_RW_MEMBER(maxvolume)
-      .DEF_RW_MEMBER(maxdihedral)
-      .DEF_RW_MEMBER(alpha1)
-      .DEF_RW_MEMBER(alpha2)
-      .DEF_RW_MEMBER(alpha3)
+      .DEF_RW_MEMBER(minratio)
+      .DEF_RW_MEMBER(mindihedral)
+      .DEF_RW_MEMBER(optmaxdihedral)
+      .DEF_RW_MEMBER(optminsmtdihed)
+      .DEF_RW_MEMBER(optminslidihed)
       .DEF_RW_MEMBER(epsilon)
-      .DEF_RW_MEMBER(epsilon2)
+      .DEF_RW_MEMBER(minedgelength)
+      .DEF_RW_MEMBER(coarsen_percent)
 
       .def("parse_switches", (bool (tetgenbehavior::*)(char *)) &cl::parse_commandline)
       ;
@@ -475,5 +448,4 @@ BOOST_PYTHON_MODULE(_tetgen)
   exposePODForeignArray<int>("IntArray");
   exposeStructureForeignArray<tetgenio::facet>("FacetArray");
   exposeStructureForeignArray<tetgenio::polygon>("PolygonArray");
-  exposeStructureForeignArray<tetgenio::pbcgroup>("PBCGroupArray");
 }
