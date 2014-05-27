@@ -2,8 +2,6 @@ from meshpy.common import MeshInfoBase, dump_array
 import meshpy._tetgen as internals
 
 
-
-
 class MeshInfo(internals.MeshInfo, MeshInfoBase):
     def set_facets(self, facets, markers=None):
         """Set a list of simple, single-polygon factes. Unlike :meth:`set_facets_ex`,
@@ -104,8 +102,8 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
         import pyvtk
         vtkelements = pyvtk.VtkData(
             pyvtk.UnstructuredGrid(
-              self.points,
-              tetra=self.elements),
+                self.points,
+                tetra=self.elements),
             "Mesh")
         vtkelements.tofile(filename)
 
@@ -125,8 +123,6 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
                 self.element_volumes[i] = -1
 
 
-
-
 class Options(internals.Options):
     def __init__(self, switches, **kwargs):
         internals.Options.__init__(self)
@@ -140,60 +136,9 @@ class Options(internals.Options):
             try:
                 getattr(self, k)
             except AttributeError:
-                raise ValueError, "invalid option: %s" % k
+                raise ValueError("invalid option: %s" % k)
             else:
                 setattr(self, k, v)
-
-
-
-
-
-def _PBCGroup_get_transmat(self):
-    import numpy
-    return numpy.array(
-            [[self.get_transmat_entry(i,j)
-                for j in xrange(4)]
-                for i in xrange(4)])
-
-
-
-
-def _PBCGroup_set_transmat(self, matrix):
-    for i in xrange(4):
-        for j in xrange(4):
-            self.set_transmat_entry(i, j, matrix[i,j])
-
-
-
-
-def _PBCGroup_set_transform(self, matrix=None, translation=None):
-    for i in xrange(4):
-        for j in xrange(4):
-            self.set_transmat_entry(i, j, 0)
-
-    self.set_transmat_entry(3, 3, 1)
-
-    if matrix is not None:
-        for i in xrange(3):
-            for j in xrange(3):
-                self.set_transmat_entry(i, j, matrix[i][j])
-    else:
-        for i in xrange(3):
-            self.set_transmat_entry(i, i, 1)
-
-    if translation is not None:
-        for i in xrange(3):
-            self.set_transmat_entry(i, 3, translation[i])
-
-
-
-
-internals.PBCGroup.matrix = property(
-        _PBCGroup_get_transmat,
-        _PBCGroup_set_transmat)
-internals.PBCGroup.set_transform = _PBCGroup_set_transform
-
-
 
 
 def tetrahedralize(mesh_info, options):
@@ -202,7 +147,7 @@ def tetrahedralize(mesh_info, options):
     # restore "C" locale--otherwise tetgen might mis-parse stuff like "a0.01"
     try:
         import locale
-    except ImportErorr:
+    except ImportError:
         have_locale = False
     else:
         have_locale = True
@@ -217,7 +162,6 @@ def tetrahedralize(mesh_info, options):
             locale.setlocale(locale.LC_NUMERIC, prev_num_locale)
 
     return mesh
-
 
 
 def build(mesh_info, options=Options("pq"), verbose=False,
@@ -240,4 +184,3 @@ def build(mesh_info, options=Options("pq"), verbose=False,
         options.diagnose = 1
 
     return tetrahedralize(mesh_info, options)
-

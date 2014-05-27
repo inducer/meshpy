@@ -793,6 +793,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 
 void exactinit(int, int, int, REAL, REAL, REAL);
+void exactdeinit();
 REAL orient3d(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
 REAL insphere(REAL *pa, REAL *pb, REAL *pc, REAL *pd, REAL *pe);
 REAL orient4d(REAL *pa, REAL *pb, REAL *pc, REAL *pd, REAL *pe,
