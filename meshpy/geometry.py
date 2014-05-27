@@ -1,6 +1,40 @@
 from __future__ import division
 import numpy as np
 
+__doc__ = """
+
+Geometry builder
+----------------
+
+.. autoclass:: GeometryBuilder
+
+Geometries
+----------
+
+These functions are designed so that their output can be splat-passed to
+:meth:`GeometryBuilder.add_geometry`::
+
+    builder = GeometryBuilder()
+    builder.add_geometry(*make_ball(10))
+
+.. autoclass:: Marker
+    :members:
+    :undoc-members:
+
+.. autofunction:: make_box
+.. autofunction:: make_circle
+.. autofunction:: make_ball
+.. autofunction:: make_cylinder
+
+Extrusions and surfaces of revolution
+-------------------------------------
+
+.. data:: EXT_OPEN
+.. data:: EXT_CLOSED_IN_RZ
+
+.. autofunction:: generate_extrusion
+.. autofunction:: generate_surface_of_revolution
+"""
 
 # {{{ geometry building
 
@@ -36,6 +70,14 @@ def offset_point_indices(facets, offset):
 
 
 class GeometryBuilder(object):
+    """
+    .. automethod:: add_geometry
+    .. automethod:: set
+    .. automethod:: wrap_in_box
+    .. automethod:: bounding_box
+    .. automethod:: center
+    .. automethod:: apply_transform
+    """
     def __init__(self):
         self.points = []
         self.facets = []
@@ -96,6 +138,10 @@ class GeometryBuilder(object):
         return len(self.points[0])
 
     def set(self, mesh_info):
+        """Transfer the built geometry into a :class:`meshpy.triangle.MeshInfo`
+        or a :class:`meshpy.tet.MeshInfo`.
+        """
+
         mesh_info.set_points(self.points, self.point_markers)
         if self.facet_hole_starts or is_multi_polygon(self.facets):
             mesh_info.set_facets_ex(self.facets,

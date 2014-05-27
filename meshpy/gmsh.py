@@ -2,15 +2,14 @@ class GmshError(RuntimeError):
     pass
 
 
+# {{{ tools
 
-# tools -----------------------------------------------------------------------
 def _erase_dir(dir):
     from os import listdir, unlink, rmdir
     from os.path import join
     for name in listdir(dir):
         unlink(join(dir, name))
     rmdir(dir)
-
 
 
 class _TempDirManager(object):
@@ -29,10 +28,8 @@ class _TempDirManager(object):
         _erase_dir(self.path)
 
 
-
-
 class GmshRunner(object):
-    def __init__(self, source, dimensions, order=None, 
+    def __init__(self, source, dimensions, order=None,
             incomplete_elements=None, other_options=[],
             extension="geo", gmsh_executable="gmsh"):
         self.source = source
@@ -70,8 +67,9 @@ class GmshRunner(object):
                 cmdline.extend(["-order", str(self.order)])
 
             if self.incomplete_elements is not None:
-                cmdline.extend(["-string", 
-                    "Mesh.SecondOrderIncomplete = %d;" % int(self.incomplete_elements)])
+                cmdline.extend(["-string",
+                    "Mesh.SecondOrderIncomplete = %d;"
+                    % int(self.incomplete_elements)])
 
             cmdline.extend(self.other_options)
             cmdline.append(source_file_name)

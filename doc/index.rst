@@ -1,7 +1,3 @@
-.. MeshPy documentation master file, created by sphinx-quickstart on Tue Jul  1 12:35:03 2008.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to MeshPy's documentation!
 ==================================
 
@@ -9,12 +5,15 @@ MeshPy offers quality triangular and tetrahedral mesh generation for Python.
 Meshes of this type are chiefly used in finite-element simulation codes, but
 also have many other applications ranging from computer graphics to robotics.
 
-
 In order to generate these 2D and 3D meshes, MeshPy provides Python interfaces
-to two well-regarded mesh generators, `Triangle
-<http://www.cs.cmu.edu/~quake/triangle.html>`_ by J. Shewchuk and `TetGen
-<http://tetgen.berlios.de/>`_ by Hang Si. Both are included in the package in
-slightly modified versions.
+to a few well-regarded mesh generators: 
+
+* `Triangle <http://www.cs.cmu.edu/~quake/triangle.html>`_ by J. Shewchuk.
+* `TetGen <http://tetgen.berlios.de/>`_ by Hang Si.
+* `Gmsh <http://geuz.org/gmsh/>`_ by Christophe Geuzaine and Jean-François Remacle.
+
+Triangle and TetGen are included in the package in slightly modified versions. Gmsh
+is called as a subprocess.
 
 Show me! I need examples!
 -------------------------
@@ -78,7 +77,9 @@ Contents
     :maxdepth: 2
 
     installation
-    reference
+    tri-tet
+    geometry
+    gmsh
     faq
 
 MeshPy has its own `web page <http://mathema.tician.de/software/meshpy>`_, where you
