@@ -25,8 +25,34 @@ THE SOFTWARE.
 """
 
 import numpy as np
-import numpy.linalg as la
-from pytools import memoize_method, Record, single_valued
+#import numpy.linalg as la
+from pytools import memoize_method, Record
+
+__doc__ = """
+.. exception:: GmshFileFormatError
+
+Element types
+-------------
+
+.. autoclass:: GmshElementBase
+.. autoclass:: GmshPoint
+.. autoclass:: GmshIntervalElement
+.. autoclass:: GmshTriangularElement
+.. autoclass:: GmshIncompleteTriangularElement
+.. autoclass:: GmshTetrahedralElement
+
+Receiver interface
+------------------
+
+.. autoclass:: GmshMeshReceiverBase
+
+Reader
+------
+
+.. autofunction:: read_gmsh
+.. autofunction:: generate_gmsh
+
+"""
 
 
 # {{{ tools
@@ -36,6 +62,7 @@ def generate_triangle_vertex_tuples(order):
     yield (order, 0)
     yield (0, order)
 
+
 def generate_triangle_edge_tuples(order):
     for i in range(1, order):
         yield (i, 0)
@@ -44,10 +71,12 @@ def generate_triangle_edge_tuples(order):
     for i in range(1, order):
         yield (0, order-i)
 
+
 def generate_triangle_volume_tuples(order):
     for i in range(1, order):
         for j in range(1, order-i):
             yield (j, i)
+
 
 class LineFeeder:
     def __init__(self, line_iterable):
@@ -80,9 +109,20 @@ class LineFeeder:
 
 # }}}
 
+
 # {{{ element info
 
 class GmshElementBase(object):
+    """
+    .. automethod:: vertex_count
+    .. automethod:: node_count
+    .. automethod:: get_lexicographic_gmsh_node_indices
+    .. automethod:: equidistant_vandermonde
+    .. method:: equidistant_unit_nodes
+
+      (Implemented by subclasses)
+    """
+
     def __init__(self, order):
         self.order = order
 
@@ -136,8 +176,6 @@ class GmshElementBase(object):
                 list(self.basis_functions()))
 
 
-
-
 class GmshPoint(GmshElementBase):
     dimensions = 0
 
@@ -146,16 +184,13 @@ class GmshPoint(GmshElementBase):
         return [()]
 
 
-
 class GmshIntervalElement(GmshElementBase):
     dimensions = 1
 
     @memoize_method
     def gmsh_node_tuples(self):
-        return [(0,), (self.order,),] + [
+        return [(0,), (self.order,), ] + [
                 (i,) for i in range(1, self.order)]
-
-
 
 
 class GmshIncompleteTriangularElement(GmshElementBase):
@@ -174,9 +209,6 @@ class GmshIncompleteTriangularElement(GmshElementBase):
         return result
 
 
-
-
-
 class GmshTriangularElement(GmshElementBase):
     dimensions = 2
 
@@ -190,8 +222,6 @@ class GmshTriangularElement(GmshElementBase):
         for tup in generate_triangle_volume_tuples(self.order):
             result.append(tup)
         return result
-
-
 
 
 class GmshTetrahedralElement(GmshElementBase):
@@ -230,16 +260,24 @@ class GmshTetrahedralElement(GmshElementBase):
                     (1, 2, 1), (1, 1, 2)],
                 }[self.order]
 
-
-
-
-
-
 # }}}
+
 
 # {{{ receiver interface
 
 class GmshMeshReceiverBase(object):
+    """
+    .. attribute:: gmsh_element_type_to_info_map
+    .. automethod:: set_up_nodes
+    .. automethod:: add_node
+    .. automethod:: finalize_nodes
+    .. automethod:: set_up_elements
+    .. automethod:: add_element
+    .. automethod:: finalize_elements
+    .. automethod:: add_tag
+    .. automethod:: finalize_tags
+    """
+
     gmsh_element_type_to_info_map = {
             1:  GmshIntervalElement(1),
             2:  GmshTriangularElement(1),
@@ -289,17 +327,19 @@ class GmshMeshReceiverBase(object):
 
 # }}}
 
+
 # {{{ file reader
 
 class GmshFileFormatError(RuntimeError):
     pass
 
 
-
-
 def read_gmsh(receiver, filename, force_dimension=None):
-    """
-    :param force_dimension: if not None, truncate point coordinates to this many dimensions.
+    """Read a gmsh mesh file from *filename* and feed it to *receiver*.
+
+    :param receiver: Implements the :class:`GmshMeshReceiverBase` interface.
+    :param force_dimension: if not None, truncate point coordinates to
+        this many dimensions.
     """
     mesh_file = open(filename, 'rt')
     try:
@@ -310,10 +350,12 @@ def read_gmsh(receiver, filename, force_dimension=None):
     return result
 
 
-
-
 def generate_gmsh(receiver, source, dimensions, order=None, other_options=[],
             extension="geo", gmsh_executable="gmsh", force_dimension=None):
+    """Run gmsh and feed the output to *receiver*.
+
+    :param receiver: Implements the :class:`GmshMeshReceiverBase` interface.
+    """
     from meshpy.gmsh import GmshRunner
     runner = GmshRunner(source, dimensions, order=order,
             other_options=other_options, extension=extension,
@@ -321,20 +363,19 @@ def generate_gmsh(receiver, source, dimensions, order=None, other_options=[],
 
     runner.__enter__()
     try:
-        result = parse_gmsh(receiver, runner.output_file, force_dimension=force_dimension)
+        result = parse_gmsh(receiver, runner.output_file,
+                force_dimension=force_dimension)
     finally:
         runner.__exit__(None, None, None)
 
     return result
 
 
-
-
 def parse_gmsh(receiver, line_iterable, force_dimension=None):
     """
     :arg receiver: This object will be fed the entities encountered in reading the
-        GMSH file. See :class:`GmshMeshReceiverBase` for the interface this object needs
-        to conform to.
+        GMSH file. See :class:`GmshMeshReceiverBase` for the interface this
+        object needs to conform to.
     :param force_dimension: if not None, truncate point coordinates to this many
         dimensions.
     """
@@ -349,7 +390,8 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
     while feeder.has_next_line():
         next_line = feeder.get_next_line()
         if not next_line.startswith("$"):
-            raise GmshFileFormatError("expected start of section, '%s' found instead" % next_line)
+            raise GmshFileFormatError(
+                    "expected start of section, '%s' found instead" % next_line)
 
         section_name = next_line[1:]
 
@@ -364,14 +406,17 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
                     version_number, file_type, data_size = next_line.split()
 
                 if line_count > 0:
-                    raise GmshFileFormatError("more than one line found in MeshFormat section")
+                    raise GmshFileFormatError(
+                            "more than one line found in MeshFormat section")
 
                 if version_number not in ["2.1", "2.2"]:
                     from warnings import warn
-                    warn("unexpected mesh version number '%s' found" % version_number)
+                    warn("unexpected mesh version number '%s' found"
+                            % version_number)
 
                 if file_type != "0":
-                    raise GmshFileFormatError("only ASCII gmsh file type is supported")
+                    raise GmshFileFormatError(
+                            "only ASCII gmsh file type is supported")
 
                 line_count += 1
 
@@ -388,7 +433,8 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
 
                 parts = next_line.split()
                 if len(parts) != 4:
-                    raise GmshFileFormatError("expected four-component line in $Nodes section")
+                    raise GmshFileFormatError(
+                            "expected four-component line in $Nodes section")
 
                 read_node_idx = int(parts[0])
                 if read_node_idx != node_idx:
@@ -431,7 +477,8 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
 
                 el_type_num = parts[1]
                 try:
-                    element_type = receiver.gmsh_element_type_to_info_map[el_type_num]
+                    element_type = \
+                            receiver.gmsh_element_type_to_info_map[el_type_num]
                 except KeyError:
                     raise GmshFileFormatError("unexpected element type %d"
                             % el_type_num)
@@ -440,10 +487,12 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
                 tags = parts[3:3+tag_count]
 
                 # convert to zero-based
-                node_indices = np.array([x-1 for x in parts[3+tag_count:]], dtype=np.intp)
+                node_indices = np.array(
+                        [x-1 for x in parts[3+tag_count:]], dtype=np.intp)
 
-                if element_type.node_count()!= len(node_indices):
-                    raise GmshFileFormatError("unexpected number of nodes in element")
+                if element_type.node_count() != len(node_indices):
+                    raise GmshFileFormatError(
+                            "unexpected number of nodes in element")
 
                 gmsh_vertex_nrs = node_indices[:element_type.vertex_count()]
                 zero_based_idx = element_idx - 1
@@ -456,7 +505,7 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
                             element_type.get_lexicographic_gmsh_node_indices()],
                         tag_numbers=tag_numbers)
 
-                element_idx +=1
+                element_idx += 1
 
             if element_count+1 != element_idx:
                 raise GmshFileFormatError("unexpected number of elements found")
@@ -484,7 +533,8 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
                 name_idx += 1
 
             if name_count+1 != name_idx:
-                raise GmshFileFormatError("unexpected number of physical names found")
+                raise GmshFileFormatError(
+                        "unexpected number of physical names found")
 
             receiver.finalize_tags()
         else:

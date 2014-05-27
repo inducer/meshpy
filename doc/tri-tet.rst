@@ -1,5 +1,5 @@
-Reference Documentation
-=======================
+Triangle/TetGen interface
+=========================
 
 Some common notions
 -------------------
@@ -363,51 +363,3 @@ Some common notions
 
     :param insert_points: a :class:`MeshInfo` object specifying additional points to be inserted
 
-.. data:: EXT_OPEN
-.. data:: EXT_CLOSED_IN_RZ
-
-.. function:: generate_extrusion(rz_points, base_shape, closure=EXT_OPEN, point_idx_offset=0, ring_point_indices=None, ring_markers=None, rz_closure_marker=0)
-
-    Extrude a given connected *base_shape* (a list of (x,y) points)
-    along the z axis. For each step in the extrusion, the base shape
-    is multiplied by a radius and shifted in the z direction. Radius
-    and z offset are given by *rz_points*, which is a list of
-    (r, z) tuples.
-
-    Returns *(points, facets, facet_holestarts, markers)*, where *points* is a list
-    of (3D) points and facets is a list of polygons. Each polygon is, in turn,
-    represented by a tuple of indices into *points*. If *point_idx_offset* is
-    not zero, these indices start at that number. *markers* is a list equal in
-    length to *facets*, each specifying the facet marker of that facet.
-    *facet_holestarts* is also equal in length to *facets*, each element is a list of
-    hole starting points for the corresponding facet.
-
-    Use :meth:`MeshInfo.set_facets_ex` to add the extrusion to a :class:`MeshInfo`
-    structure.
-
-    The extrusion proceeds by generating quadrilaterals connecting each
-    ring.  If any given radius in *rz_points* is 0, triangle fans are
-    produced instead of quads to provide non-degenerate closure.
-
-    If *closure* is :data:`EXT_OPEN`, no efforts are made to put end caps on the
-    extrusion.
-
-    If *closure* is :data:`EXT_CLOSED_IN_RZ`, then a torus-like structure
-    is assumed and the last ring is just connected to the first.
-
-    If *ring_markers* is not None, it is an list of markers added to each
-    ring. There should be len(rz_points)-1 entries in this list.
-    If rings are added because of closure options, they receive the
-    corresponding *XXX_closure_marker*.  If *facet_markers* is given, this function
-    returns (points, facets, markers), where markers is is a list containing
-    a marker for each generated facet. Unspecified markers generally
-    default to 0.
-
-    If *ring_point_indices* is given, it must be a list of the same
-    length as *rz_points*. Each entry in the list may either be None,
-    or a list of point indices. This list must contain the same number
-    of points as the *base_shape*; it is taken as the indices of
-    pre-existing points that are to be used for the given ring, instead
-    of generating new points.
-
-.. function:: generate_surface_of_revolution(rz_points, closure=EXT_OPEN, radial_subdiv=16, point_idx_offset=0, ring_point_indices=None, ring_markers=None, rz_closure_marker=0)
