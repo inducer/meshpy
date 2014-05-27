@@ -289,6 +289,61 @@ class GmshMeshReceiverBase(object):
 
 # }}}
 
+class GmshMeshReceiverNumPy(meshpy.gmsh_reader.GmshMeshReceiverBase):
+    """ GmshReceiver that emulates the semantics of meshpy.triangle.MeshInfo and
+     meshpy.tet.MeshInfo by using similar fields, but instead of loading data
+     into ForeignArrays, load into NumPy arrays. Since this class is not wrapping
+     any libraries in other languages -- the Gmsh data is obtained via parsing
+     text -- use NumPy arrays as the base array data structure for convenience.
+    """
+
+    # Use data fields similar to meshpy.triangle.MeshInfo and meshpy.tet.MeshInfo
+    points = None
+    elements = None
+    element_types = None
+    element_markers = None
+    tags = None
+
+    # Gmsh has no explicit concept of facets or faces; certain faces are a type of element.
+    # Consequently, there are no face markers, but elements can be grouped together in
+    # physical groups that serve as markers.
+
+    def set_up_nodes(self, count):
+        # Preallocate array of nodes within list; treat None as sentinel value.
+        # Preallocation not done for performance, but to assign values at indices
+        # in random order.
+        self.points = [None] * count
+
+    def add_node(self, node_nr, point):
+        self.points[node_nr] = point
+
+    def finalize_nodes(self):
+        pass
+
+    def set_up_elements(self, count):
+        # Preallocation of arrays for assignment elements in random order.
+        self.elements = [None] * count
+        self.element_types = [None] * count
+        self.element_markers = [None] * count
+        self.tags = []
+
+    def add_element(self, element_nr, element_type, vertex_nrs,
+            lexicographic_nodes, tag_numbers):
+        self.elements[element_nr] = vertex_nrs
+        self.element_types[element_nr] = element_type
+        self.element_markers[element_nr] = tag_numbers
+        # TODO: Add lexicographic node information
+
+    def finalize_elements(self):
+        pass
+
+    def add_tag(self, name, index, dimension):
+        self.tags.append((name, index, dimension))
+
+    def finalize_tags(self):
+        pass
+
+
 # {{{ file reader
 
 class GmshFileFormatError(RuntimeError):
