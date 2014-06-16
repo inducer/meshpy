@@ -346,12 +346,13 @@ class GmshMeshReceiverNumPy(GmshMeshReceiverBase):
     .. versionadded:: 2014.1
     """
 
-    # Use data fields similar to meshpy.triangle.MeshInfo and meshpy.tet.MeshInfo
-    points = None
-    elements = None
-    element_types = None
-    element_markers = None
-    tags = None
+    def __init__(self):
+        # Use data fields similar to meshpy.triangle.MeshInfo and meshpy.tet.MeshInfo
+        self.points = None
+        self.elements = None
+        self.element_types = None
+        self.element_markers = None
+        self.tags = None
 
     # Gmsh has no explicit concept of facets or faces; certain faces are a type
     # of element.  Consequently, there are no face markers, but elements can be
