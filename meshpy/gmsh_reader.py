@@ -27,6 +27,8 @@ THE SOFTWARE.
 import numpy as np
 #import numpy.linalg as la
 from pytools import memoize_method, Record
+from meshpy.gmsh import LiteralSource, FileSource  # noqa
+
 
 __doc__ = """
 .. exception:: GmshFileFormatError
@@ -53,6 +55,9 @@ Receiver example implementation
 
 Reader
 ------
+
+.. autoclass:: LiteralSource
+.. autoclass:: FileSource
 
 .. autofunction:: read_gmsh
 .. autofunction:: generate_gmsh
@@ -149,9 +154,6 @@ class GmshElementBase(object):
         in this element. Each tuple has a length equal to the dimension
         of the element. The tuples constituents are non-negative integers
         whose sum is less than or equal to the order of the element.
-
-        The order in which these nodes are generated dictates the local
-        node numbering.
         """
         from pytools import \
                 generate_nonnegative_integer_tuples_summing_to_at_most
@@ -347,7 +349,8 @@ class GmshMeshReceiverNumPy(GmshMeshReceiverBase):
     """
 
     def __init__(self):
-        # Use data fields similar to meshpy.triangle.MeshInfo and meshpy.tet.MeshInfo
+        # Use data fields similar to meshpy.triangle.MeshInfo and
+        # meshpy.tet.MeshInfo
         self.points = None
         self.elements = None
         self.element_types = None

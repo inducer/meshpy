@@ -28,16 +28,34 @@ class _TempDirManager(object):
         _erase_dir(self.path)
 
 
+class LiteralSource(object):
+    def __init__(self, source, extension):
+        self.source = source
+        self.extension = extension
+
+
+class FileSource(object):
+    def __init__(self, filename):
+        self.filename = filename
+
+
 class GmshRunner(object):
     def __init__(self, source, dimensions, order=None,
             incomplete_elements=None, other_options=[],
             extension="geo", gmsh_executable="gmsh"):
+        if isinstance(source, str):
+            from warnings import warn
+            warn("passing a string as 'source' is deprecated--use "
+                    "LiteralSource or FileSource",
+                    DeprecationWarning)
+
+            source = LiteralSource(source, extension)
+
         self.source = source
         self.dimensions = dimensions
         self.order = order
         self.incomplete_elements = incomplete_elements
         self.other_options = other_options
-        self.extension = extension
         self.gmsh_executable = gmsh_executable
 
         if dimensions not in [1, 2, 3]:
@@ -48,13 +66,22 @@ class GmshRunner(object):
         temp_dir_mgr = _TempDirManager()
         try:
             working_dir = temp_dir_mgr.path
-            from os.path import join
-            source_file_name = join(working_dir, "temp."+self.extension)
-            source_file = open(source_file_name, "w")
-            try:
-                source_file.write(self.source)
-            finally:
-                source_file.close()
+            from os.path import join, abspath, exists
+
+            if isinstance(self.source, LiteralSource):
+                source_file_name = join(
+                        working_dir, "temp."+self.source.extension)
+                source_file = open(source_file_name, "w")
+                try:
+                    source_file.write(self.source.source)
+                finally:
+                    source_file.close()
+            elif isinstance(self.source, FileSource):
+                source_file_name = abspath(self.source.filename)
+                if not exists(source_file_name):
+                    raise IOError("'%s' does not exist" % source_file_name)
+            else:
+                raise RuntimeError("'source' type unrecognized")
 
             output_file_name = join(working_dir, "output.msh")
             cmdline = [
@@ -97,7 +124,7 @@ class GmshRunner(object):
             self.output_file = open(output_file_name, "r")
 
             self.temp_dir_mgr = temp_dir_mgr
-            return self.output_file
+            return self
         except:
             temp_dir_mgr.clean_up()
             raise
