@@ -1,3 +1,7 @@
+import logging
+logger = logging.getLogger(__name__)
+
+
 class GmshError(RuntimeError):
     pass
 
@@ -101,9 +105,11 @@ class GmshRunner(object):
             cmdline.extend(self.other_options)
             cmdline.append(source_file_name)
 
+            logger.info("invoking gmsh: '%s'" % " ".join(cmdline))
             from pytools.prefork import call_capture_output
             retcode, stdout, stderr = call_capture_output(
                     cmdline, working_dir)
+            logger.info("return from gmsh")
 
             if stderr and "error" in stderr.lower():
                 msg = "gmsh execution failed with message:\n\n"
