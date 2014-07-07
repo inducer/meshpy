@@ -78,8 +78,8 @@ Contents
 
     installation
     tri-tet
-    geometry
     gmsh
+    geometry
     faq
 
 MeshPy has its own `web page <http://mathema.tician.de/software/meshpy>`_, where you

@@ -425,6 +425,7 @@ def generate_gmsh(receiver, source, dimensions, order=None, other_options=[],
             extension="geo", gmsh_executable="gmsh", force_dimension=None):
     """Run gmsh and feed the output to *receiver*.
 
+    :arg source: an instance of :class:`LiteralSource` or :class:`FileSource`
     :param receiver: Implements the :class:`GmshMeshReceiverBase` interface.
     """
     from meshpy.gmsh import GmshRunner
@@ -444,6 +445,7 @@ def generate_gmsh(receiver, source, dimensions, order=None, other_options=[],
 
 def parse_gmsh(receiver, line_iterable, force_dimension=None):
     """
+    :arg source: an instance of :class:`LiteralSource` or :class:`FileSource`
     :arg receiver: This object will be fed the entities encountered in reading the
         GMSH file. See :class:`GmshMeshReceiverBase` for the interface this
         object needs to conform to.

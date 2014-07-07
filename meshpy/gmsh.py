@@ -33,12 +33,18 @@ class _TempDirManager(object):
 
 
 class LiteralSource(object):
+    """
+    .. versionadded:: 2014.1
+    """
     def __init__(self, source, extension):
         self.source = source
         self.extension = extension
 
 
 class FileSource(object):
+    """
+    .. versionadded:: 2014.1
+    """
     def __init__(self, filename):
         self.filename = filename
 
