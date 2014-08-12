@@ -174,6 +174,47 @@ class GmshElementBase(object):
                 for tup in self.lexicographic_node_tuples()],
                 dtype=np.intp)
 
+    def get_gmsh_indices(self, tuple_fun):
+        """Utility function for reconstructing node indices for edges & faces
+           from node indices for elements. Useful in specialized
+           subclasses of GmshReceiverBase. Maps tuples enumerated by
+           tuple_fun to element array indices via the mapping provided
+           by get_lexicographic_gmsh_node indices.
+
+        *Note:* This function provides machinery for calculating
+           indices for lower-dimensional elements from the
+           highest-available-dimensional element type in the mesh. If
+           used over all elements, the resulting list will contain
+           duplicate edges/faces (that is, an edge/face may be listed
+           multiple times, possibly with different, but equivalent,
+           representations, such as rotating an edge/face by
+           self.order nodes), so that list should then be processed to
+           remove duplicates in GmshReceiverBase (or one of its
+           subclasses).
+
+        """
+        gmsh_tup_to_index = dict(
+                (tup, i)
+                for i, tup in enumerate(self.gmsh_node_tuples()))
+
+        tuples = tuple_fun()
+        num_tuples = len(tuples)
+        indices = [None] * num_tuples
+        for i in range(num_tuples):
+            indices[i] = np.array([gmsh_tup_to_index[tup] for tup in tuples[i]])
+
+        return indices
+
+    @memoize_method
+    def get_gmsh_edge_indices(self):
+        """Specialization of get_gmsh_indices to get edge indices."""
+        return self.get_gmsh_indices(self.gmsh_edge_tuples)
+
+    @memoize_method
+    def get_gmsh_face_indices(self):
+        """Specialization of get_gmsh_indices to get face indices."""
+        return self.get_gmsh_indices(self.gmsh_face_tuples)
+
     @memoize_method
     def equidistant_vandermonde(self):
         from hedge.polynomial import generic_vandermonde
@@ -190,6 +231,25 @@ class GmshPoint(GmshElementBase):
     def gmsh_node_tuples(self):
         return [()]
 
+    @memoize_method
+    def gmsh_edge_tuples(self):
+        # 0-d element has no edges, so return empty list
+        # Empty list useful as degenerate case for iterators:
+        # then
+        # for i in []:
+        #     """ Some code """
+        # will do nothing.
+        # Also note that the empty tuple is the "correct thing
+        # to do" for gmsh_node_tuples because numpy_array[()]
+        # returns all of the indices of the array.
+        return []
+
+    @memoize_method
+    def gmsh_face_tuples(self):
+        # 0-d element has no faces, so return empty list
+        # Empty list useful as degenerate case for iterators
+        return []
+
 
 class GmshIntervalElement(GmshElementBase):
     dimensions = 1
@@ -198,6 +258,19 @@ class GmshIntervalElement(GmshElementBase):
     def gmsh_node_tuples(self):
         return [(0,), (self.order,), ] + [
                 (i,) for i in range(1, self.order)]
+
+    @memoize_method
+    def gmsh_edge_tuples(self):
+        # 1-d element, so edge is whole element; must return
+        # iterable of iterables! Could also return [()] here;
+        # see GmshPointElement for details.
+        return [self.gmsh_node_tuples()]
+
+    @memoize_method
+    def gmsh_face_tuples(self):
+        # 1-d element has no faces, so return empty list
+        # Empty list useful as degenerate case for iterators
+        return []
 
 
 class GmshIncompleteTriangularElement(GmshElementBase):
@@ -215,6 +288,21 @@ class GmshIncompleteTriangularElement(GmshElementBase):
             result.append(tup)
         return result
 
+    @memoize_method
+    def gmsh_edge_tuples(self):
+        # 3 edges: x-axis, y-axis, x + y = order
+        x_axis_edge = [(i, 0) for i in range(self.order + 1)]
+        y_axis_edge = [(0, i) for i in range(self.order + 1)]
+        x_plus_y_eq_order_edge = [(self.order - i, i)
+                                  for i in range(self.order + 1)]
+        return [x_axis_edge, y_axis_edge, x_plus_y_eq_order_edge]
+
+    @memoize_method
+    def gmsh_face_tuples(self):
+        # 2-d element, so face is whole element; must return a
+        # iterable of iterables! Could also return [()] here.
+        return [self.gmsh_node_tuples()]
+
 
 class GmshTriangularElement(GmshElementBase):
     dimensions = 2
@@ -229,6 +317,21 @@ class GmshTriangularElement(GmshElementBase):
         for tup in generate_triangle_volume_tuples(self.order):
             result.append(tup)
         return result
+
+    @memoize_method
+    def gmsh_edge_tuples(self):
+        # 3 edges: x-axis, y-axis, x + y = order
+        x_axis_edge = [(i, 0) for i in range(self.order + 1)]
+        y_axis_edge = [(0, i) for i in range(self.order + 1)]
+        x_plus_y_eq_order_edge = [(self.order - i, i)
+                                  for i in range(self.order + 1)]
+        return [x_axis_edge, y_axis_edge, x_plus_y_eq_order_edge]
+
+    @memoize_method
+    def gmsh_face_tuples(self):
+        # 2-d element, so face is whole element; must return an iterable
+        # of iterables! Could also return [()] here.
+        return [self.gmsh_node_tuples()]
 
 
 class GmshTetrahedralElement(GmshElementBase):
@@ -266,6 +369,42 @@ class GmshTetrahedralElement(GmshElementBase):
                     (1, 3, 1), (2, 1, 2), (2, 2, 1), (1, 2, 2), (1, 1, 1), (2, 1, 1),
                     (1, 2, 1), (1, 1, 2)],
                 }[self.order]
+
+        @memoize_method
+        def gmsh_edge_tuples(self):
+            all_tuples = self.gmsh_node_tuples()
+            # 6 edges: x-axis, y-axis, z-axis
+            #          x + y = order, x + z = order, y + z = order
+            x_axis_edge = [(i, 0, 0) for i in range(self.order + 1)]
+            y_axis_edge = [(0, i, 0) for i in range(self.order + 1)]
+            z_axis_edge = [(0, 0, i) for i in range(self.order + 1)]
+            x_plus_y_eq_order_edge = [(self.order - i, i, 0)
+                                      for i in range(self.order + 1)]
+            x_plus_z_eq_order_edge = [(self.order - i, 0, i)
+                                      for i in range(self.order + 1)]
+            y_plus_z_eq_order_edge = [(0, self.order - i, i)
+                                      for i in range(self.order + 1)]
+            return [x_axis_edge,
+                    y_axis_edge,
+                    z_axis_edge,
+                    x_plus_y_eq_order_edge,
+                    x_plus_z_eq_order_edge,
+                    y_plus_z_eq_order_edge]
+
+        @memoize_method
+        def gmsh_face_tuples(self):
+            all_tuples = self.gmsh_node_tuples()
+            # 4 faces: x = 0, y = 0, z = 0, x + y + z = order
+            x_eq_0_face = [tup for tup in all_tuples if tup[0] == 0]
+            y_eq_0_face = [tup for tup in all_tuples if tup[1] == 0]
+            z_eq_0_face = [tup for tup in all_tuples if tup[2] == 0]
+            sum_eq_order = [tup for tup in all_tuples
+                            if tup[0] + tup[1] + tup[2] == self.order]
+            return [x_eq_0_face,
+                    y_eq_0_face,
+                    z_eq_0_face,
+                    sum_eq_order_face]
+
 
 # }}}
 
