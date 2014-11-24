@@ -3,12 +3,11 @@ from __future__ import division
 import numpy
 
 
-
 class FourDigitsSymmetric:
     def __init__(self, thickness, edge_coeff):
         self.thickness = thickness
         self.edge_coeff = edge_coeff
-    
+
     def __call__(self, x, side):
         t = self.thickness
 
@@ -24,7 +23,7 @@ class FourDigitsSymmetric:
         def x_lower(x):
             return x
 
-        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x + 
+        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x +
             0.2843) * x - 0.3516) * x) - 0.126) * x)
 
         if side == "upper":
@@ -33,9 +32,6 @@ class FourDigitsSymmetric:
             return numpy.array([x_lower(x), y_lower(y)])
         else:
             raise ValueError("Neither upper nor lower side selected in the call.")
-
-
-
 
 
 class FourDigitsCambered:
@@ -62,8 +58,8 @@ class FourDigitsCambered:
         def x_lower(x, y, theta):
             return x + y * numpy.sin(theta)
 
-        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x + 
-            0.2843) * x - 0.3516) * x) -0.126) * x)
+        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x +
+            0.2843) * x - 0.3516) * x) - 0.126) * x)
 
         if x <= p:
             y_c = m * x / p ** 2 * (2 * p - x)
@@ -78,9 +74,6 @@ class FourDigitsCambered:
             return numpy.array([x_lower(x, y, theta), y_lower(y_c, y, theta)])
         else:
             raise ValueError("Neither upper nor lower side selected in the call.")
-
-
-
 
 
 class FiveDigits:
@@ -107,12 +100,12 @@ class FiveDigits:
         def x_lower(x, y, theta):
             return x + y * numpy.sin(theta)
 
-        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x + 
-            0.2843) * x - 0.3516) * x) -0.126) * x)
+        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x +
+            0.2843) * x - 0.3516) * x) - 0.126) * x)
 
         if x <= m:
-            y_c = k1 / 6 * x *((x - 3 * m) * x + m ** 2 * (3 - m)) 
-            theta = numpy.arctan(k1 / 6 * ((3 * x - 6 * m) * x + 
+            y_c = k1 / 6 * x * ((x - 3 * m) * x + m ** 2 * (3 - m))
+            theta = numpy.arctan(k1 / 6 * ((3 * x - 6 * m) * x +
                 m ** 2 * (3 - m)))
         else:
             y_c = k1 * m ** 3 / 6 * (1 - x)
@@ -126,12 +119,9 @@ class FiveDigits:
             raise ValueError("Neither upper nor lower side selected in the call.")
 
 
-
-
-
 def get_naca_points(naca_digits, number_of_points=100,
-        sharp_trailing_edge=True, 
-        abscissa_map=lambda x: 0.03*x+0.97*x**2, 
+        sharp_trailing_edge=True,
+        abscissa_map=lambda x: 0.03*x+0.97*x**2,
         verbose=False):
     """
     Return a list of coordinates of NACA 4-digit and 5-digit series
@@ -145,15 +135,14 @@ def get_naca_points(naca_digits, number_of_points=100,
         def explain(*s):
             pass
 
-    explain("Airfoil: NACA-%s" %(naca_digits))
+    explain("Airfoil: NACA-%s" % naca_digits)
 
-    if sharp_trailing_edge == True:
+    if sharp_trailing_edge:
         explain("Sharp trailing edge")
         edge_coeff = 0.1036
     else:
         explain("Blunt trailing edge")
         edge_coeff = 0.1015
-
 
     raw_abscissae = numpy.linspace(0, 1, number_of_points, endpoint=True)
     abscissae = numpy.empty_like(raw_abscissae)
@@ -179,10 +168,11 @@ def get_naca_points(naca_digits, number_of_points=100,
             points = FourDigitsSymmetric(thickness, edge_coeff)
         elif max_camber != 0 and max_camber_pos != 0:
             explain("Cambered 4-digit airfoil")
-            points = FourDigitsCambered(thickness, max_camber, 
+            points = FourDigitsCambered(thickness, max_camber,
                     max_camber_pos, edge_coeff)
         else:
-            raise NotImplementedError("You must decide whether your airfoil shall be cambered or not!")
+            raise NotImplementedError(
+                    "You must decide whether your airfoil shall be cambered or not!")
 
     elif len(naca_digits) == 5:
         thickness = (digits_int % 100)
@@ -221,28 +211,23 @@ def get_naca_points(naca_digits, number_of_points=100,
         raise NotImplementedError(
                 "Only the 4-digit and 5-digit series are implemented!")
 
-    points_upper = numpy.zeros((len(abscissae),2))
-    points_lower = numpy.zeros((len(abscissae),2))
+    points_upper = numpy.zeros((len(abscissae), 2))
+    points_lower = numpy.zeros((len(abscissae), 2))
 
     for i in range(len(abscissae)):
         points_upper[i] = points(abscissae[i], "upper")
         points_lower[i] = points(abscissae[i], "lower")
 
-    if sharp_trailing_edge == True:
+    if sharp_trailing_edge:
         return list(points_upper)[1:-1] + list(points_lower[::-1])
     else:
         return list(points_upper)[1:] + list(points_lower[::-1])
-
-
-
 
 
 def write_points(points, filename):
     file = open(filename, "w")
     for pt in points:
         print >>file, "\t".join(repr(p_comp) for p_comp in pt)
-
-
 
 
 def main():
@@ -269,7 +254,7 @@ def main():
         options.points = 100
 
     digits = args[0]
-    points = generate_naca(digits, 
+    points = get_naca_points(digits,
             number_of_points=options.points,
             sharp_trailing_edge=options.sharp_trailing_edge,
             uniform_distribution=options.uniform_distribution,
@@ -280,8 +265,6 @@ def main():
 
     print "Output file:", options.output
     write_points(points, options.output)
-
-
 
 
 if __name__ == "__main__":
