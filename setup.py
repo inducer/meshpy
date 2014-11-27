@@ -87,6 +87,7 @@ def main():
                   "pytools>=2011.2",
                   "pytest>=2",
                   "numpy",
+                  "six",
                   ],
           ext_modules=[
               Extension(
