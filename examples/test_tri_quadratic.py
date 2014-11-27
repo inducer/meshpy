@@ -7,11 +7,13 @@ from meshpy.triangle import MeshInfo, build
 # Utility function to create lists of the form [(1,2), (2,3), (3,4),
 #(4,1)], given two numbers 1 and 4
 from itertools import islice, cycle
-loop = lambda a, b: zip(range(a, b), islice(cycle(range(a, b)), 1, None))
+from six.moves import range
+from six.moves import zip
+loop = lambda a, b: list(zip(list(range(a, b)), islice(cycle(list(range(a, b))), 1, None)))
 
 info = MeshInfo()
 info.set_points([(0,0), (1,0), (1,1), (0,1), (2,0), (3,0), (3,1), (2,1)])
-info.set_facets(loop(0,4) + loop(4,8), range(1,9)) # Create 8 facets and apply markers 1-8 on them
+info.set_facets(loop(0,4) + loop(4,8), list(range(1,9))) # Create 8 facets and apply markers 1-8 on them
 info.regions.resize(2)
 info.regions[0] = [0.5, 0.5, 1, 0.1] # Fourth item specifies maximum area of triangles as a region attribute
 info.regions[1] = [2.5, 0.5, 2, 0.1] # Replace 0.1 by a smaller value to produce a finer mesh

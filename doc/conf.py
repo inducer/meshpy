@@ -48,7 +48,7 @@ copyright = u"2008, Andreas Klöckner"
 # The short X.Y version.
 def get_version():
     conf = {}
-    execfile("../meshpy/__init__.py", conf)
+    exec(compile(open("../meshpy/__init__.py").read(), "../meshpy/__init__.py", 'exec'), conf)
     return conf["version"]
 
 version = get_version()

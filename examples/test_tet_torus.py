@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from six.moves import range
 def main():
     from math import pi, cos, sin
     from meshpy.tet import MeshInfo, build
@@ -27,7 +29,7 @@ def main():
     mesh.save_elements("torus_mesh")
     mesh.save_nodes("torus_mesh")
 
-    mesh.write_neu(file("torus.neu", "w"),
+    mesh.write_neu(open("torus.neu", "w"),
             {1: ("pec", 0)})
 
 

@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from __future__ import print_function
+from six.moves import zip
 def main():
     import numpy
     #from math import pi, cos, sin
@@ -59,7 +62,7 @@ def main():
     mesh_info.set_holes([(0, 0, 0.5)])
 
     mesh = build(mesh_info)
-    print "%d elements" % len(mesh.elements)
+    print("%d elements" % len(mesh.elements))
     mesh.write_vtk("airfoil3d.vtk")
 
 

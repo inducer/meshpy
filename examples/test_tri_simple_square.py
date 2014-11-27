@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from __future__ import print_function
+from six.moves import range
 def main():
     import meshpy.triangle as triangle
 
@@ -16,7 +19,7 @@ def main():
 
     mesh = triangle.build(info, max_volume=1e-3, min_angle=25)
 
-    print "A"
+    print("A")
     triangle.write_gnuplot_mesh("triangles.dat", mesh)
 
 if __name__ == "__main__":

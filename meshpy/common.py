@@ -1,3 +1,7 @@
+from __future__ import absolute_import
+from __future__ import print_function
+from six.moves import range
+from six.moves import zip
 class _Table:
     def __init__(self):
         self.Rows = []
@@ -101,7 +105,7 @@ class MeshInfoBase:
         outfile.write("PROGRAM: MeshPy VERSION: %s\n" % version)
         outfile.write("%s\n" % datetime.now().ctime())
 
-        bc_markers = bc.keys()
+        bc_markers = list(bc.keys())
         if periodicity:
             periodic_marker, periods = periodicity
             bc_markers.append(periodic_marker)
@@ -149,7 +153,7 @@ class MeshInfoBase:
         outfile.write("ELEMENT GROUP 1.3.0\n")
         # FIXME
         i = 0
-        grp_elements = range(len(self.elements))
+        grp_elements = list(range(len(self.elements)))
         material = 1
         flags = 0
         outfile.write("GROUP:%11d ELEMENTS:%11d MATERIAL:%11s NFLAGS: %11d\n"
@@ -190,7 +194,7 @@ class MeshInfoBase:
                     face2el.setdefault(face, []).append((ti, fi+1))
 
         else:
-            raise ValueError, "invalid number of dimensions (%d)" % dim
+            raise ValueError("invalid number of dimensions (%d)" % dim)
 
         # actually output bc sections
         if not self.faces.allocated:
@@ -257,7 +261,7 @@ class MeshInfoBase:
 
 
 def dump_array(name, array):
-    print "array %s: %d elements, %d values per element" % (name, len(array), array.unit)
+    print("array %s: %d elements, %d values per element" % (name, len(array), array.unit))
 
     if len(array) == 0 or array.unit == 0:
         return
@@ -265,12 +269,12 @@ def dump_array(name, array):
     try:
         array[0]
     except RuntimeError:
-        print "  not allocated"
+        print("  not allocated")
         return
 
     for i, entry in enumerate(array):
         if isinstance(entry, list):
-            print "  %d: %s" % (i, ",".join(str(sub) for sub in entry))
+            print("  %d: %s" % (i, ",".join(str(sub) for sub in entry)))
         else:
-            print "  %d: %s" % (i, entry)
+            print("  %d: %s" % (i, entry))
 

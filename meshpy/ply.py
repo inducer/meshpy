@@ -1,7 +1,10 @@
+from __future__ import absolute_import
+from six.moves import range
+from six.moves import zip
 def parse_int(it):
-    return int(it.next())
+    return int(next(it))
 def parse_float(it):
-    return float(it.next())
+    return float(next(it))
 class ListParser:
     def __init__(self, len_parser, item_parser):
         self.len_parser = len_parser
@@ -11,7 +14,7 @@ class ListParser:
         return [self.item_parser(it) for i in range(self.len_parser(it))]
 
 def make_parser(it):
-    tp = it.next()
+    tp = next(it)
     if tp == "list":
         len_parser = make_parser(it)
         item_parser = make_parser(it)
@@ -49,7 +52,7 @@ def parse_ply(name):
         elif words[0] in ["comment", "created"]:
             i += 1
         else:
-            raise ValueError, "invalid header field"
+            raise ValueError("invalid header field")
     i += 1 # skip end_header
 
     result = {}
@@ -66,7 +69,7 @@ def parse_ply(name):
         pass
 
     for name, line_count, props in data_queue:
-        prop_names, parsers = zip(*props)
+        prop_names, parsers = list(zip(*props))
         result[name] = DataBlock(
                 properties=prop_names, 
                 data=[parse_line(parsers, l) for l in lines[i:i+line_count]])

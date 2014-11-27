@@ -1,6 +1,9 @@
 """Reader for the GMSH file format."""
 
 from __future__ import division
+from __future__ import absolute_import
+from six.moves import range
+from functools import reduce
 
 __copyright__ = "Copyright (C) 2009 Xueyu Zhu, Andreas Kloeckner"
 
@@ -98,7 +101,7 @@ class LineFeeder:
             return True
 
         try:
-            self.next_line = self.line_iterable.next()
+            self.next_line = next(self.line_iterable)
         except StopIteration:
             return False
         else:
@@ -111,7 +114,7 @@ class LineFeeder:
             return nl.strip()
 
         try:
-            nl = self.line_iterable.next()
+            nl = next(self.line_iterable)
         except StopIteration:
             raise GmshFileFormatError("unexpected end of file")
         else:

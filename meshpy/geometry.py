@@ -1,5 +1,8 @@
 from __future__ import division
+from __future__ import absolute_import
 import numpy as np
+from six.moves import range
+from six.moves import zip
 
 __doc__ = """
 
@@ -290,7 +293,7 @@ def make_circle(r, center=(0, 0), subdivisions=40, marker=Marker.SHELL):
     y = r*np.sin(phi) + cy
 
     return ([np.array(pt) for pt in zip(x, y)],
-            round_trip_connect(range(subdivisions)),
+            round_trip_connect(list(range(subdivisions))),
             None,
             subdivisions*[marker])
 
@@ -414,7 +417,7 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
             p_indices = (first_idx,)
             points.append((0, 0, z))
         else:
-            p_indices = tuple(xrange(first_idx, first_idx+len(base_shape)))
+            p_indices = tuple(range(first_idx, first_idx+len(base_shape)))
             points.extend([(x*r, y*r, z) for (x, y) in base_shape])
 
         rings[ring_idx] = p_indices

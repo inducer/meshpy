@@ -1,5 +1,9 @@
+from __future__ import absolute_import
+from __future__ import print_function
 from meshpy.common import MeshInfoBase, dump_array
 import meshpy._tetgen as internals
+import six
+from six.moves import range
 
 
 class MeshInfo(internals.MeshInfo, MeshInfoBase):
@@ -93,10 +97,10 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
         for name in ["points"]:
             dump_array(name, getattr(self, name))
         for ifacet, facet in enumerate(self.faces):
-            print "facet %d:" % ifacet
+            print("facet %d:" % ifacet)
             for ipolygon, polygon in enumerate(facet.polygons):
-                print "  polygon %d: vertices [%s]" % \
-                        (ipolygon, ",".join(str(vi) for vi in polygon.vertices))
+                print("  polygon %d: vertices [%s]" % \
+                        (ipolygon, ",".join(str(vi) for vi in polygon.vertices)))
 
     def write_vtk(self, filename):
         import pyvtk
@@ -116,7 +120,7 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
     def set_element_constraints(self, element_constraints):
         self.element_volumes.setup()
 
-        for i in xrange(len(self.element_volumes)):
+        for i in range(len(self.element_volumes)):
             if i in element_constraints:
                 self.element_volumes[i] = element_constraints[i]
             else:
@@ -132,7 +136,7 @@ class Options(internals.Options):
         self.parse_switches(switches)
         self.quiet = 1
 
-        for k, v in kwargs.iteritems():
+        for k, v in six.iteritems(kwargs):
             try:
                 getattr(self, k)
             except AttributeError:

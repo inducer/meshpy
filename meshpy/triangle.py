@@ -1,6 +1,9 @@
 from __future__ import division
+from __future__ import absolute_import
 from meshpy.common import MeshInfoBase, dump_array
 import meshpy._triangle as internals
+from six.moves import range
+from six.moves import zip
 
 
 
@@ -22,12 +25,13 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
                self.number_of_element_attributes, \
                [(name, getattr(self, name)) for name in self._constituents]
 
-    def __setstate__(self, (p_attr_count, e_attr_count, state)):
+    def __setstate__(self, xxx_todo_changeme):
+        (p_attr_count, e_attr_count, state) = xxx_todo_changeme
         self.number_of_point_attributes = p_attr_count
         self.number_of_element_attributes = e_attr_count
         for name, array in state:
             if name not in self._constituents:
-                raise RuntimeError, "Unknown constituent during unpickling"
+                raise RuntimeError("Unknown constituent during unpickling")
 
             dest_array = getattr(self, name)
 
@@ -151,7 +155,7 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
     if volume_constraints:
         opts += "a"
         if max_volume:
-            raise ValueError, "cannot specify both volume_constraints and max_area"
+            raise ValueError("cannot specify both volume_constraints and max_area")
     elif max_volume:
         opts += "a%.20f" % max_volume
 

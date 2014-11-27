@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 def main():
     import numpy
     from meshpy.tet import MeshInfo, build
@@ -33,7 +35,7 @@ def main():
 
     mesh = build(mesh_info, max_volume=0.06,
             volume_constraints=True, attributes=True)
-    print ("%d elements" % len(mesh.elements))
+    print(("%d elements" % len(mesh.elements)))
     mesh.write_vtk("box-in-box.vtk")
 
 

@@ -1,8 +1,10 @@
 from __future__ import division
+from __future__ import absolute_import
 
 import meshpy.triangle as triangle
 import numpy as np
 import numpy.linalg as la
+from six.moves import range
 
 
 def round_trip_connect(start, end):

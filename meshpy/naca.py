@@ -1,6 +1,9 @@
 from __future__ import division
+from __future__ import absolute_import
+from __future__ import print_function
 
 import numpy
+from six.moves import range
 
 
 class FourDigitsSymmetric:
@@ -130,7 +133,7 @@ def get_naca_points(naca_digits, number_of_points=100,
 
     if verbose:
         def explain(*s):
-            print " ".join(str(s_i) for s_i in s)
+            print(" ".join(str(s_i) for s_i in s))
     else:
         def explain(*s):
             pass
@@ -146,7 +149,7 @@ def get_naca_points(naca_digits, number_of_points=100,
 
     raw_abscissae = numpy.linspace(0, 1, number_of_points, endpoint=True)
     abscissae = numpy.empty_like(raw_abscissae)
-    for i in xrange(number_of_points):
+    for i in range(number_of_points):
         abscissae[i] = abscissa_map(raw_abscissae[i])
 
     digits_int = int(naca_digits)
@@ -227,7 +230,7 @@ def get_naca_points(naca_digits, number_of_points=100,
 def write_points(points, filename):
     file = open(filename, "w")
     for pt in points:
-        print >>file, "\t".join(repr(p_comp) for p_comp in pt)
+        print("\t".join(repr(p_comp) for p_comp in pt), file=file)
 
 
 def main():
@@ -263,7 +266,7 @@ def main():
     if options.output is None:
         options.output = "naca-%s.dat" % digits
 
-    print "Output file:", options.output
+    print("Output file:", options.output)
     write_points(points, options.output)
 
 

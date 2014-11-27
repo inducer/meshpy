@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 def main():
     from ply import parse_ply
     import sys
@@ -16,7 +18,7 @@ def main():
     builder.set(mi)
     mi.set_holes([builder.center()])
     mesh = build(mi)
-    print "%d elements" % len(mesh.elements)
+    print("%d elements" % len(mesh.elements))
     mesh.write_vtk("out.vtk")
 
 

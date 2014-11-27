@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from __future__ import print_function
+from six.moves import range
 def main():
     import meshpy.triangle as triangle
     import math
@@ -36,7 +39,7 @@ def main():
             )
 
     triangle.write_gnuplot_mesh("triangles-unrefined.dat", mesh)
-    print len(mesh.elements)
+    print(len(mesh.elements))
 
     mesh.element_volumes.setup()
 
@@ -46,7 +49,7 @@ def main():
         mesh.element_volumes[i] = 1e-8
 
     mesh = triangle.refine(mesh)
-    print len(mesh.elements)
+    print(len(mesh.elements))
 
     triangle.write_gnuplot_mesh("triangles.dat", mesh)
 

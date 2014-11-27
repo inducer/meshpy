@@ -49,12 +49,6 @@ def main():
     init_filename = "meshpy/__init__.py"
     exec(compile(open(init_filename, "r").read(), init_filename, "exec"), conf)
 
-    try:
-        from distutils.command.build_py import build_py_2to3 as build_py
-    except ImportError:
-        # 2.x
-        from distutils.command.build_py import build_py
-
     import codecs
     setup(name="MeshPy",
           version=conf["version"],
@@ -74,7 +68,12 @@ def main():
               'Natural Language :: English',
               'Programming Language :: C++',
               'Programming Language :: Python',
+              'Programming Language :: Python :: 2.6',
+              'Programming Language :: Python :: 2.7',
               'Programming Language :: Python :: 3',
+              'Programming Language :: Python :: 3.2',
+              'Programming Language :: Python :: 3.3',
+              'Programming Language :: Python :: 3.4',
               'Topic :: Multimedia :: Graphics :: 3D Modeling',
               'Topic :: Scientific/Engineering',
               'Topic :: Scientific/Engineering :: Mathematics',
@@ -115,11 +114,7 @@ def main():
                   extra_compile_args=conf["CXXFLAGS"],
                   extra_link_args=conf["LDFLAGS"],
                   ),
-              ],
-
-          # 2to3 invocation
-          cmdclass={'build_py': build_py},
-          )
+              ])
 
 
 if __name__ == '__main__':
