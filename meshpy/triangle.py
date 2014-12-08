@@ -154,9 +154,7 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
 
     if volume_constraints:
         opts += "a"
-        if max_volume:
-            raise ValueError("cannot specify both volume_constraints and max_area")
-    elif max_volume:
+    if max_volume:
         opts += "a%.20f" % max_volume
 
     if refinement_func is not None:
