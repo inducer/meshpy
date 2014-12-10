@@ -71,7 +71,7 @@ namespace
           Regions(regionlist, numberofregions, 5),
 
           FacetConstraints(facetconstraintlist, numberoffacetconstraints, 2),
-          SegmentConstraints(facetconstraintlist, numberofsegmentconstraints, 3),
+          SegmentConstraints(segmentconstraintlist, numberofsegmentconstraints, 3),
 
           Faces(trifacelist, numberoftrifaces, 3),
           AdjacentElements(adjtetlist, numberoftrifaces, 2, &Faces),
