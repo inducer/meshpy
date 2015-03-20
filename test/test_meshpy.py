@@ -133,6 +133,23 @@ def test_torus():
 
     build(mesh_info)
 
+
+def test_tetgen_points():
+    from meshpy.tet import MeshInfo, build, Options
+
+    import numpy as np
+    points = np.random.randn(10000, 3)
+
+    mesh_info = MeshInfo()
+    mesh_info.set_points(points)
+    options = Options("")
+    mesh = build(mesh_info, options=options)
+
+    print len(mesh.points)
+    print len(mesh.elements)
+
+    #mesh.write_vtk("test.vtk")
+
 # }}}
 
 
