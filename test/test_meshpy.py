@@ -1,6 +1,4 @@
-from __future__ import division
-from __future__ import absolute_import
-from six.moves import range
+from __future__ import division, absolute_import, print_function
 
 __copyright__ = "Copyright (C) 2013 Andreas Kloeckner"
 
@@ -23,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
+
+from six.moves import range
 
 
 # {{{ triangle
@@ -145,8 +145,8 @@ def test_tetgen_points():
     options = Options("")
     mesh = build(mesh_info, options=options)
 
-    print len(mesh.points)
-    print len(mesh.elements)
+    print(len(mesh.points))
+    print(len(mesh.elements))
 
     #mesh.write_vtk("test.vtk")
 
