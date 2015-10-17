@@ -68,7 +68,7 @@ class PyUblasExtension(NumpyExtension):
         return resource_filename(Requirement.parse(name), "%s/include" % name)
 
     def get_additional_include_dirs(self):
-        return (super(PyUblasExtension, self).get_additional_include_dirs()
+        return (NumpyExtension.get_additional_include_dirs(self)
                 + [self.get_module_include_path("pyublas")])
 
 
@@ -492,7 +492,7 @@ class BoostLibraries(Libraries):
         Libraries.__init__(self, "BOOST_%s" % lib_base_name.upper(),
                 [default_lib_name],
                 help="Library names for Boost C++ %s library (without lib or .so)"
-                    % humanize(lib_base_name))
+                % humanize(lib_base_name))
 
 
 def set_up_shipped_boost_if_requested(project_name, conf, source_path=None,
