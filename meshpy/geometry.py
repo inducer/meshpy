@@ -1,8 +1,4 @@
-from __future__ import division
-from __future__ import absolute_import
-import numpy as np
-from six.moves import range
-from six.moves import zip
+from __future__ import division, absolute_import
 
 __doc__ = """
 
@@ -38,6 +34,11 @@ Extrusions and surfaces of revolution
 .. autofunction:: generate_extrusion
 .. autofunction:: generate_surface_of_revolution
 """
+
+import numpy as np
+from six.moves import range
+from six.moves import zip
+
 
 # {{{ geometry building
 
