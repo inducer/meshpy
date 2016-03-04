@@ -128,6 +128,7 @@ class LineFeeder:
 class GmshElementBase(object):
     """
     .. automethod:: vertex_count
+    .. automethod:: edge_count
     .. automethod:: node_count
     .. automethod:: get_lexicographic_gmsh_node_indices
     .. automethod:: equidistant_vandermonde
@@ -142,6 +143,12 @@ class GmshElementBase(object):
     def vertex_count(self):
         return self.dimensions + 1
 
+    def edge_count(self):
+        result = []
+        for tup in generate_triangle_edge_tuples(self.order):
+            result.append(tup)
+        return len(result)
+    
     @memoize_method
     def node_count(self):
         """Return the number of interpolation nodes in this element."""
@@ -322,7 +329,7 @@ class GmshMeshReceiverBase(object):
     def set_up_elements(self, count):
         pass
 
-    def add_element(self, element_nr, element_type, vertex_nrs,
+    def add_element(self, element_nr, element_type, vertex_nrs, edge_nrs,
             lexicographic_nodes, tag_numbers):
         pass
 
@@ -383,9 +390,10 @@ class GmshMeshReceiverNumPy(GmshMeshReceiverBase):
         self.element_markers = [None] * count
         self.tags = []
 
-    def add_element(self, element_nr, element_type, vertex_nrs,
+    def add_element(self, element_nr, element_type, vertex_nrs, edge_nrs,
             lexicographic_nodes, tag_numbers):
         self.elements[element_nr] = vertex_nrs
+        self.elements[element_nr] = np.append(self.elements[element_nr],edge_nrs)
         self.element_types[element_nr] = element_type
         self.element_markers[element_nr] = tag_numbers
         # TODO: Add lexicographic node information
@@ -571,12 +579,13 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
                             "unexpected number of nodes in element")
 
                 gmsh_vertex_nrs = node_indices[:element_type.vertex_count()]
+                gmsh_edge_nrs = node_indices[element_type.vertex_count():element_type.vertex_count()+element_type.edge_count()]
                 zero_based_idx = element_idx - 1
 
-                tag_numbers = [tag for tag in tags[:1] if tag != 0]
+                tag_numbers = [tag for tag in tags[1:] if tag != 0]
 
                 receiver.add_element(element_nr=zero_based_idx,
-                        element_type=element_type, vertex_nrs=gmsh_vertex_nrs,
+                        element_type=element_type, vertex_nrs=gmsh_vertex_nrs, edge_nrs=gmsh_edge_nrs,
                         lexicographic_nodes=node_indices[
                             element_type.get_lexicographic_gmsh_node_indices()],
                         tag_numbers=tag_numbers)
