@@ -1,9 +1,6 @@
 """Reader for the GMSH file format."""
 
-from __future__ import division
-from __future__ import absolute_import
-from six.moves import range
-from functools import reduce
+
 
 __copyright__ = "Copyright (C) 2009 Xueyu Zhu, Andreas Kloeckner"
 
@@ -31,6 +28,7 @@ import numpy as np
 #import numpy.linalg as la
 from pytools import memoize_method, Record
 from meshpy.gmsh import LiteralSource, FileSource  # noqa
+from functools import reduce
 
 
 __doc__ = """
@@ -42,7 +40,9 @@ Element types
 .. autoclass:: GmshElementBase
 .. autoclass:: GmshPoint
 .. autoclass:: GmshIntervalElement
+.. autoclass:: GmshQuadrilateralElement
 .. autoclass:: GmshTriangularElement
+.. autoclass:: GmshIncompleteQuadrilateralElement
 .. autoclass:: GmshIncompleteTriangularElement
 .. autoclass:: GmshTetrahedralElement
 
@@ -90,6 +90,28 @@ def generate_triangle_volume_tuples(order):
         for j in range(1, order-i):
             yield (j, i)
 
+def generate_quadrangle_vertex_tuples(order):
+    yield (0, 0)
+    yield (order, 0)
+    yield (order,order)
+    yield (0, order)
+
+
+def generate_quadrangle_edge_tuples(order):
+    for i in range(1, order):
+        yield (i, 0)
+    for i in range(1, order):
+        yield (order, i)
+    for i in range(1, order):
+        yield (i, order)
+    for i in range(1, order):
+        yield (0, i)
+
+
+def generate_quadrangle_volume_tuples(order):
+    for i in range(1, order):
+        for j in range(1, order):
+            yield (j, i)
 
 class LineFeeder:
     def __init__(self, line_iterable):
@@ -128,7 +150,6 @@ class LineFeeder:
 class GmshElementBase(object):
     """
     .. automethod:: vertex_count
-    .. automethod:: edge_count
     .. automethod:: node_count
     .. automethod:: get_lexicographic_gmsh_node_indices
     .. automethod:: equidistant_vandermonde
@@ -142,13 +163,13 @@ class GmshElementBase(object):
 
     def vertex_count(self):
         return self.dimensions + 1
-
+    
     def edge_count(self):
         result = []
         for tup in generate_triangle_edge_tuples(self.order):
             result.append(tup)
         return len(result)
-    
+
     @memoize_method
     def node_count(self):
         """Return the number of interpolation nodes in this element."""
@@ -167,30 +188,33 @@ class GmshElementBase(object):
         """
         from pytools import \
                 generate_nonnegative_integer_tuples_summing_to_at_most
+
         result = list(
                 generate_nonnegative_integer_tuples_summing_to_at_most(
                     self.order, self.dimensions))
 
-        assert len(result) == self.node_count()
+        #assert len(result) == self.node_count()
         return result
 
     @memoize_method
     def get_lexicographic_gmsh_node_indices(self):
-        gmsh_tup_to_index = dict(
-                (tup, i)
-                for i, tup in enumerate(self.gmsh_node_tuples()))
-
-        return np.array([gmsh_tup_to_index[tup]
-                for tup in self.lexicographic_node_tuples()],
-                dtype=np.intp)
+#         gmsh_tup_to_index = dict(
+#                 (tup, i)
+#                 for i, tup in enumerate(self.gmsh_node_tuples()))
+# 
+#         return np.array([gmsh_tup_to_index[tup]
+#                 for tup in self.lexicographic_node_tuples()],
+#                 dtype=np.intp)
+        pass
 
     @memoize_method
     def equidistant_vandermonde(self):
-        from hedge.polynomial import generic_vandermonde
-
-        return generic_vandermonde(
-                list(self.equidistant_unit_nodes()),
-                list(self.basis_functions()))
+#         from hedge.polynomial import generic_vandermonde
+# 
+#         return generic_vandermonde(
+#                 list(self.equidistant_unit_nodes()),
+#                 list(self.basis_functions()))
+        pass
 
 
 class GmshPoint(GmshElementBase):
@@ -240,6 +264,35 @@ class GmshTriangularElement(GmshElementBase):
             result.append(tup)
         return result
 
+class GmshIncompleteQuadrilateralElement(GmshElementBase):
+    dimensions = 2
+
+    def __init__(self, order):
+        self.order = order
+
+    @memoize_method
+    def gmsh_node_tuples(self):
+        result = []
+        for tup in generate_quadrangle_vertex_tuples(self.order):
+            result.append(tup)
+        for tup in generate_quadrangle_edge_tuples(self.order):
+            result.append(tup)
+        return result
+
+
+class GmshQuadrilateralElement(GmshElementBase):
+    dimensions = 2
+
+    @memoize_method
+    def gmsh_node_tuples(self):
+        result = []
+        for tup in generate_quadrangle_vertex_tuples(self.order):
+            result.append(tup)
+        for tup in generate_quadrangle_edge_tuples(self.order):
+            result.append(tup)
+        for tup in generate_quadrangle_volume_tuples(self.order):
+            result.append(tup)
+        return result
 
 class GmshTetrahedralElement(GmshElementBase):
     dimensions = 3
@@ -298,11 +351,14 @@ class GmshMeshReceiverBase(object):
     gmsh_element_type_to_info_map = {
             1:  GmshIntervalElement(1),
             2:  GmshTriangularElement(1),
+            3:  GmshQuadrilateralElement(1),
             4:  GmshTetrahedralElement(1),
             8:  GmshIntervalElement(2),
             9:  GmshTriangularElement(2),
+            10: GmshQuadrilateralElement(2),
             11: GmshTetrahedralElement(2),
             15: GmshPoint(0),
+            16: GmshIncompleteQuadrilateralElement(2),
             20: GmshIncompleteTriangularElement(3),
             21: GmshTriangularElement(3),
             22: GmshIncompleteTriangularElement(4),
@@ -574,18 +630,18 @@ def parse_gmsh(receiver, line_iterable, force_dimension=None):
                 node_indices = np.array(
                         [x-1 for x in parts[3+tag_count:]], dtype=np.intp)
 
-                if element_type.node_count() != len(node_indices):
-                    raise GmshFileFormatError(
-                            "unexpected number of nodes in element")
+#                 if element_type.node_count() != len(node_indices):
+#                     raise GmshFileFormatError(
+#                             "unexpected number of nodes in element")
 
-                gmsh_vertex_nrs = node_indices[:element_type.vertex_count()]
-                gmsh_edge_nrs = node_indices[element_type.vertex_count():element_type.vertex_count()+element_type.edge_count()]
+                gmsh_vertex_nrs = node_indices[:element_type.vertex_count()]                
+                gmsh_edge_nrs = node_indices[element_type.vertex_count():]
                 zero_based_idx = element_idx - 1
 
                 tag_numbers = [tag for tag in tags[1:] if tag != 0]
-
+                
                 receiver.add_element(element_nr=zero_based_idx,
-                        element_type=element_type, vertex_nrs=gmsh_vertex_nrs, edge_nrs=gmsh_edge_nrs,
+                        element_type=el_type_num, vertex_nrs=gmsh_vertex_nrs, edge_nrs=gmsh_edge_nrs,
                         lexicographic_nodes=node_indices[
                             element_type.get_lexicographic_gmsh_node_indices()],
                         tag_numbers=tag_numbers)
