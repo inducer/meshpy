@@ -30,7 +30,8 @@ THE SOFTWARE.
 import numpy as np
 #import numpy.linalg as la
 from pytools import memoize_method, Record
-from meshpy.gmsh import LiteralSource, FileSource  # noqa
+from meshpy.gmsh import (  # noqa
+        ScriptSource, LiteralSource, FileSource, ScriptWithFilesSource)
 
 
 __doc__ = """
@@ -40,11 +41,23 @@ Element types
 -------------
 
 .. autoclass:: GmshElementBase
+
+Simplex Elements
+^^^^^^^^^^^^^^^^
+
+.. autoclass:: GmshSimplexElementBase
 .. autoclass:: GmshPoint
 .. autoclass:: GmshIntervalElement
 .. autoclass:: GmshTriangularElement
 .. autoclass:: GmshIncompleteTriangularElement
 .. autoclass:: GmshTetrahedralElement
+
+Tensor Product Elements
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: GmshTensorProductElementBase
+.. autoclass:: GmshQuadrilateralElement
+.. autoclass:: GmshHexahedralElement
 
 Receiver interface
 ------------------
@@ -129,15 +142,19 @@ class GmshElementBase(object):
     """
     .. automethod:: vertex_count
     .. automethod:: node_count
+    .. automethod:: lexicographic_node_tuples
     .. automethod:: get_lexicographic_gmsh_node_indices
-    .. automethod:: equidistant_vandermonde
     .. method:: equidistant_unit_nodes
 
       (Implemented by subclasses)
     """
-
     def __init__(self, order):
         self.order = order
+
+
+# {{{ simplices
+
+class GmshSimplexElementBase(GmshElementBase):
 
     def vertex_count(self):
         return self.dimensions + 1
@@ -177,16 +194,8 @@ class GmshElementBase(object):
                 for tup in self.lexicographic_node_tuples()],
                 dtype=np.intp)
 
-    @memoize_method
-    def equidistant_vandermonde(self):
-        from hedge.polynomial import generic_vandermonde
 
-        return generic_vandermonde(
-                list(self.equidistant_unit_nodes()),
-                list(self.basis_functions()))
-
-
-class GmshPoint(GmshElementBase):
+class GmshPoint(GmshSimplexElementBase):
     dimensions = 0
 
     @memoize_method
@@ -194,7 +203,7 @@ class GmshPoint(GmshElementBase):
         return [()]
 
 
-class GmshIntervalElement(GmshElementBase):
+class GmshIntervalElement(GmshSimplexElementBase):
     dimensions = 1
 
     @memoize_method
@@ -203,7 +212,7 @@ class GmshIntervalElement(GmshElementBase):
                 (i,) for i in range(1, self.order)]
 
 
-class GmshIncompleteTriangularElement(GmshElementBase):
+class GmshIncompleteTriangularElement(GmshSimplexElementBase):
     dimensions = 2
 
     def __init__(self, order):
@@ -219,7 +228,7 @@ class GmshIncompleteTriangularElement(GmshElementBase):
         return result
 
 
-class GmshTriangularElement(GmshElementBase):
+class GmshTriangularElement(GmshSimplexElementBase):
     dimensions = 2
 
     @memoize_method
@@ -234,7 +243,7 @@ class GmshTriangularElement(GmshElementBase):
         return result
 
 
-class GmshTetrahedralElement(GmshElementBase):
+class GmshTetrahedralElement(GmshSimplexElementBase):
     dimensions = 3
 
     @memoize_method
@@ -273,6 +282,55 @@ class GmshTetrahedralElement(GmshElementBase):
 # }}}
 
 
+# {{{ tensor product elements
+
+class GmshTensorProductElementBase(GmshElementBase):
+    def vertex_count(self):
+        return 2**self.dimensions
+
+    @memoize_method
+    def node_count(self):
+        return (self.order+1) ** self.dimensions
+
+    @memoize_method
+    def lexicographic_node_tuples(self):
+        """Generate tuples enumerating the node indices present
+        in this element. Each tuple has a length equal to the dimension
+        of the element. The tuples constituents are non-negative integers
+        whose sum is less than or equal to the order of the element.
+        """
+        from pytools import \
+                generate_nonnegative_integer_tuples_below
+        result = list(
+                generate_nonnegative_integer_tuples_below(
+                    self.order, self.dimensions))
+
+        assert len(result) == self.node_count()
+        return result
+
+    @memoize_method
+    def get_lexicographic_gmsh_node_indices(self):
+        gmsh_tup_to_index = dict(
+                (tup, i)
+                for i, tup in enumerate(self.gmsh_node_tuples()))
+
+        return np.array([gmsh_tup_to_index[tup]
+                for tup in self.lexicographic_node_tuples()],
+                dtype=np.intp)
+
+
+class GmshQuadrilateralElement(GmshTensorProductElementBase):
+    dimensions = 2
+
+
+class GmshHexahedralElement(GmshTensorProductElementBase):
+    dimensions = 3
+
+# }}}
+
+# }}}
+
+
 # {{{ receiver interface
 
 class GmshMeshReceiverBase(object):
@@ -291,10 +349,14 @@ class GmshMeshReceiverBase(object):
     gmsh_element_type_to_info_map = {
             1:  GmshIntervalElement(1),
             2:  GmshTriangularElement(1),
+            3:  GmshQuadrilateralElement(1),
             4:  GmshTetrahedralElement(1),
+            5:  GmshHexahedralElement(1),
             8:  GmshIntervalElement(2),
             9:  GmshTriangularElement(2),
+            10: GmshQuadrilateralElement(2),
             11: GmshTetrahedralElement(2),
+            12: GmshHexahedralElement(2),
             15: GmshPoint(0),
             20: GmshIncompleteTriangularElement(3),
             21: GmshTriangularElement(3),
@@ -307,7 +369,9 @@ class GmshMeshReceiverBase(object):
             28: GmshIntervalElement(5),
             29: GmshTetrahedralElement(3),
             30: GmshTetrahedralElement(4),
-            31: GmshTetrahedralElement(5)
+            31: GmshTetrahedralElement(5),
+            92: GmshHexahedralElement(3),
+            93: GmshHexahedralElement(4),
             }
 
     def set_up_nodes(self, count):
@@ -424,8 +488,9 @@ def read_gmsh(receiver, filename, force_dimension=None):
     return result
 
 
-def generate_gmsh(receiver, source, dimensions, order=None, other_options=[],
-            extension="geo", gmsh_executable="gmsh", force_dimension=None):
+def generate_gmsh(receiver, source, dimensions=None, order=None, other_options=[],
+            extension="geo", gmsh_executable="gmsh", force_dimension=None,
+            output_file_name="output.msh"):
     """Run gmsh and feed the output to *receiver*.
 
     :arg source: an instance of :class:`LiteralSource` or :class:`FileSource`
@@ -434,7 +499,8 @@ def generate_gmsh(receiver, source, dimensions, order=None, other_options=[],
     from meshpy.gmsh import GmshRunner
     runner = GmshRunner(source, dimensions, order=order,
             other_options=other_options, extension=extension,
-            gmsh_executable=gmsh_executable)
+            gmsh_executable=gmsh_executable,
+            output_file_name=output_file_name)
 
     runner.__enter__()
     try:
