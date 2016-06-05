@@ -2,6 +2,17 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+__doc__ = """
+
+.. exception:: GmshError
+.. autoclass:: ScriptSource
+.. autoclass:: FileSource
+.. autoclass:: ScriptWithFilesSource
+
+.. autoclass:: GmshRunner
+"""
+
+
 class GmshError(RuntimeError):
     pass
 
@@ -32,13 +43,25 @@ class _TempDirManager(object):
         _erase_dir(self.path)
 
 
-class LiteralSource(object):
+class ScriptSource(object):
     """
-    .. versionadded:: 2014.1
+    .. versionadded:: 2016.1
     """
     def __init__(self, source, extension):
         self.source = source
         self.extension = extension
+
+
+class LiteralSource(ScriptSource):
+    """
+    .. versionadded:: 2014.1
+    """
+    def __init__(self, source, extension):
+        super(LiteralSource, self).__init__(source, extension)
+
+        from warnings import warn
+        warn("LiteralSource is deprecated, use ScriptSource instead",
+                DeprecationWarning, stacklevel=2)
 
 
 class FileSource(object):
@@ -49,17 +72,37 @@ class FileSource(object):
         self.filename = filename
 
 
+class ScriptWithFilesSource(object):
+    """
+    .. versionadded:: 2016.1
+
+    .. attriute:: source
+
+        The script code to be fed to gmsh.
+
+    .. attriute:: filenames
+
+        The names of files to be copied to the temporary directory where
+        gmsh is run.
+    """
+    def __init__(self, source, filenames, source_name="temp.geo"):
+        self.source = source
+        self.source_name = source_name
+        self.filenames = filenames
+
+
 class GmshRunner(object):
-    def __init__(self, source, dimensions, order=None,
+    def __init__(self, source, dimensions=None, order=None,
             incomplete_elements=None, other_options=[],
-            extension="geo", gmsh_executable="gmsh"):
+            extension="geo", gmsh_executable="gmsh",
+            output_file_name="output.msh"):
         if isinstance(source, str):
             from warnings import warn
             warn("passing a string as 'source' is deprecated--use "
-                    "LiteralSource or FileSource",
+                    "one of the *Source classes",
                     DeprecationWarning)
 
-            source = LiteralSource(source, extension)
+            source = ScriptSource(source, extension)
 
         self.source = source
         self.dimensions = dimensions
@@ -67,9 +110,10 @@ class GmshRunner(object):
         self.incomplete_elements = incomplete_elements
         self.other_options = other_options
         self.gmsh_executable = gmsh_executable
+        self.output_file_name = output_file_name
 
-        if dimensions not in [1, 2, 3]:
-            raise RuntimeError("dimensions must be one of 1,2,3")
+        if dimensions not in [1, 2, 3, None]:
+            raise RuntimeError("dimensions must be one of 1,2,3 or None")
 
     def __enter__(self):
         self.temp_dir_mgr = None
@@ -78,27 +122,39 @@ class GmshRunner(object):
             working_dir = temp_dir_mgr.path
             from os.path import join, abspath, exists
 
-            if isinstance(self.source, LiteralSource):
+            if isinstance(self.source, ScriptSource):
                 source_file_name = join(
                         working_dir, "temp."+self.source.extension)
-                source_file = open(source_file_name, "w")
-                try:
+                with open(source_file_name, "w") as source_file:
                     source_file.write(self.source.source)
-                finally:
-                    source_file.close()
+
             elif isinstance(self.source, FileSource):
                 source_file_name = abspath(self.source.filename)
                 if not exists(source_file_name):
                     raise IOError("'%s' does not exist" % source_file_name)
+
+            elif isinstance(self.source, ScriptWithFilesSource):
+                source_file_name = join(
+                        working_dir, self.source.source_name)
+                with open(source_file_name, "w") as source_file:
+                    source_file.write(self.source.source)
+
+                from os.path import basename
+                from shutil import copyfile
+                for f in self.source.filenames:
+                    copyfile(f, join(working_dir, basename(f)))
+
             else:
                 raise RuntimeError("'source' type unrecognized")
 
-            output_file_name = join(working_dir, "output.msh")
+            output_file_name = join(working_dir, self.output_file_name)
             cmdline = [
                     self.gmsh_executable,
-                    "-%d" % self.dimensions,
-                    "-o", output_file_name,
+                    "-o", self.output_file_name,
                     "-nopopup"]
+
+            if self.dimensions is not None:
+                cmdline.append("-%d" % self.dimensions)
 
             if self.order is not None:
                 cmdline.extend(["-order", str(self.order)])
@@ -110,6 +166,9 @@ class GmshRunner(object):
 
             cmdline.extend(self.other_options)
             cmdline.append(source_file_name)
+
+            if self.dimensions is None:
+                cmdline.append("-")
 
             logger.info("invoking gmsh: '%s'" % " ".join(cmdline))
             from pytools.prefork import call_capture_output
