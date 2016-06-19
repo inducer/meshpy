@@ -176,6 +176,9 @@ class GmshRunner(object):
                     cmdline, working_dir)
             logger.info("return from gmsh")
 
+            stdout = stdout.decode("utf-8")
+            stderr = stderr.decode("utf-8")
+
             if stderr and "error" in stderr.lower():
                 msg = "gmsh execution failed with message:\n\n"
                 if stdout:
