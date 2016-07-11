@@ -61,7 +61,15 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
     def dump(self):
         for name in self._constituents:
             dump_array(name, getattr(self, name))
-
+    
+    def write_vtk(self, filename):
+        import pyvtk
+        vtkelements = pyvtk.VtkData(
+            pyvtk.UnstructuredGrid(
+                self.points,
+                triangle=self.elements),
+            "Mesh")
+        vtkelements.tofile(filename)
 
 
 
