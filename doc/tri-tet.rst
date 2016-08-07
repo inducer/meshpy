@@ -282,6 +282,9 @@ Some common notions
     .. attribute:: face_markers
     .. attribute:: edges
     .. attribute:: edge_markers
+    .. attribute:: edge_adjacent_elements
+
+        .. versionadded:: 2016.1
     .. attribute:: number_of_point_attributes
     .. attribute:: number_of_element_attributes
 

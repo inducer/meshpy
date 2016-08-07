@@ -49,6 +49,7 @@ namespace
 
       tForeignArray<int>                  Edges;
       tForeignArray<int>                  EdgeMarkers;
+      tForeignArray<int>                  EdgeAdjTetList;
 
     public:
       tMeshInfo()
@@ -78,7 +79,8 @@ namespace
           FaceMarkers(trifacemarkerlist, numberoftrifaces, 1, &Faces),
 
           Edges(edgelist, numberofedges, 2),
-          EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges)
+          EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges),
+          EdgeAdjTetList(edgeadjtetlist, numberofedges, 1, &Edges)
       {
         Elements.fixUnit(numberofcorners);
       }
@@ -310,6 +312,7 @@ BOOST_PYTHON_MODULE(_tetgen)
 
       .def_readonly("edges", &cl::Edges)
       .def_readonly("edge_markers", &cl::EdgeMarkers)
+      .def_readonly("edge_adjacent_elements", &cl::EdgeAdjTetList)
 
       .add_property("number_of_point_attributes",
           &cl::numberOfPointAttributes,

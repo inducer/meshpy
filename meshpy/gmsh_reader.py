@@ -1,9 +1,6 @@
 """Reader for the GMSH file format."""
 
-from __future__ import division
-from __future__ import absolute_import
-from six.moves import range
-from functools import reduce
+from __future__ import division, absolute_import
 
 __copyright__ = "Copyright (C) 2009 Xueyu Zhu, Andreas Kloeckner"
 
@@ -26,6 +23,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
+
+from six.moves import range
+from functools import reduce
 
 import numpy as np
 #import numpy.linalg as la
@@ -72,8 +72,9 @@ Receiver example implementation
 Reader
 ------
 
-.. autoclass:: LiteralSource
+.. autoclass:: ScriptSource
 .. autoclass:: FileSource
+.. autoclass:: ScriptWithFilesSource
 
 .. autofunction:: read_gmsh
 .. autofunction:: generate_gmsh
