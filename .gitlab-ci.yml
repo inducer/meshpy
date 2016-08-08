@@ -28,3 +28,13 @@ Python 2.6:
   - python2.6
   except:
   - tags
+
+Documentation:
+  script:
+  - EXTRA_INSTALL="numpy"
+  - curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/master/build-docs.sh
+  - ". ./build-docs.sh"
+  tags:
+  - python3.5
+  only:
+  - master
