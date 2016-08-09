@@ -176,7 +176,7 @@ int triunsuitable(vertex triorg, vertex tridest, vertex triapex, REAL area)
   try
   {
     return call<bool>(RefinementFunction,
-        make_tuple(
+        boost::python::make_tuple(
           object(boost::ref(org)),
           object(boost::ref(dest)),
           object(boost::ref(apex))
