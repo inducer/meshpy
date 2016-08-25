@@ -285,6 +285,12 @@ Some common notions
     .. attribute:: edge_adjacent_elements
 
         .. versionadded:: 2016.1
+    .. attribute:: voro_edges
+
+        .. versionadded:: 2016.2
+    .. attribute:: voro_facets
+
+        .. versionadded:: 2016.2
     .. attribute:: number_of_point_attributes
     .. attribute:: number_of_element_attributes
 
