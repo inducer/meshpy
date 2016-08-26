@@ -34,25 +34,22 @@ namespace
       tForeignArray<REAL>                       ElementVolumes; // out
       tForeignArray<int>                        Neighbors; // out
 
-      tForeignArray<tetgenio::facet>            Facets;
-      tForeignArray<int>                        FacetMarkers;
+      tForeignArray<tetgenio::facet>      Facets;
+      tForeignArray<int>                  FacetMarkers;
 
-      tForeignArray<REAL>                       Holes;
-      tForeignArray<REAL>                       Regions;
+      tForeignArray<REAL>                 Holes;
+      tForeignArray<REAL>                 Regions;
 
-      tForeignArray<REAL>                       FacetConstraints;
-      tForeignArray<REAL>                       SegmentConstraints;
+      tForeignArray<REAL>                 FacetConstraints;
+      tForeignArray<REAL>                 SegmentConstraints;
 
-      tForeignArray<int>                        Faces;
-      tForeignArray<int>                        AdjacentElements;
-      tForeignArray<int>                        FaceMarkers;
+      tForeignArray<int>                  Faces;
+      tForeignArray<int>                  AdjacentElements;
+      tForeignArray<int>                  FaceMarkers;
 
-      tForeignArray<int>                        Edges;
-      tForeignArray<int>                        EdgeMarkers;
-      tForeignArray<int>                        EdgeAdjTetList;
-
-      tForeignArray<tetgenio::voroedge>         VoroEdges;
-      tForeignArray<tetgenio::vorofacet>        VoroFacets;
+      tForeignArray<int>                  Edges;
+      tForeignArray<int>                  EdgeMarkers;
+      tForeignArray<int>                  EdgeAdjTetList;
 
     public:
       tMeshInfo()
@@ -83,10 +80,7 @@ namespace
 
           Edges(edgelist, numberofedges, 2),
           EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges),
-          EdgeAdjTetList(edgeadjtetlist, numberofedges, 1, &Edges),
-
-          VoroEdges(vedgelist, numberofvedges, 2),
-          VoroFacets(vfacetlist, numberofvfacets, 2)
+          EdgeAdjTetList(edgeadjtetlist, numberofedges, 1, &Edges)
       {
         Elements.fixUnit(numberofcorners);
       }
@@ -255,30 +249,25 @@ namespace
         self.polygonlist, self.numberofpolygons);
   }
 
+
+
+
   tForeignArray<REAL> *facet_get_holes(tetgenio::facet &self)
   {
     return new tForeignArray<REAL>(self.holelist, self.numberofholes, 3);
   }
 
 
+
+
+
   tForeignArray<int> *polygon_get_vertices(tetgenio::polygon &self)
   {
     return new tForeignArray<int>(self.vertexlist, self.numberofvertices);
   }
-
-  int *voro_get_edge(tetgenio::voroedge &self)
-  {
-    int edge[2] = { self.v1, self.v2 };
-    return edge;
-  }
-
-  int *voro_get_facet(tetgenio::vorofacet &self)
-  {
-    int facet[2] = { self.c1, self.c2 };
-    return facet;
-  }
-
 }
+
+
 
 
 
@@ -324,9 +313,6 @@ BOOST_PYTHON_MODULE(_tetgen)
       .def_readonly("edges", &cl::Edges)
       .def_readonly("edge_markers", &cl::EdgeMarkers)
       .def_readonly("edge_adjacent_elements", &cl::EdgeAdjTetList)
-
-      .def_readonly("voro_edges", &cl::VoroEdges)
-      .def_readonly("voro_facets", &cl::VoroFacets)
 
       .add_property("number_of_point_attributes",
           &cl::numberOfPointAttributes,
@@ -379,22 +365,6 @@ BOOST_PYTHON_MODULE(_tetgen)
     class_<cl, boost::noncopyable>("Polygon", no_init)
       .add_property("vertices",
           make_function(polygon_get_vertices, manage_new_internal_reference<>()))
-      ;
-  }
-
-  {
-    typedef tetgenio::voroedge cl;
-    class_<cl, boost::noncopyable>("VoroEdge", no_init)
-      .add_property("v",
-          make_function(voro_get_edge, manage_new_internal_reference<>()))
-      ;
-  }
-
-  {
-    typedef tetgenio::vorofacet cl;
-    class_<cl, boost::noncopyable>("VoroFacet", no_init)
-      .add_property("c",
-          make_function(voro_get_facet, manage_new_internal_reference<>()))
       ;
   }
 
