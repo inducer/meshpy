@@ -56,7 +56,7 @@ def main():
           long_description=codecs.open("README.rst", "r", "utf-8").read(),
           author="Andreas Kloeckner",
           author_email="inform@tiker.net",
-          license="MIT for the wrapper/non-commercial MIT for the meshers",
+          license="MIT for the wrapper/non-commercial for the Triangle/GNU Affero Public License for TetGen",
           url="http://mathema.tician.de/software/meshpy",
           classifiers=[
               'Development Status :: 4 - Beta',

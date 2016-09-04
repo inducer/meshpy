@@ -1,16 +1,17 @@
 include src/cpp/*.h
 include src/cpp/*.hpp
+include src/cpp/*LICENSE
 include README.rst
 include LICENSE
 include test/*.py
 include examples/clean.sh
 include examples/clean.sh
 
-include doc/source/*.rst
-include doc/source/conf.py
+include doc/*.rst
+include doc/conf.py
 include doc/Makefile
-include doc/source/_static/*.css
-include doc/source/_templates/*.html
+include doc/_static/*.css
+include doc/_templates/*.html
 
 include configure.py
 include Makefile.in

@@ -74,64 +74,21 @@ free, then you are not required to make any arrangement with me.)
 TetGen License
 --------------
 
-The software (TetGen) is licensed under the terms of the  MIT  license
-with the following exceptions:
+TetGen is distributed under a dual licensing scheme. You can
+redistribute it and/or modify it under the terms of the GNU Affero
+General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later
+version. A copy of the GNU Affero General Public License is reproduced
+below.
 
-Distribution of  modified  versions  of this code is permissible UNDER
-THE CONDITION THAT  THIS CODE AND ANY MODIFICATIONS  MADE TO IT IN THE
-SAME SOURCE FILES  tetgen.h AND tetgen.cxx  REMAIN UNDER  COPYRIGHT OF
-THE  ORIGINAL AUTHOR,  BOTH  SOURCE AND OBJECT  CODE  ARE MADE  FREELY
-AVAILABLE  WITHOUT   CHARGE,   AND  CLEAR   NOTICE  IS  GIVEN  OF  THE 
-MODIFICATIONS.
+If the terms and conditions of the AGPL v.3. would prevent you from
+using TetGen, please consider the option to obtain a commercial
+license for a fee. These licenses are offered by the Weierstrass
+Institute for Applied Analysis and Stochastics (WIAS). As a rule,
+licenses are provided "as-is", unlimited in time for a one time
+fee. Please send corresponding requests to:
+tetgen@wias-berlin.de. Please do not forget to include some
+description of your company and the realm of its activities.
 
-Distribution of this code for  any  commercial purpose  is permissible
-ONLY BY DIRECT ARRANGEMENT WITH THE COPYRIGHT OWNER.
+For details, see the `TetGen web page <http://tetgen.org>`_
 
-The full  license text is reproduced below.
-
-This means that TetGen is no free software, but for private, research,
-and  educational purposes it  can be  used at  absolutely no  cost and
-without further arrangements.
-
-
-For details, see http://tetgen.berlios.de
-
-==============================================================================
-
-TetGen
-A Quality Tetrahedral Mesh Generator and 3D Delaunay Triangulator
-Version 1.4 (Released on January 14, 2006).
-
-Copyright 2002, 2004, 2005, 2006 
-Hang Si
-Rathausstr. 9, 10178 Berlin, Germany
-si@wias-berlin.de
-
-Permission is hereby granted, free  of charge, to any person obtaining
-a  copy  of this  software  and  associated  documentation files  (the
-"Software"), to  deal in  the Software without  restriction, including
-without limitation  the rights to  use, copy, modify,  merge, publish,
-distribute,  sublicense and/or  sell copies  of the  Software,  and to
-permit persons to whom the Software  is furnished to do so, subject to
-the following conditions:
-
-Distribution of  modified  versions  of this code is permissible UNDER
-THE CONDITION THAT  THIS CODE AND ANY MODIFICATIONS  MADE TO IT IN THE
-SAME SOURCE FILES  tetgen.h AND tetgen.cxx  REMAIN UNDER  COPYRIGHT OF
-THE  ORIGINAL AUTHOR,  BOTH  SOURCE AND OBJECT  CODE  ARE MADE  FREELY
-AVAILABLE  WITHOUT   CHARGE,   AND  CLEAR   NOTICE  IS  GIVEN  OF  THE 
-MODIFICATIONS.
-
-Distribution of this code for  any  commercial purpose  is permissible
-ONLY BY DIRECT ARRANGEMENT WITH THE COPYRIGHT OWNER.
-
-The  above  copyright  notice  and  this permission  notice  shall  be
-included in all copies or substantial portions of the Software.
-
-THE  SOFTWARE IS  PROVIDED  "AS  IS", WITHOUT  WARRANTY  OF ANY  KIND,
-EXPRESS OR  IMPLIED, INCLUDING  BUT NOT LIMITED  TO THE  WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT  SHALL THE AUTHORS OR COPYRIGHT HOLDERS  BE LIABLE FOR ANY
-CLAIM, DAMAGES OR  OTHER LIABILITY, WHETHER IN AN  ACTION OF CONTRACT,
-TORT  OR OTHERWISE, ARISING  FROM, OUT  OF OR  IN CONNECTION  WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
