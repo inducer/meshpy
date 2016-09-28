@@ -241,14 +241,27 @@ class GmshTriangularElement(GmshSimplexElementBase):
 
     @memoize_method
     def gmsh_node_tuples(self):
-        result = []
-        for tup in generate_triangle_vertex_tuples(self.order):
-            result.append(tup)
-        for tup in generate_triangle_edge_tuples(self.order):
-            result.append(tup)
-        for tup in generate_triangle_volume_tuples(self.order):
-            result.append(tup)
-        return result
+        return {
+                1: [
+                    (0, 0), (1, 0), (0, 1),
+                    ],
+                2: [
+                    (0, 0), (2, 0), (0, 2), (1, 0), (1, 1), (0, 1),
+                    ],
+                3: [
+                    (0, 0), (3, 0), (0, 3), (1, 0), (2, 0), (2, 1), (1, 2), (0, 2),
+                    (0, 1), (1, 1),
+                    ],
+                4: [
+                    (0, 0), (4, 0), (0, 4), (1, 0), (2, 0), (3, 0), (3, 1), (2, 2),
+                    (1, 3), (0, 3), (0, 2), (0, 1), (1, 1), (2, 1), (1, 2),
+                    ],
+                5: [
+                    (0, 0), (5, 0), (0, 5), (1, 0), (2, 0), (3, 0), (4, 0), (4, 1),
+                    (3, 2), (2, 3), (1, 4), (0, 4), (0, 3), (0, 2), (0, 1), (1, 1),
+                    (3, 1), (1, 3), (2, 1), (2, 2), (1, 2),
+                    ],
+                }[self.order]
 
 
 class GmshTetrahedralElement(GmshSimplexElementBase):
