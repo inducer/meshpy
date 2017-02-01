@@ -76,11 +76,11 @@ class ScriptWithFilesSource(object):
     """
     .. versionadded:: 2016.1
 
-    .. attriute:: source
+    .. attribute:: source
 
         The script code to be fed to gmsh.
 
-    .. attriute:: filenames
+    .. attribute:: filenames
 
         The names of files to be copied to the temporary directory where
         gmsh is run.
