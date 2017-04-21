@@ -126,7 +126,7 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
         volume_constraints=False, max_volume=None, allow_boundary_steiner=True,
         allow_volume_steiner=True, quality_meshing=True,
         generate_edges=None, generate_faces=False, min_angle=None,
-        mesh_order=None):
+        mesh_order=None, generate_neighbor_lists=False):
     """Triangulate the domain given in `mesh_info'."""
     opts = "pzj"
     if quality_meshing:
@@ -158,6 +158,8 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
         from warnings import warn
         warn("generate_edges is deprecated--use generate_faces instead")
         generate_faces = generate_edges
+    if generate_neighbor_lists is not None:
+        opts += "n"
 
     if generate_faces:
         opts += "e"
@@ -193,7 +195,7 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
 
 
 def refine(input_p, verbose=False, refinement_func=None,  quality_meshing=True,
-        min_angle=None):
+        min_angle=None, generate_neighbor_lists=False):
     opts = "razj"
 
     if quality_meshing:
@@ -210,6 +212,8 @@ def refine(input_p, verbose=False, refinement_func=None,  quality_meshing=True,
         opts += "Q"
     if refinement_func is not None:
         opts += "u"
+    if generate_neighbor_lists is not None:
+        opts += "n"
 
     output_p = MeshInfo()
     internals.triangulate(opts, input_p, output_p, MeshInfo(), refinement_func)
