@@ -6,8 +6,6 @@ from six.moves import range
 from six.moves import zip
 
 
-
-
 class MeshInfo(internals.MeshInfo, MeshInfoBase):
     _constituents = [
             "points", "point_attributes", "point_markers",
@@ -40,11 +38,11 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
             else:
                 if len(dest_array) != len(array):
                     dest_array.resize(len(array))
-                if not dest_array.allocated and len(array)>0:
+                if not dest_array.allocated and len(array) > 0:
                     dest_array.setup()
 
-                for i,tup in enumerate(array):
-                    for j,v in enumerate(tup):
+                for i, tup in enumerate(array):
+                    for j, v in enumerate(tup):
                         dest_array[i, j] = v
 
     def set_facets(self, facets, facet_markers=None):
@@ -61,8 +59,6 @@ class MeshInfo(internals.MeshInfo, MeshInfoBase):
     def dump(self):
         for name in self._constituents:
             dump_array(name, getattr(self, name))
-
-
 
 
 def subdivide_facets(subdivisions, points, facets, facet_markers=None):
@@ -124,8 +120,6 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
         return new_points, new_facets, new_facet_markers
     else:
         return new_points, new_facets
-
-
 
 
 def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
@@ -198,9 +192,8 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
     return mesh
 
 
-
-
-def refine(input_p, verbose=False, refinement_func=None,  quality_meshing=True, min_angle=None):
+def refine(input_p, verbose=False, refinement_func=None,  quality_meshing=True,
+        min_angle=None):
     opts = "razj"
 
     if quality_meshing:
@@ -223,8 +216,6 @@ def refine(input_p, verbose=False, refinement_func=None,  quality_meshing=True, 
     return output_p
 
 
-
-
 def write_gnuplot_mesh(filename, out_p, facets=False):
     gp_file = open(filename, "w")
 
@@ -237,4 +228,3 @@ def write_gnuplot_mesh(filename, out_p, facets=False):
         for pt in points:
             gp_file.write("%f %f\n" % tuple(out_p.points[pt]))
         gp_file.write("%f %f\n\n" % tuple(out_p.points[points[0]]))
-
