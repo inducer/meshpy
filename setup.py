@@ -58,18 +58,18 @@ def main():
     for line in output:
       for var in boost_variables:
         if var in line:
-          line = line.replace('-- ' + var, '')
-          line = line.replace(': ', '')
-          line = line.replace('\n', '')
+          line = line.replace('-- ' + var, '').replace(': ', '').replace('\n', '')
           boost_dict[var] = line
     if not "VERSION" in boost_dict:
       print("CMake didn't find any boost library")
       print("default installation will be used instead.")
     else:
       print("use cmake to detect bost")
+      lib_name = os.path.basename(boost_dict["LIBRARIES"])
+      lib_name = lib_name.replace("lib", "").replace(".so", "").replace(".lib", "")
       INCLUDE_DIRS = [boost_dict["INCLUDE_DIRS"]] + ["src/cpp"]
       LIBRARY_DIRS = [boost_dict["LIB_DIRS"]]
-      LIBRARIES = [boost_dict["LIBRARIES"]]
+      LIBRARIES = [lib_name]
     ########## end of CMAKE configuration
 
     print("using the following configuration:")
