@@ -53,7 +53,7 @@ namespace {
         return object(self.get(idx));
     }
 
-    static object getitem(FA &self, tuple idx)
+    static object getitem(FA &self, boost::python::tuple idx)
     {
       if (len(idx) != 2)
         PYTHON_ERROR(IndexError, "expected index tuple of length 2");
@@ -88,7 +88,7 @@ namespace {
         self.set(idx, extract<value_type>(value));
     }
 
-    static void setitem(FA &self, tuple idx, const value_type &v)
+    static void setitem(FA &self, boost::python::tuple idx, const value_type &v)
     {
       if (len(idx) != 2)
         PYTHON_ERROR(IndexError, "expected index tuple of length 2");
@@ -147,9 +147,9 @@ void exposePODForeignArray(const std::string &name)
     .add_property("unit", &cl::unit)
     .add_property("allocated", &cl::is_allocated)
     .def("__getitem__", (object (*)(cl &, long)) &w_cl::getitem)
-    .def("__getitem__", (object (*)(cl &, tuple)) &w_cl::getitem)
+    .def("__getitem__", (object (*)(cl &, boost::python::tuple)) &w_cl::getitem)
     .def("__setitem__", (void (*)(cl &, long, object)) &w_cl::setitem)
-    .def("__setitem__", (void (*)(cl &, tuple, const value_type &)) &w_cl::setitem)
+    .def("__setitem__", (void (*)(cl &, boost::python::tuple, const value_type &)) &w_cl::setitem)
     .def("deallocate", &cl::deallocate)
     ;
 }
