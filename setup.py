@@ -66,7 +66,7 @@ def main():
     else:
       print("use cmake to detect bost")
       lib_name = os.path.basename(boost_dict["LIBRARIES"])
-      lib_name = lib_name.replace("lib", "").replace(".so", "").replace(".lib", "")
+      lib_name = lib_name.replace(".lib", "").replace("lib", "").replace(".so", "")
       INCLUDE_DIRS = [boost_dict["INCLUDE_DIRS"]] + ["src/cpp"]
       LIBRARY_DIRS = [boost_dict["LIB_DIRS"]]
       LIBRARIES = [lib_name]
