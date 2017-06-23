@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import sys, os
 
 def get_config_schema():
     from aksetup_helper import (ConfigSchema,
@@ -8,7 +8,7 @@ def get_config_schema():
     return ConfigSchema(make_boost_base_options() + [
         BoostLibraries("python"),
 
-        Switch("USE_SHIPPED_BOOST", True, "Use included Boost library"),
+        Switch("USE_SHIPPED_BOOST", False, "Use included Boost library"),
 
         StringListOption("CXXFLAGS", [],
             help="Any extra C++ compiler options to include"),
@@ -45,6 +45,37 @@ def main():
     INCLUDE_DIRS = conf["BOOST_INC_DIR"] + ["src/cpp"]
     LIBRARY_DIRS = conf["BOOST_LIB_DIR"]
     LIBRARIES = conf["BOOST_PYTHON_LIBNAME"]
+
+    ######## simple use CMAKE to find get the directories:
+
+    boost_variables = ["VERSION", "INCLUDE_DIRS", "LIB_DIRS", "LIBRARIES"]
+    boost_dict = {}
+    if sys.version_info.major < 3:
+      output = os.popen("cmake . -Dpy_version=2")
+    else:
+      output = os.popen("cmake .")
+
+    for line in output:
+      for var in boost_variables:
+        if var in line:
+          line = line.replace('-- ' + var, '')
+          line = line.replace(': ', '')
+          line = line.replace('\n', '')
+          boost_dict[var] = line
+    if not "VERSION" in boost_dict:
+      print("CMake didn't find any boost library")
+      print("default installation will be used instead.")
+    else:
+      print("use cmake to detect bost")
+      INCLUDE_DIRS = [boost_dict["INCLUDE_DIRS"]] + ["src/cpp"]
+      LIBRARY_DIRS = [boost_dict["LIB_DIRS"]]
+      LIBRARIES = [boost_dict["LIBRARIES"]]
+    ########## end of CMAKE configuration
+
+    print("using the following configuration:")
+    print("INCLUDE_DIRS: ", INCLUDE_DIRS)
+    print("LIBRARY_DIRS: ", LIBRARY_DIRS)
+    print("LIBRARIES: ", LIBRARIES)
 
     init_filename = "meshpy/__init__.py"
     exec(compile(open(init_filename, "r").read(), init_filename, "exec"), conf)
