@@ -3,12 +3,9 @@ cmake_minimum_required(VERSION 3.5)
 # for python2 use -Dpy_version=2
 
 if (NOT py_version LESS 3)
-	find_package( Boost COMPONENTS "python3")
-	if (NOT Boost_PYTHON3_FOUND)
-		find_package( Boost COMPONENTS "python")
-	endif()
+    find_package( Boost COMPONENTS "python3")
 else()
-	find_package( Boost COMPONENTS "python")
+    find_package( Boost COMPONENTS "python")
 endif()
 
 if(Boost_FOUND)
