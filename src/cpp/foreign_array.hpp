@@ -9,9 +9,7 @@
 #include <boost/python.hpp>
 
 
-
-
-namespace {
+namespace{
 
 class tSizeChangeNotifier;
 
@@ -275,7 +273,6 @@ class tForeignArray : public tReadOnlyForeignArray<ElementT>
 };
 
 }
-
 
 
 

@@ -14,7 +14,27 @@ namespace py = boost::python;
 using namespace std;
 
 
+namespace boost {
+template <>
+inline tForeignArray<struct tetgenio::polygon> const volatile * get_pointer(class tForeignArray<struct tetgenio::polygon> const volatile *tF) {
+  return tF;
+}
 
+template <>
+inline tForeignArray<struct tetgenio::facet> const volatile * get_pointer(class tForeignArray<struct tetgenio::facet> const volatile *tF) {
+  return tF;
+}
+
+template <>
+inline tForeignArray<int> const volatile * get_pointer(class tForeignArray<int> const volatile *tF) {
+  return tF;
+}
+
+template <>
+inline tForeignArray<double> const volatile * get_pointer(class tForeignArray<double> const volatile *tF) {
+  return tF;
+}
+}
 
 namespace
 {

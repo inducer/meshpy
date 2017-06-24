@@ -22,8 +22,6 @@ using namespace boost::python;
 }
 
 
-
-
 namespace {
   /* This wrap helper works as long as the value_type is a plain old data (POD)
    * type.

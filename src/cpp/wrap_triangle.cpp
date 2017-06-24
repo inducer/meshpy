@@ -11,6 +11,18 @@ using namespace boost::python;
 using namespace std;
 
 
+namespace boost {
+template <>
+inline tForeignArray<int> const volatile * get_pointer(class tForeignArray<int> const volatile *tF) {
+  return tF;
+}
+
+template <>
+inline tForeignArray<double> const volatile * get_pointer(class tForeignArray<double> const volatile *tF) {
+  return tF;
+}
+}
+
 
 
 struct tMeshInfo : public triangulateio, public boost::noncopyable
