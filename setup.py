@@ -17,7 +17,13 @@ def get_boost_defaults_from_cmake():
 
     from subprocess import Popen, PIPE
 
-    cmake = Popen(cmake_cmd, stdout=PIPE)
+    boost_conf = {}
+
+    try:
+        cmake = Popen(cmake_cmd, stdout=PIPE)
+    except OSError:
+        return boost_conf
+
     cmake_out, stderr_out = cmake.communicate()
 
     if cmake.returncode == 0:
@@ -32,8 +38,6 @@ def get_boost_defaults_from_cmake():
 
     else:
         print("*** error return from cmake")
-
-    boost_conf = {}
 
     if "VERSION" in boost_dict:
         print("used cmake to detect boost")
