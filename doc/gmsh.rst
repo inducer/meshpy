@@ -1,5 +1,6 @@
 Gmsh interface
-===================
+==============
 
-.. automodule:: meshpy.gmsh_reader
+This is deprecated. See the `gmsh_interop
+<https://github.com/inducer/gmsh_interop>`_ packages instead.
 
