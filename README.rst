@@ -8,11 +8,14 @@ also have many other applications ranging from computer graphics to robotics.
 In order to generate 2D and 3D meshes, MeshPy provides Python interfaces to
 three well-regarded mesh generators, `Triangle
 <http://www.cs.cmu.edu/~quake/triangle.html>`_ by J.  Shewchuk, `TetGen
-<http://tetgen.berlios.de/>`_ by Hang Si, and `gmsh
-<http://www.geuz.org/gmsh/>`_ by Christophe Geuzaine and Jean-Francois Remacle.
+<http://tetgen.berlios.de/>`_ by Hang Si
 The former two are included in the package in slightly modified versions. A
 generic mesh reader for the latter is included, as is an easy way to run `gmsh`
 from a Python script.
+
+For an interface to `gmsh
+<http://www.geuz.org/gmsh/>`_ by Christophe Geuzaine and Jean-Francois Remacle,
+see `gmsh_interop <https://github.com/inducer/gmsh_interop>`.
 
 MeshPy has no dependencies other than a C++ compiler and a working Python installation.
 
