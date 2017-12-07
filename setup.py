@@ -150,6 +150,7 @@ def main():
                   "pytools>=2011.2",
                   "pytest>=2",
                   "numpy",
+                  "gmsh_interop",
                   "six",
                   ],
           ext_modules=[
