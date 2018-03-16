@@ -1,3 +1,8 @@
+MeshPy: Simplicial Mesh Generation from Python
+==============================================
+
+.. image:: https://gitlab.tiker.net/inducer/meshpy/badges/master/pipeline.svg
+   :target: https://gitlab.tiker.net/inducer/meshpy/commits/master
 .. image:: https://badge.fury.io/py/meshpy.png
     :target: http://pypi.python.org/pypi/meshpy
 
