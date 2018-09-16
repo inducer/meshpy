@@ -6,10 +6,21 @@
 
 #include <vector>
 #include <stdexcept>
-#include <boost/python.hpp>
 
 
-namespace{
+// https://stackoverflow.com/a/44175911
+class noncopyable {
+public:
+  noncopyable() = default;
+  ~noncopyable() = default;
+
+private:
+  noncopyable(const noncopyable&) = delete;
+  noncopyable& operator=(const noncopyable&) = delete;
+};
+
+
+namespace {
 
 class tSizeChangeNotifier;
 
@@ -70,7 +81,7 @@ class tSizeChangeNotifier
 
 template<class ElementT>
 class tReadOnlyForeignArray : public tSizeChangeNotifier, public tSizeChangeNotificationReceiver,
-  public boost::noncopyable
+  public noncopyable
 {
   protected:
     ElementT                    *&Contents;

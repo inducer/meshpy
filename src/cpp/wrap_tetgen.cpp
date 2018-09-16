@@ -1,6 +1,5 @@
 #include "tetgen.h"
-#include <boost/python.hpp>
-#include <boost/lexical_cast.hpp>
+#include <pybind11/pybind11.h>
 #include <vector>
 #include <stdexcept>
 #include <iostream>
@@ -9,36 +8,13 @@
 
 
 
-using namespace boost::python;
-namespace py = boost::python;
+namespace py = pybind11;
 using namespace std;
 
 
-namespace boost {
-template <>
-inline tForeignArray<struct tetgenio::polygon> const volatile * get_pointer(class tForeignArray<struct tetgenio::polygon> const volatile *tF) {
-  return tF;
-}
-
-template <>
-inline tForeignArray<struct tetgenio::facet> const volatile * get_pointer(class tForeignArray<struct tetgenio::facet> const volatile *tF) {
-  return tF;
-}
-
-template <>
-inline tForeignArray<int> const volatile * get_pointer(class tForeignArray<int> const volatile *tF) {
-  return tF;
-}
-
-template <>
-inline tForeignArray<double> const volatile * get_pointer(class tForeignArray<double> const volatile *tF) {
-  return tF;
-}
-}
-
 namespace
 {
-  struct tMeshInfo : public tetgenio, public boost::noncopyable
+  struct tMeshInfo : public tetgenio, public noncopyable
   {
     private:
       typedef tetgenio super;
@@ -241,7 +217,7 @@ namespace
     }
     catch (int &i)
     {
-      throw runtime_error("TetGen runtime error code "+boost::lexical_cast<string>(i));
+      throw runtime_error("TetGen runtime error code "+std::to_string(i));
     }
 
     out.Elements.fixUnit(out.numberofcorners);
@@ -249,16 +225,6 @@ namespace
     out.PointMetricTensors.fixUnit(out.numberofpointmtrs);
     out.ElementAttributes.fixUnit(out.numberoftetrahedronattributes);
   }
-
-
-
-
-  template <std::size_t owner_arg = 1, class Base = default_call_policies>
-  struct manage_new_internal_reference
-      : with_custodian_and_ward_postcall<0, owner_arg, Base>
-  {
-     typedef manage_new_object result_converter;
-  };
 
 
 
@@ -296,15 +262,16 @@ namespace
 #define DEF_METHOD(NAME) \
     def(#NAME, &cl::NAME)
 
-BOOST_PYTHON_MODULE(_tetgen)
+PYBIND11_MODULE(_tetgen, m)
 {
-  def("tetrahedralize", tetrahedralizeWrapper,
-      (py::args("behavior", "in", "out"), py::arg("addin")=py::object()));
+  m.def("tetrahedralize", tetrahedralizeWrapper,
+      py::arg("behavior"), py::arg("in"), py::arg("out"),
+      py::arg("addin").none(true)=py::none());
 
   {
     typedef tMeshInfo cl;
-    class_<cl, boost::noncopyable>
-      ("MeshInfo", init<>())
+    py::class_<cl>(m, "MeshInfo")
+      .def(py::init<>())
       .def_readonly("points", &cl::Points)
       .def_readonly("point_attributes", &cl::PointAttributes)
       .def_readonly("point_metric_tensors", &cl::PointMetricTensors)
@@ -334,13 +301,13 @@ BOOST_PYTHON_MODULE(_tetgen)
       .def_readonly("edge_markers", &cl::EdgeMarkers)
       .def_readonly("edge_adjacent_elements", &cl::EdgeAdjTetList)
 
-      .add_property("number_of_point_attributes",
+      .def_property("number_of_point_attributes",
           &cl::numberOfPointAttributes,
           &cl::setNumberOfPointAttributes)
-      .add_property("number_of_element_vertices",
+      .def_property("number_of_element_vertices",
           &cl::numberOfElementVertices,
           &cl::setNumberOfElementVertices)
-      .add_property("number_of_element_attributes",
+      .def_property("number_of_element_attributes",
           &cl::numberOfElementAttributes,
           &cl::setNumberOfElementAttributes)
 
@@ -372,25 +339,26 @@ BOOST_PYTHON_MODULE(_tetgen)
 
   {
     typedef tetgenio::facet cl;
-    class_<cl, boost::noncopyable>("Facet", no_init)
-      .add_property("polygons",
-          make_function(facet_get_polygons, manage_new_internal_reference<>()))
-      .add_property("holes",
-          make_function(facet_get_holes, manage_new_internal_reference<>()))
+    py::class_<cl>(m, "Facet")
+      .def_property_readonly("polygons",
+          facet_get_polygons, py::return_value_policy::reference_internal)
+      .def_property_readonly("holes",
+          facet_get_holes, py::return_value_policy::reference_internal)
       ;
   }
 
   {
     typedef tetgenio::polygon cl;
-    class_<cl, boost::noncopyable>("Polygon", no_init)
-      .add_property("vertices",
-          make_function(polygon_get_vertices, manage_new_internal_reference<>()))
+    py::class_<cl>(m, "Polygon")
+      .def_property_readonly("vertices",
+          polygon_get_vertices, py::return_value_policy::reference_internal)
       ;
   }
 
   {
     typedef tetgenbehavior cl;
-    class_<cl, boost::noncopyable>("Options", init<>())
+    py::class_<cl>(m, "Options")
+      .def(py::init<>())
       .DEF_RW_MEMBER(plc)
       .DEF_RW_MEMBER(psc)
       .DEF_RW_MEMBER(refine)
@@ -467,8 +435,8 @@ BOOST_PYTHON_MODULE(_tetgen)
       ;
   }
 
-  exposePODForeignArray<REAL>("RealArray");
-  exposePODForeignArray<int>("IntArray");
-  exposeStructureForeignArray<tetgenio::facet>("FacetArray");
-  exposeStructureForeignArray<tetgenio::polygon>("PolygonArray");
+  exposePODForeignArray<REAL>(m, "RealArray");
+  exposePODForeignArray<int>(m, "IntArray");
+  exposeStructureForeignArray<tetgenio::facet>(m, "FacetArray");
+  exposeStructureForeignArray<tetgenio::polygon>(m, "PolygonArray");
 }
