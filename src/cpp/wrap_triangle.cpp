@@ -1,16 +1,16 @@
 #include "triangle.h"
-#include <boost/python.hpp>
+#include <pybind11/pybind11.h>
 #include <stdexcept>
 #include <iostream>
+#include <memory>
 #include "foreign_array_wrap.hpp"
 
+namespace py = pybind11;
 
-
-
-using namespace boost::python;
 using namespace std;
 
 
+/*
 namespace boost {
 template <>
 inline tForeignArray<int> const volatile * get_pointer(class tForeignArray<int> const volatile *tF) {
@@ -22,10 +22,11 @@ inline tForeignArray<double> const volatile * get_pointer(class tForeignArray<do
   return tF;
 }
 }
+*/
 
 
 
-struct tMeshInfo : public triangulateio, public boost::noncopyable
+struct tMeshInfo : public triangulateio, public noncopyable
 {
   public:
     tForeignArray<REAL>         Points; // in/out
@@ -135,7 +136,7 @@ struct tMeshInfo : public triangulateio, public boost::noncopyable
 
 tMeshInfo *copyMesh(const tMeshInfo &src)
 {
-  auto_ptr<tMeshInfo> copy(new tMeshInfo);
+  std::unique_ptr<tMeshInfo> copy(new tMeshInfo);
   *copy = src;
   return copy.release();
 }
@@ -148,7 +149,7 @@ PyObject *RefinementFunction;
 
 
 
-class tVertex : public boost::noncopyable
+class tVertex : public noncopyable
 {
   public:
     REAL        *Data;
@@ -185,16 +186,17 @@ int triunsuitable(vertex triorg, vertex tridest, vertex triapex, REAL area)
   tVertex dest(tridest);
   tVertex apex(triapex);
 
+  py::handle refine_func = py::reinterpret_borrow<py::object>(RefinementFunction);
+
   try
   {
-    return call<bool>(RefinementFunction,
-        boost::python::make_tuple(
-          object(boost::ref(org)),
-          object(boost::ref(dest)),
-          object(boost::ref(apex))
-          ), area);
+    return py::cast<bool>(refine_func(
+        py::make_tuple(
+          py::cast(org, py::return_value_policy::reference),
+          py::cast(dest, py::return_value_policy::reference),
+          py::cast(apex, py::return_value_policy::reference)), area));
   }
-  catch (error_already_set)
+  catch (py::error_already_set &)
   {
     std::cout << "[MeshPy warning] A Python exception occurred in "
       "a Python refinement query:" << std::endl;
@@ -218,9 +220,9 @@ int triunsuitable(vertex triorg, vertex tridest, vertex triapex, REAL area)
 void triangulateWrapper(char *options, tMeshInfo &in,
     tMeshInfo &out,
     tMeshInfo &voronoi,
-    PyObject *refinement_func)
+    py::object refinement_func)
 {
-  RefinementFunction = refinement_func;
+  RefinementFunction = refinement_func.ptr();
   triangulate(options, &in, &out, &voronoi);
 
   out.holelist = NULL;
@@ -237,14 +239,14 @@ void triangulateWrapper(char *options, tMeshInfo &in,
 
 
 
-BOOST_PYTHON_MODULE(_triangle)
+PYBIND11_MODULE(_triangle, m)
 {
-  def("triangulate", triangulateWrapper);
+  m.def("triangulate", triangulateWrapper);
 
   {
     typedef tMeshInfo cl;
-    class_<cl, boost::noncopyable>
-      ("MeshInfo", init<>())
+    py::class_<cl>(m, "MeshInfo")
+      .def(py::init<>())
       .def_readonly("points", &cl::Points)
       .def_readonly("point_attributes", &cl::PointAttributes)
       .def_readonly("point_markers", &cl::PointMarkers)
@@ -266,26 +268,26 @@ BOOST_PYTHON_MODULE(_triangle)
 
       .def_readonly("normals", &cl::Normals)
 
-      .add_property("number_of_point_attributes",
+      .def_property("number_of_point_attributes",
           &cl::numberOfPointAttributes,
           &cl::setNumberOfPointAttributes)
-      .add_property("number_of_element_attributes",
+      .def_property("number_of_element_attributes",
           &cl::numberOfElementAttributes,
           &cl::setNumberOfElementAttributes)
 
-      .def("copy", &copyMesh, return_value_policy<manage_new_object>())
-      .enable_pickling()
+      .def("copy", &copyMesh)
+      // .enable_pickling()
       ;
   }
 
-  exposePODForeignArray<REAL>("RealArray");
-  exposePODForeignArray<int>("IntArray");
+  exposePODForeignArray<REAL>(m, "RealArray");
+  exposePODForeignArray<int>(m, "IntArray");
 
   {
     typedef tVertex cl;
-    class_<cl, boost::noncopyable>("Vertex", no_init)
-      .add_property("x", &cl::x)
-      .add_property("y", &cl::y)
+    py::class_<cl>(m, "Vertex")
+      .def_property_readonly("x", &cl::x)
+      .def_property_readonly("y", &cl::y)
       .def("__len__", &cl::size)
       .def("__getitem__", &cl::operator[])
       ;

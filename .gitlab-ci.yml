@@ -1,37 +1,39 @@
 Python 2.7:
   script:
   - py_version=2.7
-  - EXTRA_INSTALL=numpy
+  - EXTRA_INSTALL="numpy pybind11"
   - curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/master/build-and-test-py-project.sh
   - ". ./build-and-test-py-project.sh"
   tags:
   - python2.7
   except:
   - tags
+
 Python 3.5:
   script:
   - py_version=3.5
-  - EXTRA_INSTALL=numpy
+  - EXTRA_INSTALL="numpy pybind11"
   - curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/master/build-and-test-py-project.sh
   - ". ./build-and-test-py-project.sh"
   tags:
   - python3.5
   except:
   - tags
-Python 2.6:
+
+Python 3.7:
   script:
-  - py_version=2.6
-  - EXTRA_INSTALL=numpy
+  - py_version=3.7
+  - EXTRA_INSTALL="numpy pybind11"
   - curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/master/build-and-test-py-project.sh
   - ". ./build-and-test-py-project.sh"
   tags:
-  - python2.6
+  - python3.7
   except:
   - tags
 
 Documentation:
   script:
-  - EXTRA_INSTALL="numpy"
+  - EXTRA_INSTALL="numpy pybind11"
   - curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/master/build-docs.sh
   - ". ./build-docs.sh"
   tags:
