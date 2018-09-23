@@ -4,7 +4,9 @@ include src/cpp/*LICENSE
 include README.rst
 include LICENSE
 include test/*.py
-include examples/clean.sh
+include examples/*.py
+include examples/*.ply
+include examples/*.txt
 include examples/clean.sh
 
 include doc/*.rst
