@@ -8,6 +8,10 @@ Python 2.7:
   - python2.7
   except:
   - tags
+  artifacts:
+    reports:
+      junit: test/pytest.xml
+
 
 Python 3.5:
   script:
@@ -19,6 +23,10 @@ Python 3.5:
   - python3.5
   except:
   - tags
+  artifacts:
+    reports:
+      junit: test/pytest.xml
+
 
 Python 3.7:
   script:
@@ -30,6 +38,10 @@ Python 3.7:
   - python3.7
   except:
   - tags
+  artifacts:
+    reports:
+      junit: test/pytest.xml
+
 
 Documentation:
   script:
