@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import sys
 import setuptools
 from setuptools import Extension
@@ -87,6 +88,7 @@ class BuildExt(build_ext):
 
     if sys.platform == 'darwin':
         c_opts['unix'] += ['-stdlib=libc++', '-mmacosx-version-min=10.7']
+        os.environ['CC'] = 'clang++'
 
     def build_extensions(self):
         ct = self.compiler.compiler_type
