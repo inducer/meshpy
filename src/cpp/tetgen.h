@@ -50,7 +50,6 @@
 #include <math.h>
 #include <time.h>
 #include <assert.h> 
-#include <boost/noncopyable.hpp>
 
 // The types 'intptr_t' and 'uintptr_t' are signed and unsigned integer types,
 //   respectively. They are guaranteed to be the same width as a pointer.
@@ -792,12 +791,14 @@ public:
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-void exactinit(int, int, int, REAL, REAL, REAL);
-void exactdeinit();
-REAL orient3d(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
-REAL insphere(REAL *pa, REAL *pb, REAL *pc, REAL *pd, REAL *pe);
-REAL orient4d(REAL *pa, REAL *pb, REAL *pc, REAL *pd, REAL *pe,
-              REAL ah, REAL bh, REAL ch, REAL dh, REAL eh);
+namespace predicates {
+  void exactinit(int, int, int, REAL, REAL, REAL);
+  void exactdeinit();
+  REAL orient3d(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
+  REAL insphere(REAL *pa, REAL *pb, REAL *pc, REAL *pd, REAL *pe);
+  REAL orient4d(REAL *pa, REAL *pb, REAL *pc, REAL *pd, REAL *pe,
+                REAL ah, REAL bh, REAL ch, REAL dh, REAL eh);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           //

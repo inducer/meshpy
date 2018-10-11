@@ -114,7 +114,9 @@ def main():
     check_git_submodules()
 
     hack_distutils(what_opt=1)
-    conf = get_config(get_config_schema())
+    conf = get_config(
+            get_config_schema(),
+            warn_about_no_config=False)
 
     triangle_macros = [
             ("EXTERNAL_TEST", 1),
@@ -181,21 +183,19 @@ def main():
                   ],
           ext_modules=[
               Extension(
-                  "meshpy._triangle",
-                  ["src/cpp/wrap_triangle.cpp", "src/cpp/triangle.c"],
-                  include_dirs=include_dirs,
-                  define_macros=triangle_macros,
-                  extra_compile_args=conf["CXXFLAGS"],
-                  extra_link_args=conf["LDFLAGS"],
-                  ),
-              Extension(
-                  "meshpy._tetgen",
+                  "meshpy._internals",
                   [
+                      "src/cpp/wrapper.cpp",
+
+                      "src/cpp/wrap_triangle.cpp",
+                      "src/cpp/triangle.c",
+
+                      "src/cpp/wrap_tetgen.cpp",
                       "src/cpp/tetgen.cpp",
                       "src/cpp/predicates.cpp",
-                      "src/cpp/wrap_tetgen.cpp"],
+                      ],
                   include_dirs=include_dirs,
-                  define_macros=tetgen_macros,
+                  define_macros=triangle_macros,
                   extra_compile_args=conf["CXXFLAGS"],
                   extra_link_args=conf["LDFLAGS"],
                   ),

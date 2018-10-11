@@ -10,22 +10,6 @@ namespace py = pybind11;
 using namespace std;
 
 
-/*
-namespace boost {
-template <>
-inline tForeignArray<int> const volatile * get_pointer(class tForeignArray<int> const volatile *tF) {
-  return tF;
-}
-
-template <>
-inline tForeignArray<double> const volatile * get_pointer(class tForeignArray<double> const volatile *tF) {
-  return tF;
-}
-}
-*/
-
-
-
 struct tMeshInfo : public triangulateio, public noncopyable
 {
   public:
@@ -239,13 +223,13 @@ void triangulateWrapper(char *options, tMeshInfo &in,
 
 
 
-PYBIND11_MODULE(_triangle, m)
+void expose_triangle(pybind11::module &m)
 {
   m.def("triangulate", triangulateWrapper);
 
   {
     typedef tMeshInfo cl;
-    py::class_<cl>(m, "MeshInfo")
+    py::class_<cl>(m, "TriMeshInfo")
       .def(py::init<>())
       .def_readonly("points", &cl::Points)
       .def_readonly("point_attributes", &cl::PointAttributes)
@@ -279,9 +263,6 @@ PYBIND11_MODULE(_triangle, m)
       // .enable_pickling()
       ;
   }
-
-  exposePODForeignArray<REAL>(m, "RealArray");
-  exposePODForeignArray<int>(m, "IntArray");
 
   {
     typedef tVertex cl;

@@ -20,8 +20,6 @@ private:
 };
 
 
-namespace {
-
 class tSizeChangeNotifier;
 
 
@@ -282,8 +280,6 @@ class tForeignArray : public tReadOnlyForeignArray<ElementT>
       return *this;
     }
 };
-
-}
 
 
 
