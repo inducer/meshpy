@@ -15,7 +15,8 @@
 
 #include "tetgen.h"
 
-extern void exactdeinit();
+// extern void exactdeinit();
+using namespace predicates;
 
 //// io_cxx ///////////////////////////////////////////////////////////////////
 ////                                                                       ////
