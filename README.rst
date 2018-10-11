@@ -34,3 +34,4 @@ Online resources
 * `Source <https://github.com/inducer/meshpy>`_
 * `Package index <https://pypi.python.org/pypi/MeshPy>`_
 * `Mailing list <http://lists.tiker.net/listinfo/meshpy>`_
+
