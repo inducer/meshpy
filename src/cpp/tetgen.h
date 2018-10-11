@@ -50,7 +50,6 @@
 #include <math.h>
 #include <time.h>
 #include <assert.h> 
-#include <boost/noncopyable.hpp>
 
 // The types 'intptr_t' and 'uintptr_t' are signed and unsigned integer types,
 //   respectively. They are guaranteed to be the same width as a pointer.
