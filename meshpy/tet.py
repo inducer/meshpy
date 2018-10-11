@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from meshpy.common import MeshInfoBase, dump_array
-import meshpy._tetgen as internals
+import meshpy._internals as internals
 import six
 from six.moves import range
 
 
-class MeshInfo(internals.MeshInfo, MeshInfoBase):
+class MeshInfo(internals.TetMeshInfo, MeshInfoBase):
     def set_facets(self, facets, markers=None):
         """Set a list of simple, single-polygon factes. Unlike :meth:`set_facets_ex`,
         :meth:`set_facets` does not allow hole and only lets you use a single

@@ -1,12 +1,12 @@
 from __future__ import division
 from __future__ import absolute_import
 from meshpy.common import MeshInfoBase, dump_array
-import meshpy._triangle as internals
+import meshpy._internals as internals
 from six.moves import range
 from six.moves import zip
 
 
-class MeshInfo(internals.MeshInfo, MeshInfoBase):
+class MeshInfo(internals.TriMeshInfo, MeshInfoBase):
     _constituents = [
             "points", "point_attributes", "point_markers",
             "elements", "element_attributes", "element_volumes",

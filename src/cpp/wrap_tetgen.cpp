@@ -262,7 +262,7 @@ namespace
 #define DEF_METHOD(NAME) \
     def(#NAME, &cl::NAME)
 
-PYBIND11_MODULE(_tetgen, m)
+void expose_tetgen(pybind11::module &m)
 {
   m.def("tetrahedralize", tetrahedralizeWrapper,
       py::arg("behavior"), py::arg("in"), py::arg("out"),
@@ -270,7 +270,7 @@ PYBIND11_MODULE(_tetgen, m)
 
   {
     typedef tMeshInfo cl;
-    py::class_<cl>(m, "MeshInfo")
+    py::class_<cl>(m, "TetMeshInfo")
       .def(py::init<>())
       .def_readonly("points", &cl::Points)
       .def_readonly("point_attributes", &cl::PointAttributes)
@@ -435,8 +435,6 @@ PYBIND11_MODULE(_tetgen, m)
       ;
   }
 
-  exposePODForeignArray<REAL>(m, "RealArray");
-  exposePODForeignArray<int>(m, "IntArray");
   exposeStructureForeignArray<tetgenio::facet>(m, "FacetArray");
   exposeStructureForeignArray<tetgenio::polygon>(m, "PolygonArray");
 }
