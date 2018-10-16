@@ -22,7 +22,12 @@ For an interface to `gmsh
 <http://www.geuz.org/gmsh/>`_ by Christophe Geuzaine and Jean-Francois Remacle,
 see `gmsh_interop <https://github.com/inducer/gmsh_interop>`.
 
-MeshPy has no dependencies other than a C++ compiler and a working Python installation.
+MeshPy has no dependencies other than a C++ compiler, 
+`pybind11 <https://pybind11.readthedocs.io/en/stable/>`_,
+and a working Python installation. Before installing meshpy,
+you may install pybind11 using the command::
+
+   pip install pybind11
 
 As of Version 0.91.2, MeshPy also works with Python 3.
 
