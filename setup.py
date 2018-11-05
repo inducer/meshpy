@@ -109,8 +109,9 @@ class BuildExt(build_ext):
 
 def main():
     from aksetup_helper import (hack_distutils,
-            get_config, setup, check_git_submodules)
+            check_pybind11, get_config, setup, check_git_submodules)
 
+    check_pybind11()
     check_git_submodules()
 
     hack_distutils(what_opt=1)
