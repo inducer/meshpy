@@ -195,7 +195,7 @@ def main():
                       "src/cpp/predicates.cpp",
                       ],
                   include_dirs=include_dirs,
-                  define_macros=triangle_macros,
+                  define_macros=triangle_macros + tetgen_macros,
                   extra_compile_args=conf["CXXFLAGS"],
                   extra_link_args=conf["LDFLAGS"],
                   ),
