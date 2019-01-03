@@ -96,7 +96,7 @@ def main():
                       "src/cpp/wrapper.cpp",
 
                       "src/cpp/wrap_triangle.cpp",
-                      "src/cpp/triangle.c",
+                      "src/cpp/triangle.cpp",
 
                       "src/cpp/wrap_tetgen.cpp",
                       "src/cpp/tetgen.cpp",
@@ -106,7 +106,6 @@ def main():
                   define_macros=triangle_macros + tetgen_macros,
                   extra_compile_args=conf["CXXFLAGS"],
                   extra_link_args=conf["LDFLAGS"],
-                  language="c++",
                   ),
               ],
           cmdclass={'build_ext': PybindBuildExtCommand},
