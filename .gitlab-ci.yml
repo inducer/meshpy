@@ -13,14 +13,14 @@ Python 2.7:
       junit: test/pytest.xml
 
 
-Python 3.5:
+Python 3.6:
   script:
-  - py_version=3.5
+  - py_version=3.6
   - EXTRA_INSTALL="numpy pybind11"
   - curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/master/build-and-test-py-project.sh
   - ". ./build-and-test-py-project.sh"
   tags:
-  - python3.5
+  - python3.6
   except:
   - tags
   artifacts:
