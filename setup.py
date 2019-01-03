@@ -106,6 +106,7 @@ def main():
                   define_macros=triangle_macros + tetgen_macros,
                   extra_compile_args=conf["CXXFLAGS"],
                   extra_link_args=conf["LDFLAGS"],
+                  language="c++",
                   ),
               ],
           cmdclass={'build_ext': PybindBuildExtCommand},
