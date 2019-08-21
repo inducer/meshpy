@@ -61,8 +61,7 @@ def test_triangle_refine():
     info.set_holes([(0, 0)])
     info.set_facets(
         round_trip_connect(0, n_outer_points-1)
-        +
-        round_trip_connect(n_outer_points, len(points)-1))
+        + round_trip_connect(n_outer_points, len(points)-1))
 
     mesh = triangle.build(info, refinement_func=needs_refinement)
 
@@ -76,6 +75,23 @@ def test_triangle_refine():
         mesh.element_volumes[i] = 1e-8
 
     mesh = triangle.refine(mesh)
+
+
+def test_point_attributes():
+    import meshpy.triangle as triangle
+
+    points = [(1, 1), (-1, 1), (-1, -1), (1, -1)]
+    info = triangle.MeshInfo()
+    info.set_points(points)
+
+    info.number_of_point_attributes = len(points)
+
+    info.point_attributes.setup()
+
+    for i in range(len(points)):
+        info.point_attributes[i] = [0, 0, 0, 0]
+
+    triangle.build(info)
 
 # }}}
 
