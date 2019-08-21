@@ -84,12 +84,12 @@ def test_point_attributes():
     info = triangle.MeshInfo()
     info.set_points(points)
 
-    info.number_of_point_attributes = len(points)
+    info.number_of_point_attributes = 2
 
     info.point_attributes.setup()
 
     for i in range(len(points)):
-        info.point_attributes[i] = [0, 0, 0, 0]
+        info.point_attributes[i] = [0, 0]
 
     triangle.build(info)
 
