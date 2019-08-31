@@ -2,9 +2,14 @@ MeshPy: Simplicial Mesh Generation from Python
 ==============================================
 
 .. image:: https://gitlab.tiker.net/inducer/meshpy/badges/master/pipeline.svg
-   :target: https://gitlab.tiker.net/inducer/meshpy/commits/master
+    :alt: Gitlab Build Status
+    :target: https://gitlab.tiker.net/inducer/meshpy/commits/master
+.. image:: https://dev.azure.com/ak-spam/inducer/_apis/build/status/inducer.meshpy?branchName=master
+    :alt: Azure Build Status
+    :target: https://dev.azure.com/ak-spam/inducer/_build/latest?definitionId=8&branchName=master
 .. image:: https://badge.fury.io/py/meshpy.png
-    :target: http://pypi.python.org/pypi/meshpy
+    :alt: Python Package Index Release Page
+    :target: https://pypi.org/project/meshpy/
 
 MeshPy offers quality triangular and tetrahedral mesh generation for Python.
 Meshes of this type are chiefly used in finite-element simulation codes, but
