@@ -19,7 +19,7 @@ jobs:
     -
         script: |
             set -e
-            EXTRA_INSTALL="numpy scipy"
+            EXTRA_INSTALL="numpy pybind11"
             curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/master/build-and-test-py-project.sh
             . ./build-and-test-py-project.sh
 
