@@ -32,3 +32,11 @@ jobs:
         inputs:
             testResultsFormat: 'JUnit'
             testResultsFiles: 'test/pytest.xml'
+
+schedules:
+-
+    cron: "0 0 * * 0"
+    displayName: Weekly build
+    branches:
+        include:
+        - master
