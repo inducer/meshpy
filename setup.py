@@ -82,6 +82,7 @@ def main():
 
           packages=["meshpy"],
           setup_requires=["pybind11"],
+          python_requires="~=3.6",
           install_requires=[
                   "pytools>=2011.2",
                   "pytest>=2",
