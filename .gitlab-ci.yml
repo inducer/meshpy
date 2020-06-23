@@ -12,21 +12,6 @@ Python 3:
     reports:
       junit: test/pytest.xml
 
-Python 2.7 Apple:
-  script:
-  - export PY_EXE=python2.7
-  - export EXTRA_INSTALL="pybind11 numpy"
-  - curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/master/build-and-test-py-project.sh
-  - ". ./build-and-test-py-project.sh"
-  tags:
-  - python2.7
-  - apple
-  except:
-  - tags
-  artifacts:
-    reports:
-      junit: test/pytest.xml
-
 Documentation:
   script:
   - EXTRA_INSTALL="numpy pybind11"
