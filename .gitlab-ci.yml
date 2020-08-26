@@ -19,5 +19,3 @@ Documentation:
   - ". ./build-docs.sh"
   tags:
   - python3
-  only:
-  - master
