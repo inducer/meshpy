@@ -1,6 +1,8 @@
 Triangle/TetGen interface
 =========================
 
+.. module:: meshpy
+
 Some common notions
 -------------------
 
@@ -64,15 +66,16 @@ Some common notions
 
             points[2,1] = 17
 
-
-
-
 :mod:`meshpy.triangle` -- Triangular Meshing
 --------------------------------------------
 .. module:: meshpy.triangle
     :synopsis: Generate triangular meshes
 .. moduleauthor:: Andreas Klöckner <inform@tiker.net>
 
+
+.. class:: ForeignArray
+
+    See :class:`meshpy.ForeignArray` for shared documentation.
 
 .. class:: MeshInfo
 
@@ -87,13 +90,13 @@ Some common notions
     .. attribute:: point_attributes
 
         If :attr:`MeshInfo.number_of_point_attributes` is non-zero, this is a
-        :class:`ForeignArray` of :class:`floats` of point attributes.
+        :class:`ForeignArray` of :class:`float`\ s of point attributes.
 
         This element's size is tied to that of :attr:`MeshInfo.points`.
 
     .. attribute:: point_markers
 
-        :class:`ForeignArray` of :class:`floats` of point attributes.
+        :class:`ForeignArray` of :class:`float`\ s of point attributes.
 
         This element's size is tied to that of :attr:`MeshInfo.points`.
 
@@ -181,6 +184,10 @@ Some common notions
    :synopsis: Generate triangular meshes
 .. moduleauthor:: Andreas Klöckner <inform@tiker.net>
 
+.. class:: ForeignArray
+
+    See :class:`meshpy.ForeignArray` for shared documentation.
+
 .. class:: Options(switches='pq', **kwargs)
 
     Run time switches for TetGen. See the TetGen documentation for the meaning of each
@@ -199,7 +206,6 @@ Some common notions
     .. attribute:: fixedvolume
     .. attribute:: insertaddpoints
     .. attribute:: regionattrib
-    .. attribute:: offcenter
     .. attribute:: conformdel
     .. attribute:: diagnose
     .. attribute:: zeroindex
@@ -224,7 +230,6 @@ Some common notions
     .. attribute:: nojettison
     .. attribute:: steiner
     .. attribute:: fliprepair
-    .. attribute:: offcenter
     .. attribute:: docheck
     .. attribute:: quiet
     .. attribute:: verbose
