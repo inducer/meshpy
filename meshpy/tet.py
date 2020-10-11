@@ -99,7 +99,7 @@ class MeshInfo(internals.TetMeshInfo, MeshInfoBase):
         for ifacet, facet in enumerate(self.faces):
             print("facet %d:" % ifacet)
             for ipolygon, polygon in enumerate(facet.polygons):
-                print("  polygon %d: vertices [%s]" % \
+                print("  polygon %d: vertices [%s]" %
                         (ipolygon, ",".join(str(vi) for vi in polygon.vertices)))
 
     def write_vtk(self, filename):

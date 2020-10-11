@@ -365,7 +365,7 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
     *facets*, each element is a list of hole starting points for the
     corresponding facet.
 
-    Use L{MeshInfo.set_facets_ex} to add the extrusion to a L{MeshInfo}
+    Use :meth:`MeshInfo.set_facets_ex` to add the extrusion to a :class:`MeshInfo`
     structure.
 
     The extrusion proceeds by generating quadrilaterals connecting each
@@ -424,9 +424,9 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
         rings[ring_idx] = p_indices
         return p_indices
 
-    def pair_with_successor(l):
-        n = len(l)
-        return [(l[i], l[(i+1) % n]) for i in range(n)]
+    def pair_with_successor(ln):
+        n = len(ln)
+        return [(ln[i], ln[(i+1) % n]) for i in range(n)]
 
     def add_polygons(new_polys, marker):
         """Add several new facets, each polygon in new_polys corresponding

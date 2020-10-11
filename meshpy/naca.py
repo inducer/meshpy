@@ -26,8 +26,8 @@ class FourDigitsSymmetric:
         def x_lower(x):
             return x
 
-        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x +
-            0.2843) * x - 0.3516) * x) - 0.126) * x)
+        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x
+            + 0.2843) * x - 0.3516) * x) - 0.126) * x)
 
         if side == "upper":
             return numpy.array([x_upper(x), y_upper(y)])
@@ -61,8 +61,8 @@ class FourDigitsCambered:
         def x_lower(x, y, theta):
             return x + y * numpy.sin(theta)
 
-        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x +
-            0.2843) * x - 0.3516) * x) - 0.126) * x)
+        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x
+            + 0.2843) * x - 0.3516) * x) - 0.126) * x)
 
         if x <= p:
             y_c = m * x / p ** 2 * (2 * p - x)
@@ -103,13 +103,13 @@ class FiveDigits:
         def x_lower(x, y, theta):
             return x + y * numpy.sin(theta)
 
-        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x +
-            0.2843) * x - 0.3516) * x) - 0.126) * x)
+        y = t * 5 * (0.2969 * numpy.sqrt(x) + ((((-self.edge_coeff * x
+            + 0.2843) * x - 0.3516) * x) - 0.126) * x)
 
         if x <= m:
             y_c = k1 / 6 * x * ((x - 3 * m) * x + m ** 2 * (3 - m))
-            theta = numpy.arctan(k1 / 6 * ((3 * x - 6 * m) * x +
-                m ** 2 * (3 - m)))
+            theta = numpy.arctan(k1 / 6 * ((3 * x - 6 * m) * x
+                + m ** 2 * (3 - m)))
         else:
             y_c = k1 * m ** 3 / 6 * (1 - x)
             theta = numpy.arctan(-k1 * m ** 3 / 6)

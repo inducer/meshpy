@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 from six.moves import range
 from six.moves import zip
+
+
 class _Table:
     def __init__(self):
         self.Rows = []
@@ -21,8 +23,6 @@ class _Table:
         return "\n".join(lines)
 
 
-
-
 def _linebreak_list(list, per_line=10, pad=None):
     def format(s):
         if pad is None:
@@ -32,10 +32,9 @@ def _linebreak_list(list, per_line=10, pad=None):
 
     result = ""
     while len(list) > per_line:
-        result += " ".join(format(l) for l in list[:per_line]) + "\n"
+        result += " ".join(format(ln) for ln in list[:per_line]) + "\n"
         list = list[per_line:]
-    return result + " ".join(format(l) for l in list)
-
+    return result + " ".join(format(ln) for ln in list)
 
 
 class MeshInfoBase:
@@ -52,10 +51,6 @@ class MeshInfoBase:
             self._fvi2fm = result
             return result
 
-
-
-
-
     def set_points(self, points, point_markers=None):
         if point_markers is not None:
             assert len(point_markers) == len(point_markers)
@@ -70,19 +65,13 @@ class MeshInfoBase:
             for i, mark in enumerate(point_markers):
                 self.point_markers[i] = mark
 
-
-
-
-
     def set_holes(self, hole_starts):
         self.holes.resize(len(hole_starts))
         for i, hole in enumerate(hole_starts):
             self.holes[i] = hole
 
-
-
-
-    def write_neu(self, outfile, bc={}, periodicity=None, description="MeshPy Output"):
+    def write_neu(self, outfile, bc={}, periodicity=None,
+            description="MeshPy Output"):
         """Write the mesh out in (an approximation to) Gambit neutral mesh format.
 
         outfile is a file-like object opened for writing.
@@ -158,7 +147,7 @@ class MeshInfoBase:
         flags = 0
         outfile.write("GROUP:%11d ELEMENTS:%11d MATERIAL:%11s NFLAGS: %11d\n"
                 % (1, len(grp_elements), repr(material), flags))
-        outfile.write(("epsilon: %s\n" % material).rjust(32)) # FIXME
+        outfile.write(("epsilon: %s\n" % material).rjust(32))  # FIXME
         outfile.write("0\n")
         outfile.write(_linebreak_list([str(i+1) for i in grp_elements],
             pad=8)
@@ -199,7 +188,8 @@ class MeshInfoBase:
         # actually output bc sections
         if not self.faces.allocated:
             from warnings import warn
-            warn("no exterior faces in mesh data structure, not writing boundary conditions")
+            warn("no exterior faces in mesh data structure, not writing "
+                    "boundary conditions")
         else:
             # requires -f option in tetgen, -e in triangle
 
@@ -223,11 +213,10 @@ class MeshInfoBase:
                     bc_name, bc_code = bc[bc_marker]
                     outfile.write("%32s%8d%8d%8d%8d\n"
                             % (bc_name,
-                                1, # face BC
+                                1,  # face BC
                                 len(face_indices),
-                                0, # zero additional values per face,
-                                bc_code,
-                                )
+                                0,  # zero additional values per face,
+                                bc_code)
                             )
                 else:
                     # periodic BC
@@ -235,9 +224,8 @@ class MeshInfoBase:
                     outfile.write("%s%s%8d%8d%8d\n"
                             % ("periodic", " ".join(repr(p) for p in periods),
                                 len(face_indices),
-                                0, # zero additional values per face,
-                                0,
-                                )
+                                0,  # zero additional values per face,
+                                0)
                             )
 
                 for i, fi in enumerate(face_indices):
@@ -257,11 +245,9 @@ class MeshInfoBase:
             # FIXME proper element group support
 
 
-
-
-
 def dump_array(name, array):
-    print("array %s: %d elements, %d values per element" % (name, len(array), array.unit))
+    print("array %s: %d elements, %d values per element"
+            % (name, len(array), array.unit))
 
     if len(array) == 0 or array.unit == 0:
         return
@@ -277,4 +263,3 @@ def dump_array(name, array):
             print("  %d: %s" % (i, ",".join(str(sub) for sub in entry)))
         else:
             print("  %d: %s" % (i, entry))
-
