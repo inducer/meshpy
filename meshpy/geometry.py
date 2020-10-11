@@ -1,5 +1,3 @@
-from __future__ import division, absolute_import
-
 __doc__ = """
 
 Geometry builder
@@ -36,8 +34,6 @@ Extrusions and surfaces of revolution
 """
 
 import numpy as np
-from six.moves import range
-from six.moves import zip
 
 
 # {{{ geometry building
@@ -73,7 +69,7 @@ def offset_point_indices(facets, offset):
         return [tuple(p_i+offset for p_i in facet) for facet in facets]
 
 
-class GeometryBuilder(object):
+class GeometryBuilder:
     """
     .. automethod:: add_geometry
     .. automethod:: set

@@ -1,8 +1,3 @@
-from __future__ import absolute_import
-from six.moves import range
-from six.moves import zip
-
-
 def parse_int(it):
     return int(next(it))
 

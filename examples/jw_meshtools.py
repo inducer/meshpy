@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Toolbox for generating a mesh
 
@@ -100,7 +99,7 @@ def connect_boundary(boundary_segments, pall, p=[]):
         # indj gives the position of the segment in allseg
         indj = nodes.index(indices[j])
         # find the number of boundary the node belongs to
-        this_boundary = (np.where((np.array(boundaries) <= indj))[0])[-1]
+        this_boundary = (np.where(np.array(boundaries) <= indj)[0])[-1]
 
         if not flag_sorted[this_boundary]:
             # define the indices for slicing

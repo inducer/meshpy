@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Short Gallery of examples
 for meshpy
@@ -200,7 +199,7 @@ facets.extend(round_trip_connect(circ_start, len(points) - 1))
 
 def needs_refinement(vertices, area):
     bary = np.sum(np.array(vertices), axis=0) / 3
-    max_area = 0.01 + abs((la.norm(bary, np.inf) - 1)) * 0.1
+    max_area = 0.01 + abs(la.norm(bary, np.inf) - 1) * 0.1
     return bool(area > max_area)
 
 

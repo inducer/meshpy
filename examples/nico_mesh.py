@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from six.moves import range
-
-
 def main():
     import meshpy.triangle as triangle
     import math

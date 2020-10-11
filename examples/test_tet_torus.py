@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from six.moves import range
-
-
 def main():
     from math import pi, cos, sin
     from meshpy.tet import MeshInfo, build

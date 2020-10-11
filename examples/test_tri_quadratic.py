@@ -7,8 +7,6 @@ from meshpy.triangle import MeshInfo, build
 # Utility function to create lists of the form [(1,2), (2,3), (3,4),
 # (4,1)], given two numbers 1 and 4
 from itertools import islice, cycle
-from six.moves import range
-from six.moves import zip
 
 
 def loop(a, b):

@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import print_function
-
-
 def main():
     from ply import parse_ply
     import sys

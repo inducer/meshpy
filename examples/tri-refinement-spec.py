@@ -1,6 +1,5 @@
 # Provided by Liu Benyuan in https://github.com/inducer/meshpy/pull/11
 
-from __future__ import division
 
 import meshpy.triangle as triangle
 import numpy as np

@@ -56,24 +56,24 @@ def main():
           author_email="inform@tiker.net",
           license=("MIT for the wrapper/non-commercial for "
               "the Triangle/GNU Affero Public License for TetGen"),
-          url="http://mathema.tician.de/software/meshpy",
+          url="https://documen.tician.de/meshpy",
           classifiers=[
-              'Development Status :: 4 - Beta',
-              'Intended Audience :: Developers',
-              'Intended Audience :: Other Audience',
-              'Intended Audience :: Science/Research',
-              'License :: OSI Approved :: MIT License',
-              'License :: Free for non-commercial use',
-              'Natural Language :: English',
-              'Programming Language :: C++',
-              'Programming Language :: Python',
-              'Programming Language :: Python :: 3',
-              'Topic :: Multimedia :: Graphics :: 3D Modeling',
-              'Topic :: Scientific/Engineering',
-              'Topic :: Scientific/Engineering :: Mathematics',
-              'Topic :: Scientific/Engineering :: Physics',
-              'Topic :: Scientific/Engineering :: Visualization',
-              'Topic :: Software Development :: Libraries',
+              "Development Status :: 4 - Beta",
+              "Intended Audience :: Developers",
+              "Intended Audience :: Other Audience",
+              "Intended Audience :: Science/Research",
+              "License :: OSI Approved :: MIT License",
+              "License :: Free for non-commercial use",
+              "Natural Language :: English",
+              "Programming Language :: C++",
+              "Programming Language :: Python",
+              "Programming Language :: Python :: 3",
+              "Topic :: Multimedia :: Graphics :: 3D Modeling",
+              "Topic :: Scientific/Engineering",
+              "Topic :: Scientific/Engineering :: Mathematics",
+              "Topic :: Scientific/Engineering :: Physics",
+              "Topic :: Scientific/Engineering :: Visualization",
+              "Topic :: Software Development :: Libraries",
               ],
 
           packages=["meshpy"],
@@ -84,7 +84,6 @@ def main():
                   "pytest>=2",
                   "numpy",
                   "gmsh_interop",
-                  "six",
                   ],
           ext_modules=[
               Extension(
@@ -105,12 +104,12 @@ def main():
                   extra_link_args=conf["LDFLAGS"],
                   ),
               ],
-          cmdclass={'build_ext': PybindBuildExtCommand},
+          cmdclass={"build_ext": PybindBuildExtCommand},
           zip_safe=False,
           )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
 # vim: foldmethod=marker
