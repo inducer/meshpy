@@ -361,8 +361,8 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
     *facets*, each element is a list of hole starting points for the
     corresponding facet.
 
-    Use :meth:`MeshInfo.set_facets_ex` to add the extrusion to a :class:`MeshInfo`
-    structure.
+    Use :meth:`~meshpy.tet.MeshInfo.set_facets_ex` to add the extrusion to a
+    :class:`~meshpy.tet.MeshInfo` structure.
 
     The extrusion proceeds by generating quadrilaterals connecting each
     ring.  If any given radius in *rz_points* is 0, triangle fans are
