@@ -8,8 +8,9 @@ class GmshMeshReceiver:
     def finalize_nodes(self):
         pass
 
-    def add_element(self, element_nr, element_type, vertex_nrs,
-            lexicographic_nodes, tag_numbers):
+    def add_element(
+        self, element_nr, element_type, vertex_nrs, lexicographic_nodes, tag_numbers
+    ):
         pass
 
     def finalize_elements(self):
@@ -27,6 +28,7 @@ def main():
 
     import sys
     from meshpy.gmsh_reader import read_gmsh
+
     read_gmsh(mr, sys.argv[1])
 
 

@@ -1,9 +1,3 @@
-from __future__ import absolute_import
-
-import six
-from six.moves import range
-
-
 def uniform_refine_triangles(points, elements, factor=2):
     new_points = points[:]
     new_elements = []
@@ -100,20 +94,20 @@ def make_swizzle_matrix(spec):
     import numpy
     axes = ["x", "y", "z"]
 
-    mapping = dict((axis, axis) for axis in axes)
+    mapping = {axis: axis for axis in axes}
     for one_spec in spec.split(","):
         import_axis, final_axis = one_spec.split(":")
         mapping[import_axis] = final_axis
 
     assert set(mapping.keys()) == set(axes), \
             "axis mapping not complete"
-    assert set(axis.lstrip("-") for axis in six.itervalues(mapping)) == set(axes), \
+    assert {axis.lstrip("-") for axis in mapping.values()} == set(axes), \
             "Axis mapping not onto"
 
     n = len(axes)
     result = numpy.zeros((n, n), dtype=int)
 
-    for imp_axis, final_axis in six.iteritems(mapping):
+    for imp_axis, final_axis in mapping.items():
         imp_axis = axes.index(imp_axis)
 
         sign = 1

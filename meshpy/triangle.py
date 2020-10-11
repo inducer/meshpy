@@ -1,9 +1,5 @@
-from __future__ import division
-from __future__ import absolute_import
 from meshpy.common import MeshInfoBase, dump_array
 import meshpy._internals as internals
-from six.moves import range
-from six.moves import zip
 
 
 class MeshInfo(internals.TriMeshInfo, MeshInfoBase):

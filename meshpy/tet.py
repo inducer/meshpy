@@ -1,9 +1,5 @@
-from __future__ import absolute_import
-from __future__ import print_function
 from meshpy.common import MeshInfoBase, dump_array
 import meshpy._internals as internals
-import six
-from six.moves import range
 
 
 class MeshInfo(internals.TetMeshInfo, MeshInfoBase):
@@ -99,7 +95,7 @@ class MeshInfo(internals.TetMeshInfo, MeshInfoBase):
         for ifacet, facet in enumerate(self.faces):
             print("facet %d:" % ifacet)
             for ipolygon, polygon in enumerate(facet.polygons):
-                print("  polygon %d: vertices [%s]" % \
+                print("  polygon %d: vertices [%s]" %
                         (ipolygon, ",".join(str(vi) for vi in polygon.vertices)))
 
     def write_vtk(self, filename):
@@ -136,7 +132,7 @@ class Options(internals.Options):
         self.parse_switches(switches)
         self.quiet = 1
 
-        for k, v in six.iteritems(kwargs):
+        for k, v in kwargs.items():
             try:
                 getattr(self, k)
             except AttributeError:

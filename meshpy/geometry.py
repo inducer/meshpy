@@ -1,5 +1,3 @@
-from __future__ import division, absolute_import
-
 __doc__ = """
 
 Geometry builder
@@ -36,8 +34,6 @@ Extrusions and surfaces of revolution
 """
 
 import numpy as np
-from six.moves import range
-from six.moves import zip
 
 
 # {{{ geometry building
@@ -73,7 +69,7 @@ def offset_point_indices(facets, offset):
         return [tuple(p_i+offset for p_i in facet) for facet in facets]
 
 
-class GeometryBuilder(object):
+class GeometryBuilder:
     """
     .. automethod:: add_geometry
     .. automethod:: set
@@ -365,8 +361,8 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
     *facets*, each element is a list of hole starting points for the
     corresponding facet.
 
-    Use L{MeshInfo.set_facets_ex} to add the extrusion to a L{MeshInfo}
-    structure.
+    Use :meth:`~meshpy.tet.MeshInfo.set_facets_ex` to add the extrusion to a
+    :class:`~meshpy.tet.MeshInfo` structure.
 
     The extrusion proceeds by generating quadrilaterals connecting each
     ring.  If any given radius in *rz_points* is 0, triangle fans are
@@ -424,9 +420,9 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
         rings[ring_idx] = p_indices
         return p_indices
 
-    def pair_with_successor(l):
-        n = len(l)
-        return [(l[i], l[(i+1) % n]) for i in range(n)]
+    def pair_with_successor(ln):
+        n = len(ln)
+        return [(ln[i], ln[(i+1) % n]) for i in range(n)]
 
     def add_polygons(new_polys, marker):
         """Add several new facets, each polygon in new_polys corresponding
