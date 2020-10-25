@@ -54,6 +54,12 @@ jobs:
         -   name: "Main Script"
             run: |
                 EXTRA_INSTALL="numpy pybind11"
+                
+                # https://numpy.org/doc/stable/user/building.html#accelerated-blas-lapack-libraries
+                # e.g. https://github.com/inducer/meshpy/runs/1303881604?check_suite_focus=true
+                export NPY_BLAS_ORDER=""
+                export NPY_LAPACK_ORDER=""
+                
                 curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/master/build-and-test-py-project.sh
                 . ./build-and-test-py-project.sh
 
