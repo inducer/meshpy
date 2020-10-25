@@ -4,10 +4,10 @@ MeshPy: Simplicial Mesh Generation from Python
 .. image:: https://gitlab.tiker.net/inducer/meshpy/badges/master/pipeline.svg
     :alt: Gitlab Build Status
     :target: https://gitlab.tiker.net/inducer/meshpy/commits/master
-.. image:: https://github.com/inducer/meshpy/workflows/CI/badge.svg?branch=master&event=push
+.. image:: https://github.com/inducer/meshpy/workflows/CI/badge.svg?branch=master
     :alt: Github Build Status
-    :target: https://github.com/inducer/meshpy/actions?query=branch%3Amaster+workflow%3ACI+event%3Apush
-.. image:: https://badge.fury.io/py/meshpy.png
+    :target: https://github.com/inducer/meshpy/actions?query=branch%3Amaster+workflow%3ACI
+.. image:: https://badge.fury.io/py/MeshPy.png
     :alt: Python Package Index Release Page
     :target: https://pypi.org/project/meshpy/
 
