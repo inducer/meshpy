@@ -16,36 +16,37 @@
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
-#sys.path.append(os.path.abspath('some/directory'))
+#sys.path.append(os.path.abspath("some/directory"))
 
 # General configuration
 # ---------------------
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
-# coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+# coming with Sphinx (named "sphinx.ext.*") or your custom ones.
 extensions = [
-        'sphinx.ext.autodoc',
-        'sphinx.ext.viewcode',
-        'sphinx.ext.intersphinx',
+        "sphinx.ext.autodoc",
+        "sphinx.ext.viewcode",
+        "sphinx.ext.intersphinx",
         ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
-#source_encoding = 'utf-8-sig'
+#source_encoding = "utf-8-sig"
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General substitutions.
 project = "MeshPy"
 copyright = u"2008, Andreas Klöckner"
+
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -53,8 +54,10 @@ copyright = u"2008, Andreas Klöckner"
 # The short X.Y version.
 def get_version():
     conf = {}
-    exec(compile(open("../meshpy/__init__.py").read(), "../meshpy/__init__.py", 'exec'), conf)
+    exec(compile(open("../meshpy/__init__.py").read(), "../meshpy/__init__.py",
+        "exec"), conf)
     return conf["version"]
+
 
 version = get_version()
 
@@ -65,7 +68,7 @@ release = version
 # non-false value, then it is used:
 #today = ''
 # Else, today_fmt is used as the format for a strftime call.
-today_fmt = '%B %d, %Y'
+today_fmt = "%B %d, %Y"
 
 # List of documents that shouldn't be included in the build.
 #unused_docs = []
@@ -86,7 +89,7 @@ today_fmt = '%B %d, %Y'
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 
 # Options for HTML output
@@ -102,18 +105,12 @@ html_theme_options = {
         }
 
 html_sidebars = {
-    '**': [
-        'about.html',
-        'navigation.html',
-        'relations.html',
-        'searchbox.html',
-    ]
-}
+        }
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
-#html_style = 'default.css'
+#html_style = "default.css"
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -128,7 +125,7 @@ html_sidebars = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 #html_static_path = ['_static']
 
-# If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
+# If not '', a "Last updated on:" timestamp is inserted at every page bottom,
 # using the given strftime format.
 html_last_updated_fmt = '%b %d, %Y'
 
@@ -158,22 +155,23 @@ html_last_updated_fmt = '%b %d, %Y'
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'MeshPydoc'
+htmlhelp_basename = "MeshPydoc"
 
 
 # Options for LaTeX output
 # ------------------------
 
-# The paper size ('letter' or 'a4').
-#latex_paper_size = 'letter'
+# The paper size ("letter" or "a4").
+#latex_paper_size = "letter"
 
-# The font size ('10pt', '11pt' or '12pt').
-#latex_font_size = '10pt'
+# The font size ("10pt", "11pt" or "12pt").
+#latex_font_size = "10pt"
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'MeshPy.tex', 'MeshPy Documentation', 'Andreas Klöckner', 'manual'),
+        ("index", "MeshPy.tex", "MeshPy Documentation", "Andreas Klöckner",
+            "manual"),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
