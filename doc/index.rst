@@ -6,7 +6,7 @@ Meshes of this type are chiefly used in finite-element simulation codes, but
 also have many other applications ranging from computer graphics to robotics.
 
 In order to generate these 2D and 3D meshes, MeshPy provides Python interfaces
-to a few well-regarded mesh generators: 
+to a few well-regarded mesh generators:
 
 * `Triangle <http://www.cs.cmu.edu/~quake/triangle.html>`_ by J. Shewchuk.
 * `TetGen <http://tetgen.berlios.de/>`_ by Hang Si.
@@ -81,6 +81,8 @@ Contents
     gmsh
     geometry
     faq
+    🚀 Github <https://github.com/inducer/meshpy>
+    💾 Download Releases <https://pypi.org/project/meshpy>
 
 MeshPy has its own `web page <http://mathema.tician.de/software/meshpy>`_, where you
 can find updated software, news, a forum, and documentation.

@@ -27,6 +27,7 @@ extensions = [
         "sphinx.ext.autodoc",
         "sphinx.ext.viewcode",
         "sphinx.ext.intersphinx",
+        "sphinx_copybutton",
         ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -95,13 +96,9 @@ pygments_style = "sphinx"
 # Options for HTML output
 # -----------------------
 
-html_theme = "alabaster"
+html_theme = "furo"
 
 html_theme_options = {
-        "extra_nav_links": {
-            "🚀 Github": "https://github.com/inducer/meshpy",
-            "💾 Download Releases": "https://pypi.python.org/pypi/meshpy",
-            }
         }
 
 html_sidebars = {
