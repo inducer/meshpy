@@ -81,9 +81,11 @@ def main():
           python_requires="~=3.6",
           install_requires=[
                   "pytools>=2011.2",
-                  "pytest>=2",
                   "numpy",
                   "gmsh_interop",
+                  ],
+          tests_require=[
+                  "pytest>=2",
                   ],
           ext_modules=[
               Extension(
