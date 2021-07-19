@@ -141,7 +141,7 @@ class Options(internals.Options):
                 setattr(self, k, v)
 
 
-def tetrahedralize(mesh_info, options):
+def tetrahedralize(mesh_info, options, insert_points=None):
     mesh = MeshInfo()
 
     # restore "C" locale--otherwise tetgen might mis-parse stuff like "a0.01"
@@ -155,7 +155,7 @@ def tetrahedralize(mesh_info, options):
         locale.setlocale(locale.LC_NUMERIC, "C")
 
     try:
-        internals.tetrahedralize(options, mesh_info, mesh)
+        internals.tetrahedralize(options, mesh_info, mesh, insert_points)
     finally:
         # restore previous locale if we've changed it
         if have_locale:
@@ -171,6 +171,8 @@ def build(mesh_info, options=Options("pq"), verbose=False,
         options.quiet = 1
 
     if insert_points is not None:
+        if not isinstance(insert_points, MeshInfo):
+            raise ValueError('insert_points should be an instance of MeshInfo')
         options.insertaddpoints = 1
 
     if attributes:
@@ -183,4 +185,4 @@ def build(mesh_info, options=Options("pq"), verbose=False,
     if diagnose:
         options.diagnose = 1
 
-    return tetrahedralize(mesh_info, options)
+    return tetrahedralize(mesh_info, options, insert_points)
