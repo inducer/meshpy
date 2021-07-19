@@ -166,7 +166,7 @@ def test_tetgen_points():
 def test_tetgen_insert_points():
     import numpy as np
 
-    from meshpy.tet import MeshInfo, Options, build
+    from meshpy.tet import MeshInfo, build
 
     points = [(0, 0, 0),
               (0, 0, 1),
