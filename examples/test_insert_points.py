@@ -26,15 +26,13 @@ if __name__ == '__main__':
     mesh_info.set_points(points)
     mesh_info.set_facets(facets)
 
-    options = Options(switches='', plc=True, verbose=True, quiet=False)
-
     # Insert an interior point of the cube as a constrained point
     interior_point = (0.33, 0.7, 0.91)
 
     insert_points_mesh_info = MeshInfo()
     insert_points_mesh_info.set_points([interior_point])
 
-    mesh = build(mesh_info, options, max_volume=0.1,
+    mesh = build(mesh_info, max_volume=0.25,
                  insert_points=insert_points_mesh_info)
 
     mesh_points = np.array(mesh.points)
