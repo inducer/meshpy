@@ -1,10 +1,10 @@
 import logging
 import numpy as np
 
-from meshpy.tet import MeshInfo, Options, build
+from meshpy.tet import MeshInfo, build
 
-if __name__ == '__main__':
-    logger = logging.getLogger('test_insert_points.py')
+if __name__ == "__main__":
+    logger = logging.getLogger("test_insert_points.py")
 
     points = [(0, 0, 0),
               (0, 0, 1),
@@ -39,4 +39,4 @@ if __name__ == '__main__':
     min_dist = np.sqrt(np.sum((interior_point - mesh_points), axis=1)**2).min()
 
     if min_dist > 0:
-        logger.error('tetrahedron mesh does not contain contrained point')
+        logger.error("tetrahedron mesh does not contain contrained point")
