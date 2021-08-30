@@ -8,22 +8,22 @@ you really only need three basic things:
 
 * A UNIX-like machine with web access.
 * A C++ compiler, preferably a Version 4.x gcc.
-* A working `Python <http://www.python.org>`_ installation, Version 2.4 or newer.
+* A working `Python <http://www.python.org>`_ installation, Version 3.6 or newer.
 
 Step 1: Download and unpack MeshPy
 -----------------------------------
 
-`Download MeshPy <http://pypi.python.org/pypi/MeshPy>`_ and unpack it::
+`Download MeshPy <http://pypi.org/project/MeshPy>`_ and unpack it::
 
     $ tar xfz MeshPy-VERSION.tar.gz
 
 If you're downloading from git, say::
 
-    $ git clone --recursive http://git.tiker.net/trees/meshpy.git
+    $ git clone --recursive https://github.com/inducer/meshpy.git
 
 If your version of git doesn't support `--recursive`, then say::
 
-    $ git clone http://git.tiker.net/trees/meshpy.git
+    $ git clone https://github.com/inducer/meshpy.git
     $ cd meshpy
     $ git submodule init
     $ git submodule update
