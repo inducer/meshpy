@@ -33,3 +33,5 @@ setuptools*pth
 CMakeCache*
 CMakeFiles
 cmake_install.cmake
+
+tmp
