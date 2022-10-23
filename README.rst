@@ -7,7 +7,7 @@ MeshPy: Simplicial Mesh Generation from Python
 .. image:: https://github.com/inducer/meshpy/workflows/CI/badge.svg?branch=main
     :alt: Github Build Status
     :target: https://github.com/inducer/meshpy/actions?query=branch%3Amain+workflow%3ACI
-.. image:: https://badge.fury.io/py/MeshPy.png
+.. image:: https://badge.fury.io/py/MeshPy.svg
     :alt: Python Package Index Release Page
     :target: https://pypi.org/project/meshpy/
 
@@ -23,9 +23,8 @@ The former two are included in the package in slightly modified versions. A
 generic mesh reader for the latter is included, as is an easy way to run `gmsh`
 from a Python script.
 
-For an interface to `gmsh
-<http://www.geuz.org/gmsh/>`_ by Christophe Geuzaine and Jean-Francois Remacle,
-see `gmsh_interop <https://github.com/inducer/gmsh_interop>`.
+For an interface to `gmsh <http://www.geuz.org/gmsh/>`_ by Christophe Geuzaine
+and Jean-Francois Remacle, see `gmsh_interop <https://github.com/inducer/gmsh_interop>`__.
 
 MeshPy has no dependencies other than a C++ compiler,
 `pybind11 <https://pybind11.readthedocs.io/en/stable/>`_,
