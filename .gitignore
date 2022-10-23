@@ -29,6 +29,7 @@ setuptools*tar.gz
 setuptools*pth
 .sw[op]
 
+.eggs
 .cache
 CMakeCache*
 CMakeFiles
