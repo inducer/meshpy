@@ -1,0 +1,53 @@
+name: Deploy
+
+on:
+  push:
+
+jobs:
+  build-wheel-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      - uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2014_x86_64
+        with:
+          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311'
+          build-requirements: 'mypy'
+      - name: Upload wheel
+        uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: dist
+  build-wheel-matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        os: [macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      - name: setup xcode version
+        if: startsWith(matrix.os, 'macos')
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '11'
+      - name: python
+        uses: actions/setup-python@v1
+        with:
+            python-version: ${{ matrix.python-version }}
+      - name: Build
+        run: |
+          pip install wheel
+          pip install mypy
+          python setup.py bdist_wheel
+      - name: Upload wheel
+        uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: dist
