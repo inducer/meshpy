@@ -1,7 +1,11 @@
 name: Build wheels
+# inspired by: https://github.com/pypa/cibuildwheel/blob/main/examples/github-deploy.yml
 
 on:
   push:
+  pull_request:
+  release:
+    types: [created]
 
 jobs:
   build-wheel-matrix:
@@ -35,3 +39,25 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
+
+
+  deploy:
+    needs: [build_wheels]
+    runs-on: ubuntu-latest
+    name: Deploy
+    if: github.event_name == 'release' && github.event.action == 'created'
+    steps:
+      - name: download artifacts
+       uses: actions/download-artifact@v3
+        with:
+          # unpacks default artifact into dist/
+          # if `name: artifact` is omitted, the action will create extra parent dir
+          name: artifact
+          path: dist
+      - name: build sdist
+       run: pipx run build --sdist
+      - name: deploy
+       uses: pypa/gh-action-pypi-publish@v1.5.0
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
