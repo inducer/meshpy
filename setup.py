@@ -47,11 +47,10 @@ def main():
     init_filename = "meshpy/__init__.py"
     exec(compile(open(init_filename, "r").read(), init_filename, "exec"), conf)
 
-    import codecs
     setup(name="MeshPy",
           version=conf["version"],
           description="Triangular and Tetrahedral Mesh Generator",
-          long_description=codecs.open("README.rst", "r", "utf-8").read(),
+          long_description=open("README.rst", "r", encoding="utf-8").read(),
           long_description_content_type="text/x-rst",
           author="Andreas Kloeckner",
           author_email="inform@tiker.net",
