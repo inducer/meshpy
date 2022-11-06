@@ -10,6 +10,9 @@ MeshPy: Simplicial Mesh Generation from Python
 .. image:: https://badge.fury.io/py/MeshPy.svg
     :alt: Python Package Index Release Page
     :target: https://pypi.org/project/meshpy/
+.. image:: https://zenodo.org/badge/2757253.svg
+    :alt: Zenodo DOI for latest release
+    :target: https://zenodo.org/badge/latestdoi/2757253
 
 MeshPy offers quality triangular and tetrahedral mesh generation for Python.
 Meshes of this type are chiefly used in finite-element simulation codes, but

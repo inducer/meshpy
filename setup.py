@@ -52,6 +52,7 @@ def main():
           version=conf["version"],
           description="Triangular and Tetrahedral Mesh Generator",
           long_description=codecs.open("README.rst", "r", "utf-8").read(),
+          long_description_content_type="text/x-rst",
           author="Andreas Kloeckner",
           author_email="inform@tiker.net",
           license=("MIT for the wrapper/non-commercial for "

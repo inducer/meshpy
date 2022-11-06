@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Kloeckner"
+  given-names: "Andreas"
+  orcid: "https://orcid.org/0000-0003-1228-519X"
+- family-names: Brun
+  given-names: Lorenz
+- family-names: Liu
+  given-names: Benyuan
+- family-names: Klemenc
+  given-names: Simon
+- family-names: Fkikl
+  given-names: Alex
+- family-names: Gohlke
+  given-names: Christoph
+- family-names: Coon
+  given-names: Ethan
+- family-names: Oxberry
+  given-names: Geoffrey
+- family-names: Veselý
+  given-names: Jozef
+- family-names: Wala
+  given-names: Matt
+- family-names: Smith
+  given-names: Matt
+- family-names: Potrowl
+  given-names: Peter
+- family-names: Kurtz
+  given-names: Aidan
+
+title: "MeshPy"
+version: 2022.1.1
+doi:  10.5281/zenodo.7296572
+date-released: 2022-11-06
+url: "https://github.com/inducer/meshpy"
