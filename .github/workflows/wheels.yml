@@ -36,7 +36,6 @@ jobs:
         env:
           CIBW_SKIP: "*-musllinux_i686"
         #   CIBW_SOME_OPTION: value
-
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
@@ -48,6 +47,7 @@ jobs:
     name: Deploy
     if: github.event_name == 'release' && github.event.action == 'created'
     steps:
+      - uses: actions/checkout@v3
       - name: download artifacts
         uses: actions/download-artifact@v3
         with:
@@ -56,7 +56,7 @@ jobs:
           name: artifact
           path: dist
       - name: build sdist
-        run: pipx run build --sdist
+        run: python setup.py sdist
       - name: deploy
         uses: pypa/gh-action-pypi-publish@v1.5.0
         with:
