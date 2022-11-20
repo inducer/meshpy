@@ -8,7 +8,7 @@ you really only need three basic things:
 
 * A UNIX-like machine with web access.
 * A C++ compiler, preferably a Version 4.x gcc.
-* A working `Python <http://www.python.org>`_ installation, Version 3.6 or newer.
+* A working `Python <http://www.python.org>`_ installation.
 
 Step 1: Download and unpack MeshPy
 -----------------------------------
