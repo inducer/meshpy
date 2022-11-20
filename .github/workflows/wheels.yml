@@ -34,8 +34,7 @@ jobs:
         run: python -m cibuildwheel --output-dir wheelhouse
         # to supply options, put them in 'env', like:
         env:
-          CIBW_SKIP: "*-musllinux_i686"
-        #   CIBW_SOME_OPTION: value
+          CIBW_SKIP: "*-musllinux_i686 cp36-* cp37-* pp37-*"
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
