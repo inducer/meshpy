@@ -34,3 +34,4 @@ version: 2022.1.1
 doi:  10.5281/zenodo.7296572
 date-released: 2022-11-06
 url: "https://github.com/inducer/meshpy"
+license: MIT
