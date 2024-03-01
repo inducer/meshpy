@@ -1,3 +1,13 @@
+from dataclasses import dataclass
+from typing import List
+
+
+@dataclass(frozen=True)
+class DataBlock:
+    properties: List[str]
+    data: List[str]
+
+
 def parse_int(it):
     return int(next(it))
 
@@ -68,11 +78,6 @@ def parse_ply(name):
         for p in parsers:
             result.append(p(it))
         return result
-
-    from pytools import Record
-
-    class DataBlock(Record):
-        pass
 
     for name, line_count, props in data_queue:
         prop_names, parsers = list(zip(*props))
