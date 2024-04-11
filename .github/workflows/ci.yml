@@ -12,7 +12,7 @@ jobs:
         name: Flake8
         runs-on: ubuntu-latest
         steps:
-        -   uses: actions/checkout@v3
+        -   uses: actions/checkout@v4
         -
             uses: actions/setup-python@v4
             with:
@@ -30,7 +30,7 @@ jobs:
             matrix:
                 python-version: ['3.8', '3.10', '3.x']
         steps:
-        -   uses: actions/checkout@v3
+        -   uses: actions/checkout@v4
         -
             uses: actions/setup-python@v4
             with:
@@ -45,7 +45,7 @@ jobs:
         name: Pytest on macOS
         runs-on: macos-latest
         steps:
-        -   uses: actions/checkout@v3
+        -   uses: actions/checkout@v4
         -
             uses: actions/setup-python@v4
             with:
@@ -66,7 +66,7 @@ jobs:
         name: Documentation
         runs-on: ubuntu-latest
         steps:
-        -   uses: actions/checkout@v3
+        -   uses: actions/checkout@v4
         -
             uses: actions/setup-python@v4
             with:
