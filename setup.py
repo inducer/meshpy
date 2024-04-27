@@ -80,7 +80,6 @@ def main():
           setup_requires=["pybind11"],
           python_requires="~=3.8",
           install_requires=[
-                  "pytools>=2011.2",
                   "numpy",
                   "gmsh_interop",
                   ],
