@@ -1,6 +1,7 @@
 def main():
-    from ply import parse_ply
     import sys
+
+    from ply import parse_ply
 
     data = parse_ply(sys.argv[1])
 

@@ -1,6 +1,6 @@
 def main():
+    from meshpy.geometry import GeometryBuilder, generate_surface_of_revolution
     from meshpy.tet import MeshInfo, build
-    from meshpy.geometry import generate_surface_of_revolution, GeometryBuilder
 
     simple_rz = [
         (0, 0),

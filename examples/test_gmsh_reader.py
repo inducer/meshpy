@@ -27,6 +27,7 @@ def main():
     mr = GmshMeshReceiver()
 
     import sys
+
     from meshpy.gmsh_reader import read_gmsh
 
     read_gmsh(mr, sys.argv[1])

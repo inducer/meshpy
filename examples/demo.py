@@ -1,5 +1,6 @@
 from meshpy.tet import MeshInfo, build
 
+
 mesh_info = MeshInfo()
 mesh_info.set_points(
     [

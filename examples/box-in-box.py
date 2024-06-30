@@ -1,7 +1,8 @@
 def main():
     import numpy
-    from meshpy.tet import MeshInfo, build
+
     from meshpy.geometry import GeometryBuilder, Marker, make_box
+    from meshpy.tet import MeshInfo, build
 
     geob = GeometryBuilder()
 

@@ -1,12 +1,13 @@
 # Quadratic element demo, by Aravind Alwan
 
-import numpy as np
-import matplotlib.pyplot as plt
-from meshpy.triangle import MeshInfo, build
-
 # Utility function to create lists of the form [(1,2), (2,3), (3,4),
 # (4,1)], given two numbers 1 and 4
-from itertools import islice, cycle
+from itertools import cycle, islice
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+from meshpy.triangle import MeshInfo, build
 
 
 def loop(a, b):

@@ -64,7 +64,7 @@ class MeshInfoBase:
         for i, hole in enumerate(hole_starts):
             self.holes[i] = hole
 
-    def write_neu(self, outfile, bc={}, periodicity=None,
+    def write_neu(self, outfile, bc=None, periodicity=None,
             description="MeshPy Output"):
         """Write the mesh out in (an approximation to) Gambit neutral mesh format.
 
@@ -77,9 +77,12 @@ class MeshInfoBase:
         face marker of the periodic boundary and the period in each coordinate
         direction (0 if none) or the value None for no periodicity.
         """
+        if bc is None:
+            bc = {}
+
+        from datetime import datetime
 
         from meshpy import version
-        from datetime import datetime
 
         # header --------------------------------------------------------------
         outfile.write("CONTROL INFO 2.1.2\n")
@@ -183,7 +186,7 @@ class MeshInfoBase:
         if not self.faces.allocated:
             from warnings import warn
             warn("no exterior faces in mesh data structure, not writing "
-                    "boundary conditions")
+                 "boundary conditions", stacklevel=2)
         else:
             # requires -f option in tetgen, -e in triangle
 
@@ -222,7 +225,7 @@ class MeshInfoBase:
                                 0)
                             )
 
-                for i, fi in enumerate(face_indices):
+                for fi in face_indices:
                     face_nodes = frozenset(self.faces[fi])
                     adj_el = face2el[face_nodes]
                     assert len(adj_el) == 1

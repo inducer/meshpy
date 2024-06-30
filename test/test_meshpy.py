@@ -24,8 +24,9 @@ THE SOFTWARE.
 # {{{ triangle
 
 def test_triangle_refine():
-    import meshpy.triangle as triangle
     import math
+
+    import meshpy.triangle as triangle
 
     segments = 50
 
@@ -122,10 +123,14 @@ def test_tetgen():
 
 
 def test_torus():
-    from math import pi, cos, sin
+    from math import cos, pi, sin
+
+    from meshpy.geometry import (
+        EXT_CLOSED_IN_RZ,
+        GeometryBuilder,
+        generate_surface_of_revolution,
+    )
     from meshpy.tet import MeshInfo, build
-    from meshpy.geometry import generate_surface_of_revolution, \
-            EXT_CLOSED_IN_RZ, GeometryBuilder
 
     big_r = 3
     little_r = 2.9
@@ -147,10 +152,12 @@ def test_torus():
 
 
 def test_tetgen_points():
-    from meshpy.tet import MeshInfo, build, Options
-
     import numpy as np
-    points = np.random.randn(10000, 3)
+
+    from meshpy.tet import MeshInfo, Options, build
+
+    rng = np.random.default_rng(seed=42)
+    points = rng.normal(size=(10000, 3))
 
     mesh_info = MeshInfo()
     mesh_info.set_points(points)

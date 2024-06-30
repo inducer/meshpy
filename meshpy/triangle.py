@@ -1,5 +1,5 @@
-from meshpy.common import MeshInfoBase, dump_array
 import meshpy._internals as internals
+from meshpy.common import MeshInfoBase, dump_array
 
 
 class MeshInfo(internals.TriMeshInfo, MeshInfoBase):
@@ -152,8 +152,11 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
 
     if generate_edges is not None:
         from warnings import warn
-        warn("generate_edges is deprecated--use generate_faces instead")
+
+        warn("generate_edges is deprecated--use generate_faces instead",
+             stacklevel=2)
         generate_faces = generate_edges
+
     if generate_neighbor_lists is not None:
         opts += "n"
 

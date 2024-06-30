@@ -1,11 +1,9 @@
 def main():
     import numpy
 
-    # from math import pi, cos, sin
-    from meshpy.tet import MeshInfo, build
     from meshpy.geometry import GeometryBuilder, Marker, generate_extrusion, make_box
-
     from meshpy.naca import get_naca_points
+    from meshpy.tet import MeshInfo, build
 
     geob = GeometryBuilder()
 

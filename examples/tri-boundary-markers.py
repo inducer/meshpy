@@ -1,8 +1,9 @@
 # Provided by Liu Benyuan in https://github.com/inducer/meshpy/pull/11
 
 
-import meshpy.triangle as triangle
 import numpy as np
+
+import meshpy.triangle as triangle
 
 
 def round_trip_connect(start, end):

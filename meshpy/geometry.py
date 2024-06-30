@@ -296,7 +296,7 @@ def make_circle(r, center=(0, 0), subdivisions=40, marker=Marker.SHELL):
 
 
 def make_ball(r, subdivisions=10):
-    from math import pi, cos, sin
+    from math import cos, pi, sin
 
     dphi = pi/subdivisions
 
@@ -534,7 +534,7 @@ def generate_surface_of_revolution(rz_points,
         closure=EXT_OPEN, radial_subdiv=16,
         point_idx_offset=0, ring_point_indices=None,
         ring_markers=None, rz_closure_marker=0):
-    from math import sin, cos, pi
+    from math import cos, pi, sin
 
     dphi = 2*pi/radial_subdiv
     base_shape = [(cos(dphi*i), sin(dphi*i)) for i in range(radial_subdiv)]

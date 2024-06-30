@@ -1,6 +1,7 @@
 def main():
-    import meshpy.triangle as triangle
     import math
+
+    import meshpy.triangle as triangle
 
     points = [(1, 1), (-1, 1), (-1, -1), (1, -1)]
 
