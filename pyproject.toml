@@ -1,0 +1,91 @@
+[build-system]
+build-backend = "mesonpy"
+requires = [
+    "meson-python",
+    "numpy",
+    "wheel",
+    "pybind11",
+]
+
+[project]
+name = "meshpy"
+version = "2022.1.3"
+description = "Triangular and Tetrahedral Mesh Generator"
+readme= "README.rst"
+license = { file = "LICENSE" }
+authors = [{ name = "Andreas Kloeckner", email = "inform@tiker.net" }]
+maintainers = [{ name = "Andreas Kloeckner", email = "inform@tiker.net" }]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Other Audience",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "License :: Free for non-commercial use",
+    "Natural Language :: English",
+    "Programming Language :: C++",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Graphics :: 3D Modeling",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "numpy",
+    "gmsh_interop",
+]
+
+[project.optional-dependencies]
+doc = [
+    "furo",
+    "sphinx>=4",
+    "sphinx-copybutton",
+]
+test = [
+    "mako",
+    "pytest",
+    "ruff",
+]
+
+[project.urls]
+Documentation = "https://documen.tician.de/meshpy"
+Repository = "https://github.com/inducer/meshpy"
+
+[tool.ruff.lint]
+preview = true
+extend-select = [
+    "B",    # flake8-bugbear
+    "C",    # flake8-comprehensions
+    "D",    # pydocstyle
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # flake8-isort
+    "N",    # pep8-naming
+    "NPY",  # numpy
+    "Q",    # flake8-quotes
+    "W",    # pycodestyle
+]
+extend-ignore = [
+    "E226", # missing whitespace around arithmetic operator
+    "E241", # multiple spaces after comma
+    "E242", # tab after comma
+    "E265", # block comment should start with #
+    "E402", # module level import not at the top of file
+    "D",    # pydocstyle
+    "C90",  # McCabe complexity
+]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "double"
+docstring-quotes = "double"
+multiline-quotes = "double"
+
+[tool.ruff.lint.isort]
+known-local-folder = ["pyfmmlib"]
+lines-after-imports = 2
+combine-as-imports = true
