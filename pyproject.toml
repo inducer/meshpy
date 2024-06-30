@@ -80,6 +80,9 @@ extend-ignore = [
     "C90",  # McCabe complexity
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"examples/jw_meshtools.py" = ["N806", "N803", "N802"]
+
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "double"
 docstring-quotes = "double"

@@ -1,11 +1,12 @@
 def main():
-    from math import pi, cos, sin
-    from meshpy.tet import MeshInfo, build
+    from math import cos, pi, sin
+
     from meshpy.geometry import (
-        generate_surface_of_revolution,
         EXT_CLOSED_IN_RZ,
         GeometryBuilder,
+        generate_surface_of_revolution,
     )
+    from meshpy.tet import MeshInfo, build
 
     big_r = 3
     little_r = 2.9

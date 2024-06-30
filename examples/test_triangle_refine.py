@@ -1,6 +1,7 @@
 def main():
-    import meshpy.triangle as triangle
     import math
+
+    import meshpy.triangle as triangle
 
     segments = 50
 

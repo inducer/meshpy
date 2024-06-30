@@ -2,7 +2,7 @@
 
 
 def get_config_schema():
-    from aksetup_helper import (ConfigSchema, StringListOption)
+    from aksetup_helper import ConfigSchema, StringListOption
 
     return ConfigSchema([
         StringListOption("CXXFLAGS", [],
@@ -13,10 +13,16 @@ def get_config_schema():
 
 
 def main():
-    from aksetup_helper import (hack_distutils,
-            check_pybind11, get_config, setup, check_git_submodules,
-            Extension,
-            get_pybind_include, PybindBuildExtCommand)
+    from aksetup_helper import (
+        Extension,
+        PybindBuildExtCommand,
+        check_git_submodules,
+        check_pybind11,
+        get_config,
+        get_pybind_include,
+        hack_distutils,
+        setup,
+    )
 
     check_pybind11()
     check_git_submodules()

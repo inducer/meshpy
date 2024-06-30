@@ -1,5 +1,6 @@
 from meshpy.tet import MeshInfo, build
 
+
 mesh_info = MeshInfo()
 
 # construct a two-box extrusion of this base

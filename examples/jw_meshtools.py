@@ -1,17 +1,13 @@
-# -*- coding: utf-8 -*-
-"""
-Toolbox for generating a mesh
+"""Toolbox for generating a mesh."""
 
-"""
-import numpy as np
-import scipy as sp
-from scipy.spatial import cKDTree
-import matplotlib.pyplot as plt
-import meshpy.triangle as triangle
-from mpl_toolkits.mplot3d import Axes3D
 from collections import Counter
 
-# import mayavi.mlab as mal
+import matplotlib.pyplot as plt
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
+from scipy.spatial import cKDTree
+
+import meshpy.triangle as triangle
 
 
 def RefineMeshElements(poi, tri, uu, n=1):
@@ -95,13 +91,15 @@ def RefineMeshElements(poi, tri, uu, n=1):
         return p_new, t_new, u_new
 
 
-def PlotMeshNumbers(p, t, edges=[], pltshow=True):
+def PlotMeshNumbers(p, t, edges=None, pltshow=True):
     """
     PlotMeshNumbers(p,t,edges=[],pltshow=True)
     ---------------
     p   :  points of the triangular mesh
     t   :  elements of the mesh (first order 3 numbers, second order 6 numbers)
     """
+    if edges is None:
+        edges = []
 
     plt.triplot(p[:, 0], p[:, 1], t[:, 0:3])
     # annotate nodes
@@ -124,13 +122,13 @@ def PlotMeshNumbers(p, t, edges=[], pltshow=True):
             ps = (p[edges[n][0], :] + p[edges[n][1], :]) / 2.0
             plt.text(ps[0], ps[1], buf, color="g", fontsize=11)
 
-    if pltshow == True:
+    if pltshow:
         plt.show()
 
 
 # only for a small number of triangles fast enough
 def PlotSurfaceMesh(p, t, color="b"):
-    ae, b, be = FindEdges(t)
+    ae, _b, _be = FindEdges(t)
     fig = plt.figure()
     ax = Axes3D(fig)
     for x in ae:
@@ -208,7 +206,7 @@ def MakeSurfaceMesh(xstr, ystr, zstr, u0, u1, v0, v1, n1, n2):
     max_len = max([np.max(np.diff(all_u)), np.max(np.diff(all_v))])
 
     # make mesh
-    uv_points = np.array([x for x in uv_bound + [uv_bound[0]]])
+    uv_points = np.array(uv_bound + [uv_bound[0]])
     p1, v1 = PointSegments(uv_points)
     p_uv, elements, bou, li_bou = DoTriMesh(p1, v1, edge_length=max_len, show=False)
 
@@ -222,14 +220,15 @@ def MakeSurfaceMesh(xstr, ystr, zstr, u0, u1, v0, v1, n1, n2):
 
     if N != len(uv_bound):
         print(
-            "WARNING: Additional boundary points inserted by triangle.c (du too different from dv)"
+            "WARNING: Additional boundary points inserted by triangle.c "
+            "(du too different from dv)"
         )
 
     # calculate boundary points of 3D surface mesh
     bound_p = np.zeros((N, 3))
     for i in bseg:
-        u = p_uv[i, 0]
-        v = p_uv[i, 1]
+        # u = p_uv[i, 0]
+        # v = p_uv[i, 1]
         p = np.array([eval(xstr), eval(ystr), eval(zstr)])
         bound_p[i, :] = p
 
@@ -261,8 +260,8 @@ def MakeSurfaceMesh(xstr, ystr, zstr, u0, u1, v0, v1, n1, n2):
     # calculate 3D points from uv points
     all_p = np.zeros((NN, 3))
     for i in range(NN):
-        u = p_uv[i, 0]
-        v = p_uv[i, 1]
+        # u = p_uv[i, 0]
+        # v = p_uv[i, 1]
         p = np.array([eval(xstr), eval(ystr), eval(zstr)])
         all_p[i, :] = p
 
@@ -310,7 +309,7 @@ def MakeSphere(P0, R, mesh_len, epsilon=1e-8, type="cart"):
         pp, tt = MakeSurfaceMesh(
             xstr, ystr, zstr, 0, 2 * np.pi, np.pi / 4.0, np.pi / 2.0, Nu, int(Nu / 3.0)
         )
-        edges, bou, bel = FindEdges(tt)
+        _edges, bou, _bel = FindEdges(tt)
 
         # add upper part
         ubou = []
@@ -319,7 +318,7 @@ def MakeSphere(P0, R, mesh_len, epsilon=1e-8, type="cart"):
             if pp[x[0], 2] > R / 10.0:
                 ubou += [x]
         # use upper segments for new 2D circle
-        ubou, bl = SortSegments(ubou)
+        ubou, _bl = SortSegments(ubou)
         p2 = []
         v2 = []
         for j, x in enumerate(ubou):
@@ -331,7 +330,7 @@ def MakeSphere(P0, R, mesh_len, epsilon=1e-8, type="cart"):
             v2 += [(j, j2)]
 
         # make circle mesh and lift up the z values
-        ppp, ttt, bouu, li = DoTriMesh(p2, v2, edge_length=mesh_len, show=False)
+        ppp, ttt, bouu, _li = DoTriMesh(p2, v2, edge_length=mesh_len, show=False)
 
         ppp = np.append(ppp, np.ones((len(ppp), 1)) * -1, axis=1)
         for i in range(len(ppp)):
@@ -339,7 +338,7 @@ def MakeSphere(P0, R, mesh_len, epsilon=1e-8, type="cart"):
 
         # connect upper sphere and lower sphere
         bou = [[x[0], x[1]] for x in bou]
-        p, t, b, bl, idn = ConnectMesh(pp, tt, bou, ppp, ttt, bouu, epsilon=1e-8)
+        p, t, b, _bl, _idn = ConnectMesh(pp, tt, bou, ppp, ttt, bouu, epsilon=1e-8)
         pp = p * 1
         for i in range(len(pp)):
             pp[i, 2] *= -1
@@ -347,7 +346,7 @@ def MakeSphere(P0, R, mesh_len, epsilon=1e-8, type="cart"):
         # connect lower half circle
         tt = [[x[1], x[0], x[2]] for x in t]
         bb = np.copy(b)
-        pn, tn, bn, bln, idn = ConnectMesh(pp, tt, bb, p, t, b, epsilon=1e-8)
+        pn, tn, _bn, _bln, _idn = ConnectMesh(pp, tt, bb, p, t, b, epsilon=1e-8)
 
     else:
         # make part of the sphere
@@ -358,7 +357,7 @@ def MakeSphere(P0, R, mesh_len, epsilon=1e-8, type="cart"):
         pn, tn = MakeSurfaceMesh(
             xstr, ystr, zstr, 0, 2.0 * np.pi, 0, np.pi, Nu, int(Nu / 3.0)
         )
-        edges, bou, bel = FindEdges(tn)
+        _edges, bou, _bel = FindEdges(tn)
 
     Ps = np.array(P0)
     pn = np.array([X - Ps for X in pn])
@@ -452,7 +451,7 @@ def RetrieveSegments(points, segments, curve_list, Ps, NoSe):
 
     # find node indices for desired points
     bnodes = list(set(row1 + row2))
-    nn, dd = FindClosestNode(bnodes, points, Ps)
+    nn, _dd = FindClosestNode(bnodes, points, Ps)
 
     # print("Ps = ",Ps)
     # print("Nodes: ",nn)
@@ -467,17 +466,17 @@ def RetrieveSegments(points, segments, curve_list, Ps, NoSe):
         try:
             first = row1.index(nn[k])
             last = row2.index(nn[k + 1])
-        except:
+        except ValueError:
             try:
                 first = row1.index(nn[k + 1])
                 last = row2.index(nn[k])
                 Orient = True
-            except:
+            except ValueError:
                 # only possible if: last_bnr!=first_bnr
                 try:
                     first = row1.index(nn[k + 1])
                     last = row1.index(nn[k])
-                except:
+                except ValueError:
                     first = row2.index(nn[k + 1])
                     last = row2.index(nn[k])
 
@@ -496,8 +495,8 @@ def RetrieveSegments(points, segments, curve_list, Ps, NoSe):
             # print("this_type = ",this_type)
             if this_type >= len(NoSe):
                 print(
-                    "Error (this_type=%g , len(NoSe)=%g):  Increase  Nodes/Segments List"
-                    % (this_type, len(NoSe))
+                    f"Error (this_type={this_type} , len(NoSe)={len(NoSe)}):  "
+                    "Increase  Nodes/Segments List"
                 )
             if NoSe[this_type] == "Nodes":
 
@@ -527,7 +526,7 @@ def RetrieveSegments(points, segments, curve_list, Ps, NoSe):
                         + segments[curve_list[first_bnr] : last + 1]
                     )
 
-                if Orient == True:
+                if Orient:
                     add = [x[-1::-1] for x in add[-1::-1]]
 
             ret += [add]
@@ -538,12 +537,14 @@ def RetrieveSegments(points, segments, curve_list, Ps, NoSe):
 
 # find all points of the triangulation which are element of
 # curve, given by a function call
-def FindCurveSegments(points, t, func, inner_p=[]):
+def FindCurveSegments(points, t, func, inner_p=None):
+    if inner_p is None:
+        inner_p = []
 
     ret = []
     for i, X in enumerate(points):
         yn = func(X)
-        if yn == True:
+        if yn:
             ret += [i]
 
     if ret == []:
@@ -634,7 +635,7 @@ def FindCurveSegments(points, t, func, inner_p=[]):
 def FindBoundary(p, t, P1, P2, btype):
 
     # find boundary
-    kanten, rand_seg, rand_elemente = FindEdges(t)
+    _kanten, rand_seg, _rand_elemente = FindEdges(t)
     # connect boundary according to P1
     rand_seg, rand_list, P1_boundary = ConnectBoundary(
         rand_seg, p, pstart=[(P1[0], P1[1])]
@@ -727,7 +728,7 @@ def SortEdgeList(folly):
 def ContourSurface(p, t, u, iso_in, infig):
 
     # make iso values
-    if isinstance(iso_in, int) == True:
+    if isinstance(iso_in, int):
         isolines = np.linspace(min(u), max(u), iso_in)
         print("isolines", isolines)
     else:
@@ -766,7 +767,7 @@ def ContourSurface(p, t, u, iso_in, infig):
                     Y = np.append(Y, P[1])
                     Z = np.append(Z, P[2])
 
-                mal.plot3d(
+                plt.plot3d(
                     X,
                     Y,
                     Z,
@@ -783,7 +784,7 @@ def ContourSurface(p, t, u, iso_in, infig):
 #
 #
 #
-def ComputeGradient(p, t, u, poi=[], num=10):
+def ComputeGradient(p, t, u, poi=None, num=10):
     """
     Compute the Gradient of a triangular mesh
 
@@ -798,6 +799,8 @@ def ComputeGradient(p, t, u, poi=[], num=10):
              g_x   gradient, x-component at (x,y)
              g_y   gradient, y-component at (x,y)
     """
+    if poi is None:
+        poi = []
 
     if poi == []:
         eps = 1e-6
@@ -855,8 +858,8 @@ def ComputeGradient(p, t, u, poi=[], num=10):
     return XYUV[:, 0], XYUV[:, 1], XYUV[:, 2], XYUV[:, 3]
 
 
-# For a given boundary segment Seg the corresponding boundary element is found. A list of
-# all boundary elements must be provided
+# For a given boundary segment Seg the corresponding boundary element is found.
+# A list of all boundary elements must be provided
 def FindBoundaryElement(t, Seg, BoundE):
     for i in range(len(BoundE)):
         # check main nodes
@@ -881,7 +884,7 @@ def FindBoundaryElement(t, Seg, BoundE):
 
 # Compute the normal derivative along the segments in boundary
 #
-def NormalDerivative(boundary, p, tt, u, inner=None, BouE=[]):
+def NormalDerivative(boundary, p, tt, u, inner=None, BouE=None):
     """
     Compute the normal derivative on a given boundary
 
@@ -895,13 +898,15 @@ def NormalDerivative(boundary, p, tt, u, inner=None, BouE=[]):
              rl        running length
              line_int  line integral over boundary of the normal derivative
     """
+    if BouE is None:
+        BouE = []
 
     # second order
 
     if len(boundary[0]) == 3:
 
         if BouE == []:
-            edges, segments, BouE = FindEdges(tt)
+            edges, _segments, BouE = FindEdges(tt)
 
         nor = []
         rl = []
@@ -936,14 +941,14 @@ def NormalDerivative(boundary, p, tt, u, inner=None, BouE=[]):
             b12 = b_1 * b_2
             b13 = b_1 * b_3
             b23 = b_2 * b_3
-            b11 = b_1**2
-            b22 = b_2**2
+            _b11 = b_1**2
+            _b22 = b_2**2
             b33 = b_3**2
             c12 = c_1 * c_2
             c13 = c_1 * c_3
             c23 = c_2 * c_3
-            c11 = c_1**2
-            c22 = c_2**2
+            _c11 = c_1**2
+            _c22 = c_2**2
             c33 = c_3**2
 
             Qseq = [0, 0, 0, 0, 0, 0]
@@ -1015,10 +1020,10 @@ def NormalDerivative(boundary, p, tt, u, inner=None, BouE=[]):
         rl = np.array(rl) - rl[0]
 
         return np.array(nor), np.array(rl), line_int
-    elif len(boundary[0]) == 2 and inner == None:
+    elif len(boundary[0]) == 2 and inner is None:
 
         if BouE == []:
-            edges, segments, BouE = FindEdges(tt)
+            edges, _segments, BouE = FindEdges(tt)
 
         nor = []
         rl = []
@@ -1070,17 +1075,18 @@ def NormalDerivative(boundary, p, tt, u, inner=None, BouE=[]):
     edges = []
     index_3 = []
     for lt in tt:
-        edges += [set([lt[0], lt[1]])]
+        edges += {lt[0], lt[1]}
         index_3 += [lt[2]]
-        edges += [set([lt[1], lt[2]])]
+        edges += {lt[1], lt[2]}
         index_3 += [lt[0]]
-        edges += [set([lt[0], lt[2]])]
+        edges += {lt[0], lt[2]}
         index_3 += [lt[1]]
 
     for s in boundary:
 
         # seg=np.array(s)
-        # no_el=[(np.setxor1d(tt[j],seg)[0],j) for j in range(len(tt)) if len(np.setxor1d(tt[j],seg))==1]
+        # no_el=[(np.setxor1d(tt[j],seg)[0],j) for j in range(len(tt))
+        # if len(np.setxor1d(tt[j],seg))==1]
 
         # search for element containing segment s, save third index and element number
         so_seg = set(s)
@@ -1109,7 +1115,10 @@ def NormalDerivative(boundary, p, tt, u, inner=None, BouE=[]):
             if inner == "right":
                 normal_x *= -1
                 normal_y *= -1
-            # plt.plot([(p[n[0],0]+p[n[1],0]+p[n[2],0])/3],[(p[n[0],1]+p[n[1],1]+p[n[2],1])/3],'x')
+            # plt.plot(
+            #     [(p[n[0],0]+p[n[1],0]+p[n[2],0])/3],
+            #     [(p[n[0],1]+p[n[1],1]+p[n[2],1])/3],
+            #     "x")
         else:
             n = [no_el[0][0], s[0], s[1]]
 
@@ -1242,9 +1251,9 @@ def CheckSegmentSense(t, boundary, indices):
         first = set(boundary[pos])
         boundary_element = [x for x in t if first.issubset(set(x))]
         x = boundary_element[0]
-        if first == set([x[0], x[2]]):
+        if first == {x[0], x[2]}:
             first = [x[2], x[0], x[1]]
-        elif first == set([x[1], x[2]]):
+        elif first == {x[1], x[2]}:
             first = [x[1], x[2], x[0]]
         else:
             first = x
@@ -1335,7 +1344,7 @@ def SortSegments(all_segments):
         seg, new_bound = FindNextSegment(all_segments, node)
         node = seg[1]
         sorted_segments.append(seg)
-        if new_bound == True:
+        if new_bound:
             boundaries.append(j)
 
     if len(sorted_segments) != count:
@@ -1346,12 +1355,13 @@ def SortSegments(all_segments):
 # connect segments in a defined way
 # (see SortSegments), but start sorting with a defined point p
 # multiple p'2 for different closed boundaries are possible
-def ConnectBoundary(boundary_segments, Pall, pstart=[]):
+def ConnectBoundary(boundary_segments, Pall, pstart=None):
     """
     Sort the boundary segments in a defined order
 
     Input:  boundary_segments   [[n1,n2],[n3,n4],...]           boundary segments
-            pstart              array([[x1,y1],[x2,y2],...)     start number of boundary 1 with (x1,y1) ,...
+            pstart              array([[x1,y1],[x2,y2],...)
+                start number of boundary 1 with (x1,y1) ,...
             Pall                array([[X1,X1],[X2,X2],...)     node coordinates
 
     Output: sorted boundary segments
@@ -1360,6 +1370,9 @@ def ConnectBoundary(boundary_segments, Pall, pstart=[]):
 
     see also SortSegments
     """
+
+    if pstart is None:
+        pstart = []
 
     # sort the boundary segments
     allseg = boundary_segments[:]
@@ -1372,14 +1385,14 @@ def ConnectBoundary(boundary_segments, Pall, pstart=[]):
     # find all nodes on the given boundary
     nodes = [x[0] for x in allseg]
     # find closest nodes to desired point list p
-    indices, distances = FindClosestNode(nodes, Pall, pstart)
+    indices, _distances = FindClosestNode(nodes, Pall, pstart)
     # print("indices,dist=",indices,distances)
     # print("boundaries",boundaries)
     # print("all_seg",allseg)
 
     # change order within each closed boundary
     flag_sorted = []
-    for j in range(len(boundaries)):
+    for _ in range(len(boundaries)):
         flag_sorted.append(False)
 
     for j in range(len(indices)):
@@ -1389,7 +1402,7 @@ def ConnectBoundary(boundary_segments, Pall, pstart=[]):
         # find the number of boundary the node belongs to
         this_boundary = (np.where((np.array(boundaries) <= indj))[0])[-1]
 
-        if flag_sorted[this_boundary] == False:
+        if not flag_sorted[this_boundary]:
             # define the indices for slicing
             ind_1 = boundaries[this_boundary]
             if this_boundary + 1 == max_boundaries:
@@ -1432,7 +1445,7 @@ def FindClosestNode(nodes, Pall, p0, constraint=-1, tree=None):
 
     # print("len(nodes) ",len(nodes))
     # print("len(Pall) ",len(Pall))
-    if tree == None:
+    if tree is None:
         p_nodes = np.array(Pall)
         p_nodes = p_nodes[nodes]
         # look for minimum distance, define dist function
@@ -1448,7 +1461,7 @@ def FindClosestNode(nodes, Pall, p0, constraint=-1, tree=None):
     num_p = len(p0)
     if constraint < 0:
         return node_closest, dist
-    elif np.isscalar(constraint) == True:
+    elif np.isscalar(constraint):
         constraint = constraint * np.ones(num_p)
     elif len(p0) != len(constraint):
         print("Error in constraint definition")
@@ -1457,7 +1470,7 @@ def FindClosestNode(nodes, Pall, p0, constraint=-1, tree=None):
     # check constraint for each node
     flags = [((dist[j] <= constraint[j]) | (constraint[j] < 0)) for j in range(num_p)]
     for j in range(num_p):
-        if flags[j] == False:
+        if not flags[j]:
             node_closest[j] = -1
     return node_closest, dist
 
@@ -1509,7 +1522,7 @@ def CircleSegments(
 
     # define vertices
     vertices = [(j, j + 1) for j in range(0, len(points) - 1, 1)]
-    if closed == True:
+    if closed:
         vertices += [(len(points) - 1, 0)]
     return points, vertices
 
@@ -1541,7 +1554,8 @@ def RectangleSegments(
     P1, P2, num_points=60, edge_length=-1, edge_lengthx=-1, edge_lengthy=-1
 ):
     """
-    p,v = RectangleSegments(P1,P2,num_points=60,edge_length=-1,edge_lengthx=-1,edge_lengthy=-1)
+    p,v = RectangleSegments(P1,P2,num_points=60,
+                            edge_length=-1,edge_lengthx=-1,edge_lengthy=-1)
     """
     P11 = [P2[0], P1[1]]
     P22 = [P1[0], P2[1]]
@@ -1554,10 +1568,10 @@ def RectangleSegments(
     if edge_lengthy > 0:
         lengy = edge_lengthy
 
-    p_1, v_1 = LineSegments(P1, P11, npoints, lengx)
-    p_2, v_2 = LineSegments(P11, P2, npoints, lengy)
-    p_3, v_3 = LineSegments(P2, P22, npoints, lengx)
-    p_4, v_4 = LineSegments(P22, P1, npoints, lengy)
+    p_1, _v_1 = LineSegments(P1, P11, npoints, lengx)
+    p_2, _v_2 = LineSegments(P11, P2, npoints, lengy)
+    p_3, _v_3 = LineSegments(P2, P22, npoints, lengx)
+    p_4, _v_4 = LineSegments(P22, P1, npoints, lengy)
     p, v = AddSegments(p_1, p_2)
     p, v = AddSegments(p, p_3)
     p, v = AddSegments(p, p_4)
@@ -1575,7 +1589,8 @@ def ORecSegments(
     edge_lengthy=-1,
 ):
     """
-    p,v = ORecSegments(P1,P2,rho,num_points=60,num_pc=7,edge_length=-1,edge_lengthx=-1,edge_lengthy=-1)
+    p,v = ORecSegments(P1,P2,rho,num_points=60,num_pc=7,
+                       edge_length=-1,edge_lengthx=-1,edge_lengthy=-1)
     """
     x1L = P1[0]
     x2L = P2[0] - rho
@@ -1600,14 +1615,14 @@ def ORecSegments(
         lengy = edge_lengthy
 
     npoints = int(np.floor(num_points / 4))
-    p_1, v_1 = LineSegments([x1R, y1R], [x2L, y1R], npoints, lengx)
-    p_2, v_2 = LineSegments([x2R, y1L], [x2R, y3R], npoints, lengy)
-    p_3, v_3 = LineSegments([x2L, y3L], [x1R, y3L], npoints, lengx)
-    p_4, v_4 = LineSegments([x1L, y3R], [x1L, y1L], npoints, lengy)
-    p_5, v_5 = CircleSegments([x2L, y1L], rho, num_pc, -np.pi / 2.0, 0, edge_length)
-    p_6, v_6 = CircleSegments([x2L, y3R], rho, num_pc, 0, np.pi / 2.0, edge_length)
-    p_7, v_7 = CircleSegments([x1R, y3R], rho, num_pc, np.pi / 2.0, np.pi, edge_length)
-    p_8, v_8 = CircleSegments(
+    p_1, _v_1 = LineSegments([x1R, y1R], [x2L, y1R], npoints, lengx)
+    p_2, _v_2 = LineSegments([x2R, y1L], [x2R, y3R], npoints, lengy)
+    p_3, _v_3 = LineSegments([x2L, y3L], [x1R, y3L], npoints, lengx)
+    p_4, _v_4 = LineSegments([x1L, y3R], [x1L, y1L], npoints, lengy)
+    p_5, _v_5 = CircleSegments([x2L, y1L], rho, num_pc, -np.pi / 2.0, 0, edge_length)
+    p_6, _v_6 = CircleSegments([x2L, y3R], rho, num_pc, 0, np.pi / 2.0, edge_length)
+    p_7, _v_7 = CircleSegments([x1R, y3R], rho, num_pc, np.pi / 2.0, np.pi, edge_length)
+    p_8, _v_8 = CircleSegments(
         [x1R, y1L], rho, num_pc, np.pi, 3 * np.pi / 2, edge_length
     )
     p, v = AddSegments(p_1, p_5)
@@ -1643,12 +1658,12 @@ def PointSegments(p, edge_length=-1):
     delta = np.min(np.sqrt(np.sum((p1[1:] - p1[:-1]) ** 2, axis=1))) / 10.0
     Pall = [(x[0], x[1]) for x in p1]
     closed = False
-    if SamePoint(p1[0], p1[-1], delta) == True:
+    if SamePoint(p1[0], p1[-1], delta):
         Pall = Pall[:-1]
         closed = True
 
     vertices = [(j, j + 1) for j in range(0, len(Pall) - 1, 1)]
-    if closed == True:
+    if closed:
         vertices += [(len(Pall) - 1, 0)]
 
     return Pall, vertices
@@ -1665,7 +1680,7 @@ def AddMultipleSegments(*args, **kwargs):
         p, v = AddSegments(p, args[k])
 
     if kwargs:
-        if kwargs["closed"] == True:
+        if kwargs["closed"]:
             p, v = AddSegments(p, args[nn - 1], closed=True)
         else:
             p, v = AddSegments(p, args[nn - 1])
@@ -1714,28 +1729,31 @@ def AddSegments(P1, P2, closed=False):
     # Add second curve to first curve
     del_first = SamePoint(p1[-1], p2[0], delta)
     Pall = P1[:]
-    if del_first == True:
+    if del_first:
         Pall += P2[1:]
     else:
         Pall += P2
 
     # check if Pall is closed
     del_last = SamePoint(Pall[-1], p1[0], delta)
-    if del_last == True:
+    if del_last:
         Pall = Pall[:-1]
 
     vertices = [(j, j + 1) for j in range(0, len(Pall) - 1, 1)]
-    if (del_last == True) or (closed == True):
+    if del_last or closed:
         vertices += [(len(Pall) - 1, 0)]
 
     return Pall, vertices
 
 
 # Append Curves
-def AddCurves(p1, v1, p2, v2, connect=False, connect_points=[], eps=1e-12):
+def AddCurves(p1, v1, p2, v2, connect=False, connect_points=None, eps=1e-12):
     """
     p,v = AddCurves(p1,v1,p2,v2,connect=False,connect_points=[],eps=1e-12)
     """
+    if connect_points:
+        connect_points = []
+
     # make one list
     p = p1 + p2
     v2n = [(v2[j][0] + len(p1), v2[j][1] + len(p1)) for j in range(len(v2))]
@@ -1745,21 +1763,21 @@ def AddCurves(p1, v1, p2, v2, connect=False, connect_points=[], eps=1e-12):
     # IDENTICAL points,
     # given in connect_points or indicated by the option connect
     con_pt = []
-    if connect == True:
-        con_pt = [x for x in p2]
+    if connect:
+        con_pt = list(p2)
     elif len(connect_points) != 0:
-        con_pt = [x for x in connect_points]
+        con_pt = list(connect_points)
     if len(con_pt) != 0:
         nodes1 = np.arange(0, len(p1))
         nodes2 = np.arange(0, len(p2))
         # node numbers of connect points in p1
         fn1, dn1 = FindClosestNode(nodes1, p1, con_pt)
         # node numbers of connect points in p2
-        if connect != True:
-            fn2, dn2 = FindClosestNode(nodes2, p2, con_pt)
+        if not connect:
+            fn2, _dn2 = FindClosestNode(nodes2, p2, con_pt)
         else:
             fn2 = np.arange(0, len(p2), dtype=int)
-            dn = 0.0 * fn2
+            _dn = 0.0 * fn2
 
         # node numbers in p
         # sort node numbers for delete process
@@ -1788,7 +1806,7 @@ def DoTriMesh(
     points,
     vertices,
     edge_length=-1,
-    holes=[],
+    holes=None,
     tri_refine=None,
     show=True,
     order=None,
@@ -1798,15 +1816,19 @@ def DoTriMesh(
     DoTriMesh(points,vertices,edge_length=-1,holes=[],tri_refine=None,show=True,order=None,writeTo=None)
     ---------
     output
-    mesh_points , mesh_elements , bou_Edges , list_boundary_edges , mesh_boundary_elements , inner_curve_segments , list_inner_curve_segments
+    mesh_points , mesh_elements , bou_Edges , list_boundary_edges ,
+    mesh_boundary_elements , inner_curve_segments , list_inner_curve_segments
     """
+    if holes is None:
+        holes = []
+
     info = triangle.MeshInfo()
     info.set_points(points)
     if len(holes) > 0:
         info.set_holes(holes)
     info.set_facets(vertices)
 
-    if tri_refine != None:
+    if tri_refine is not None:
         mesh = triangle.build(info, refinement_func=tri_refine, mesh_order=order)
     elif edge_length <= 0:
         mesh = triangle.build(info, mesh_order=order)
@@ -1851,7 +1873,7 @@ def DoTriMesh(
         for j in [0, 1, 2]:
             try:
                 edge_element_map[e[j]] += [i]
-            except:
+            except KeyError:
                 edge_element_map[e[j]] = [i]
 
     # print("--> map",edge_element_map)
@@ -1872,7 +1894,7 @@ def DoTriMesh(
     Curves = CheckSegmentSense(mesh_elements, Curves, list_Cu)
     list_Cu += [len(Curves)]
 
-    if show == True:
+    if show:
         plt.gca().set_aspect(1)
         plt.triplot(mesh_points[:, 0], mesh_points[:, 1], mesh_elements[:, 0:3])
         plt.show()
@@ -1905,7 +1927,7 @@ def DoTriMesh(
             )
             return False
 
-    if writeTo != None:
+    if writeTo is not None:
         np.savez(
             writeTo,
             mesh_points,
@@ -1934,7 +1956,8 @@ def LoadTriMesh(filename, show=True):
     LoadTriMesh(filename,show=True)
     ------------------
     output
-    mesh_points , mesh_elements , bou_Edges , list_boundary_edges , mesh_boundary_elements , inner_curve_segments , list_inner_curve_segments
+    mesh_points , mesh_elements , bou_Edges , list_boundary_edges ,
+    mesh_boundary_elements , inner_curve_segments , list_inner_curve_segments
     """
 
     erg = np.load(filename)
@@ -1948,7 +1971,7 @@ def LoadTriMesh(filename, show=True):
     li_CE = erg["arr_6"].tolist()
     erg.close()
 
-    if show == True:
+    if show:
         plt.triplot(poi[:, 0], poi[:, 1], tri[:, 0:3])
         plt.show()
 
@@ -1963,7 +1986,7 @@ def WriteXmlMesh(filename, p, t, do=None):
     WriteXmlMesh(filename,p,t,do=None)
     """
 
-    import xml.etree.ElementTree as ET
+    from xml.etree import ElementTree
 
     # pretty print method
     def indent(elem, level=0):
@@ -1984,54 +2007,56 @@ def WriteXmlMesh(filename, p, t, do=None):
         return elem
 
     # root element
-    dolf = ET.Element(
+    dolf = ElementTree.Element(
         "dolfin",
         {
-            "xmlns:dolfin": "https://fenicsproject.org converted from meshpy and meshtools"
+            "xmlns:dolfin": (
+                "https://fenicsproject.org converted from meshpy and meshtools"
+                )
         },
     )
 
     # full mesh
-    mesh = ET.SubElement(dolf, "mesh", {"celltype": "triangle", "dim": "2"})
+    mesh = ElementTree.SubElement(dolf, "mesh", {"celltype": "triangle", "dim": "2"})
 
     # coordinates
-    vert = ET.SubElement(mesh, "vertices", {"size": str(len(p))})
+    vert = ElementTree.SubElement(mesh, "vertices", {"size": str(len(p))})
 
     for i, pp in enumerate(p):
-        line = ET.SubElement(
+        _line = ElementTree.SubElement(
             vert, "vertex", {"index": str(i), "x": str(pp[0]), "y": str(pp[1])}
         )
 
     # elements
-    cells = ET.SubElement(mesh, "cells", {"size": str(len(t))})
+    cells = ElementTree.SubElement(mesh, "cells", {"size": str(len(t))})
     for i, tt in enumerate(t):
-        line = ET.SubElement(
+        _line = ElementTree.SubElement(
             cells,
             "triangle",
             {"index": str(i), "v0": str(tt[0]), "v1": str(tt[1]), "v2": str(tt[2])},
         )
 
     # data
-    line = ET.SubElement(mesh, "data")
+    _line = ElementTree.SubElement(mesh, "data")
 
     # domains
-    dom = ET.SubElement(mesh, "domains")
-    if do == None:
+    dom = ElementTree.SubElement(mesh, "domains")
+    if do is None:
         do = len(t) * [0]
-    msh_vc = ET.SubElement(
+    msh_vc = ElementTree.SubElement(
         dom,
         "mesh_value_collection",
         {"name": "m", "type": "uint", "dim": "2", "size": "686"},
     )
     for i, dd in enumerate(do):
-        line = ET.SubElement(
+        _line = ElementTree.SubElement(
             msh_vc,
             "value",
             {"cell_index": str(i), "local_entity": "0", "value": str(dd)},
         )
 
     # write to file
-    tree = ET.ElementTree(indent(dolf))
+    tree = ElementTree.ElementTree(indent(dolf))
     tree.write(filename, xml_declaration=True, encoding="utf-8")
 
 
@@ -2046,13 +2071,14 @@ def CheckElementList(p, t):
             diff2 = np.sum(((p[t[i, 1]] + p[t[i, 2]]) / 2.0 - p[t[i, 4]]) ** 2)
             diff3 = np.sum(((p[t[i, 2]] + p[t[i, 0]]) / 2.0 - p[t[i, 5]]) ** 2)
             if diff1 > 1e-10 or diff2 > 1e-10 or diff3 > 1e-10:
-                # print("Error in element list (wrong order), ",i,t[i],diff1,diff2,diff3)
+                # print("Error in element list (wrong order), ",
+                #       i, t[i], diff1, diff2, diff3)
                 j += 1
         return j
 
 
 def MakeSecondOrderMesh(p, t, bou):
-    edges, b_ed, b_el = FindEdges(t)
+    edges, _b_ed, _b_el = FindEdges(t)
 
     new_p = []
     all_ed = []
@@ -2064,9 +2090,9 @@ def MakeSecondOrderMesh(p, t, bou):
     new_t = []
     for X in t:
         print(X)
-        e1 = set([X[0], X[1]])
-        e2 = set([X[1], X[2]])
-        e3 = set([X[2], X[0]])
+        e1 = {X[0], X[1]}
+        e2 = {X[1], X[2]}
+        e3 = {X[2], X[0]}
         i4 = all_ed.index(e1) + len(p)
         i5 = all_ed.index(e2) + len(p)
         i6 = all_ed.index(e3) + len(p)
@@ -2074,7 +2100,7 @@ def MakeSecondOrderMesh(p, t, bou):
 
     new_bou = []
     for X in bou:
-        e1 = set([X[0], X[1]])
+        e1 = {X[0], X[1]}
         i3 = all_ed.index(e1) + len(p)
         new_bou += [[X[0], X[1], i3]]
 
@@ -2082,7 +2108,7 @@ def MakeSecondOrderMesh(p, t, bou):
     return p_new, np.array(new_t), np.array(new_bou)
 
 
-############### BEM #################
+# ############## BEM #################
 #  points are the vertices of the segments (or elements)
 #  nodes are the middle position in the segments for zero order
 
@@ -2094,7 +2120,9 @@ def MakeSecondOrderMesh(p, t, bou):
 #          half Diff-Vector
 #          known PHI-segments
 #          known DERIVATIVE-segments
-def MakeBEMBoundary(p, v, func=False, curves=[]):
+def MakeBEMBoundary(p, v, func=False, curves=None):
+    if curves is None:
+        curves = []
 
     # zero order base function, define nodes on middle position of element
     Ns = len(v)
@@ -2111,7 +2139,7 @@ def MakeBEMBoundary(p, v, func=False, curves=[]):
 
     # type of boundary condition
     # if a function is provided dirichlet and neumann nodes are selected
-    if func != False:
+    if func:
         flags = func(mid_points)
     else:
         if curves == []:
@@ -2207,10 +2235,10 @@ def DoBemBoundary(AllBound, show=True, show_numbers=False):
             )
             count += 1
 
-        if show == True:
+        if show:
             PlotBoundary(p, v, "Segments")
 
-    if show == True:
+    if show:
         plt.title("Dirichlet (blue),    Neumann (green),    Inner Curves (red)")
         for Z in Curves:
             x = VecXm[Z["first"] : Z["last"] + 1][:, 0]
@@ -2222,7 +2250,7 @@ def DoBemBoundary(AllBound, show=True, show_numbers=False):
             else:
                 plt.plot(x, y, "vr", markersize=6)
 
-            if show_numbers == True:
+            if show_numbers:
                 for i in range(len(x)):
                     buf = " %i" % (Z["first"] + i)
                     plt.text(x[i], y[i], buf, color="k", fontsize=13)

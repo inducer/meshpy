@@ -1,9 +1,9 @@
 def main():
-    from meshpy.tet import MeshInfo, build
     from meshpy.geometry import (
-        generate_surface_of_revolution,
         GeometryBuilder,
+        generate_surface_of_revolution,
     )
+    from meshpy.tet import MeshInfo, build
 
     r = 1
     ell = 1

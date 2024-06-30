@@ -1,5 +1,5 @@
-from meshpy.common import MeshInfoBase, dump_array
 import meshpy._internals as internals
+from meshpy.common import MeshInfoBase, dump_array
 
 
 class MeshInfo(internals.TetMeshInfo, MeshInfoBase):
@@ -128,7 +128,9 @@ class Options(internals.Options):
         internals.Options.__init__(self)
         if len(switches) == 0:
             from warnings import warn
-            warn("Recommend non-empty 'switches' for crash-free meshing")
+            warn("Recommend non-empty 'switches' for crash-free meshing",
+                 stacklevel=2)
+
         self.parse_switches(switches)
         self.quiet = 1
 
@@ -136,7 +138,7 @@ class Options(internals.Options):
             try:
                 getattr(self, k)
             except AttributeError:
-                raise ValueError("invalid option: %s" % k)
+                raise ValueError(f"invalid option: {k}") from None
             else:
                 setattr(self, k, v)
 
@@ -164,9 +166,12 @@ def tetrahedralize(mesh_info, options):
     return mesh
 
 
-def build(mesh_info, options=Options("pq"), verbose=False,
+def build(mesh_info, options=None, verbose=False,
         attributes=False, volume_constraints=False, max_volume=None,
         diagnose=False, insert_points=None):
+    if options is None:
+        options = Options("pq")
+
     if not verbose:
         options.quiet = 1
 
