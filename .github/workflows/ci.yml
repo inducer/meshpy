@@ -35,8 +35,10 @@ jobs:
                 python-version: ${{ matrix.python-version }}
         -   name: "Main Script"
             run: |
-                EXTRA_INSTALL="numpy pybind11"
-                curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/main/build-and-test-py-project.sh
+                PROJECT_INSTALL_FLAGS="--no-build-isolation"
+                EXTRA_INSTALL="numpy pybind11 meson-python ninja"
+
+                curl -L -O https://gitlab.tiker.net/inducer/ci-support/raw/main/build-and-test-py-project.sh
                 . ./build-and-test-py-project.sh
 
     pytest-macos:
@@ -50,14 +52,11 @@ jobs:
                 python-version: '3.x'
         -   name: "Main Script"
             run: |
-                EXTRA_INSTALL="numpy pybind11"
+                export CC=gcc
+                PROJECT_INSTALL_FLAGS="--no-build-isolation"
+                EXTRA_INSTALL="numpy pybind11 meson-python ninja"
 
-                # https://numpy.org/doc/stable/user/building.html#accelerated-blas-lapack-libraries
-                # e.g. https://github.com/inducer/meshpy/runs/1303881604?check_suite_focus=true
-                export NPY_BLAS_ORDER=""
-                export NPY_LAPACK_ORDER=""
-
-                curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/main/build-and-test-py-project.sh
+                curl -L -O https://gitlab.tiker.net/inducer/ci-support/raw/main/build-and-test-py-project.sh
                 . ./build-and-test-py-project.sh
 
     docs:
@@ -71,8 +70,10 @@ jobs:
                 python-version: '3.x'
         -   name: "Main Script"
             run: |
-                EXTRA_INSTALL="numpy pybind11"
-                curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/main/ci-support.sh
+                PROJECT_INSTALL_FLAGS="--no-build-isolation"
+                EXTRA_INSTALL="numpy pybind11 meson-python ninja"
+
+                curl -L -O https://gitlab.tiker.net/inducer/ci-support/raw/main/ci-support.sh
                 . ci-support.sh
                 build_py_project_in_venv
                 build_docs
