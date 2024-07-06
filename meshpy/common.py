@@ -87,9 +87,9 @@ class MeshInfoBase:
         # header --------------------------------------------------------------
         outfile.write("CONTROL INFO 2.1.2\n")
         outfile.write("** GAMBIT NEUTRAL FILE\n")
-        outfile.write("%s\n" % description)
-        outfile.write("PROGRAM: MeshPy VERSION: %s\n" % version)
-        outfile.write("%s\n" % datetime.now().ctime())
+        outfile.write(f"{description}\n")
+        outfile.write(f"PROGRAM: MeshPy VERSION: {version}\n")
+        outfile.write(f"{datetime.now().ctime()}\n")
 
         bc_markers = list(bc.keys())
         if periodicity:
@@ -144,7 +144,7 @@ class MeshInfoBase:
         flags = 0
         outfile.write("GROUP:%11d ELEMENTS:%11d MATERIAL:%11s NFLAGS: %11d\n"
                 % (1, len(grp_elements), repr(material), flags))
-        outfile.write(("epsilon: %s\n" % material).rjust(32))  # FIXME
+        outfile.write((f"epsilon: {material}\n").rjust(32))  # FIXME
         outfile.write("0\n")
         outfile.write(_linebreak_list([str(i+1) for i in grp_elements],
             pad=8)

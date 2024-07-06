@@ -27,11 +27,11 @@ def add_to_all_vertex_indices(facets, increment):
     return [[pt + increment for pt in facet] for facet in facets]
 
 
-mesh_info.set_facets(
-    [[0, 1, 2, 3]]  # base
-    + box_without_minus_z  # first box
-    + add_to_all_vertex_indices(box_without_minus_z, 4)  # second box
-)
+mesh_info.set_facets([
+    [0, 1, 2, 3],  # base
+    *box_without_minus_z,  # first box
+    *add_to_all_vertex_indices(box_without_minus_z, 4)  # second box
+])
 
 # set the volume properties -- this is where the tet size constraints are
 mesh_info.regions.resize(2)
@@ -50,7 +50,7 @@ mesh_info.regions[1] = [
     1e-2,  # max tet volume in region
 ]
 
-mesh = build(mesh_info, area_constraints=True)
+mesh = build(mesh_info, volume_constraints=True)
 
 # this is a no-op, but it shows how to access the output data
 for point in mesh.points:

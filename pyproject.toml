@@ -61,23 +61,24 @@ preview = true
 extend-select = [
     "B",    # flake8-bugbear
     "C",    # flake8-comprehensions
-    "D",    # pydocstyle
     "E",    # pycodestyle
     "F",    # pyflakes
+    "G",    # flake8-logging-format
     "I",    # flake8-isort
     "N",    # pep8-naming
     "NPY",  # numpy
     "Q",    # flake8-quotes
+    "RUF",  # ruff
+    "UP",   # pyupgrade
     "W",    # pycodestyle
 ]
 extend-ignore = [
+    "C90",  # McCabe complexity
     "E226", # missing whitespace around arithmetic operator
     "E241", # multiple spaces after comma
     "E242", # tab after comma
     "E265", # block comment should start with #
     "E402", # module level import not at the top of file
-    "D",    # pydocstyle
-    "C90",  # McCabe complexity
 ]
 
 [tool.ruff.lint.per-file-ignores]

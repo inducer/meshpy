@@ -16,7 +16,7 @@ def uniform_refine_triangles(points, elements, factor=2):
         try:
             face_points = face_point_dict[a, b]
         except KeyError:
-            a_pt, b_pt = [points[idx] for idx in [a, b]]
+            a_pt, b_pt = (points[idx] for idx in (a, b))
             dx = (b_pt - a_pt)/factor
 
             # build subdivided facet
@@ -41,13 +41,13 @@ def uniform_refine_triangles(points, elements, factor=2):
             return face_points
 
     for a, b, c in elements:
-        a_pt, b_pt, c_pt = [points[idx] for idx in [a, b, c]]
+        a_pt, b_pt, c_pt = (points[idx] for idx in (a, b, c))
         dr = (b_pt - a_pt)/factor
         ds = (c_pt - a_pt)/factor
 
-        ab_refined, bc_refined, ac_refined = [
+        ab_refined, bc_refined, ac_refined = (
                 get_refined_face(*pt_indices)
-                for pt_indices in [(a, b), (b, c), (a, c)]]
+                for pt_indices in [(a, b), (b, c), (a, c)])
 
         el_point_dict = {}
 

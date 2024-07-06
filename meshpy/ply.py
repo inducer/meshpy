@@ -38,7 +38,7 @@ def make_parser(it):
             .split()):
         return parse_int
     else:
-        raise ValueError("unknown type '%s'" % tp)
+        raise ValueError(f"unknown type '{tp}'")
 
 
 def parse_ply(name):

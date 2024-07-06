@@ -206,7 +206,7 @@ def MakeSurfaceMesh(xstr, ystr, zstr, u0, u1, v0, v1, n1, n2):
     max_len = max([np.max(np.diff(all_u)), np.max(np.diff(all_v))])
 
     # make mesh
-    uv_points = np.array(uv_bound + [uv_bound[0]])
+    uv_points = np.array([*uv_bound, uv_bound[0]])
     p1, v1 = PointSegments(uv_points)
     p_uv, elements, bou, li_bou = DoTriMesh(p1, v1, edge_length=max_len, show=False)
 
@@ -302,9 +302,9 @@ def MakeSphere(P0, R, mesh_len, epsilon=1e-8, type="cart"):
     if type == "cart":
 
         # make part of the sphere
-        xstr = "%g*np.cos(u)*np.sin(v)" % (R)
-        ystr = "%g*np.sin(u)*np.sin(v)" % (R)
-        zstr = "%g*np.cos(v)" % (R)
+        xstr = f"{R:g}*np.cos(u)*np.sin(v)"
+        ystr = f"{R:g}*np.sin(u)*np.sin(v)"
+        zstr = f"{R:g}*np.cos(v)"
         Nu = int(2 * np.pi * R / mesh_len)
         pp, tt = MakeSurfaceMesh(
             xstr, ystr, zstr, 0, 2 * np.pi, np.pi / 4.0, np.pi / 2.0, Nu, int(Nu / 3.0)
@@ -350,9 +350,9 @@ def MakeSphere(P0, R, mesh_len, epsilon=1e-8, type="cart"):
 
     else:
         # make part of the sphere
-        xstr = "%g*np.cos(u)*np.sin(v)" % (R)
-        ystr = "%g*np.sin(u)*np.sin(v)" % (R)
-        zstr = "%g*np.cos(v)" % (R)
+        xstr = f"{R:g}*np.cos(u)*np.sin(v)"
+        ystr = f"{R:g}*np.sin(u)*np.sin(v)"
+        zstr = f"{R:g}*np.cos(v)"
         Nu = int(2.0 * np.pi * R / mesh_len)
         pn, tn = MakeSurfaceMesh(
             xstr, ystr, zstr, 0, 2.0 * np.pi, 0, np.pi, Nu, int(Nu / 3.0)
@@ -867,7 +867,7 @@ def FindBoundaryElement(t, Seg, BoundE):
             # print("Boundary Segment ",Seg,"  Boundary Element ",t[BoundE[i]])
             # sort in a way that the first two indices are boundary indices
             # main indices first
-            ThirdIndex = list(set(t[BoundE[i], 0:3]) - set(Seg[0:2]))[0]
+            ThirdIndex = next(set(t[BoundE[i], 0:3]) - set(Seg[0:2]))
             dbllist = list(t[BoundE[i], 0:3]) * 2
             kk = 1 + dbllist.index(ThirdIndex)
             MainIndices = dbllist[kk : kk + 3]
@@ -1400,7 +1400,7 @@ def ConnectBoundary(boundary_segments, Pall, pstart=None):
         # indj gives the position of the segment in allseg
         indj = nodes.index(indices[j])
         # find the number of boundary the node belongs to
-        this_boundary = (np.where((np.array(boundaries) <= indj))[0])[-1]
+        this_boundary = (np.where(np.array(boundaries) <= indj)[0])[-1]
 
         if not flag_sorted[this_boundary]:
             # define the indices for slicing

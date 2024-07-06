@@ -1,9 +1,11 @@
+from typing import ClassVar, List
+
 import meshpy._internals as internals
 from meshpy.common import MeshInfoBase, dump_array
 
 
 class MeshInfo(internals.TriMeshInfo, MeshInfoBase):
-    _constituents = [
+    _constituents: ClassVar[List[str]] = [
             "points", "point_attributes", "point_markers",
             "elements", "element_attributes", "element_volumes",
             "neighbors",
@@ -127,7 +129,7 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
     opts = "pzj"
     if quality_meshing:
         if min_angle is not None:
-            opts += "q%f" % min_angle
+            opts += f"q{min_angle:f}"
         else:
             opts += "q"
 
@@ -145,7 +147,7 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
     if volume_constraints:
         opts += "a"
     if max_volume:
-        opts += "a%.20f" % max_volume
+        opts += f"a{max_volume:.20f}"
 
     if refinement_func is not None:
         opts += "u"
@@ -199,7 +201,7 @@ def refine(input_p, verbose=False, refinement_func=None,  quality_meshing=True,
 
     if quality_meshing:
         if min_angle is not None:
-            opts += "q%f" % min_angle
+            opts += f"q{min_angle:f}"
         else:
             opts += "q"
 
@@ -229,5 +231,8 @@ def write_gnuplot_mesh(filename, out_p, facets=False):
 
     for points in segments:
         for pt in points:
-            gp_file.write("%f %f\n" % tuple(out_p.points[pt]))
-        gp_file.write("%f %f\n\n" % tuple(out_p.points[points[0]]))
+            x, y = out_p.points[pt]
+            gp_file.write(f"{x:f} {y:f}\n")
+
+        x, y = out_p.points[points[0]]
+        gp_file.write(f"{x:f} {y:f}\n\n")
