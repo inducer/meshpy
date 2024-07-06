@@ -31,7 +31,7 @@ def main():
     #
     info.regions.resize(1)
     # points [x,y] in region, + region number, + regional area constraints
-    info.regions[0] = [0, 0] + [1, 0.05]
+    info.regions[0] = [0, 0, 1, 0.05]
 
     mesh = triangle.build(info, volume_constraints=True, max_volume=0.1)
 

@@ -133,7 +133,7 @@ def get_naca_points(naca_digits, number_of_points=100,
         def explain(*s):
             pass
 
-    explain("Airfoil: NACA-%s" % naca_digits)
+    explain(f"Airfoil: NACA-{naca_digits}")
 
     if sharp_trailing_edge:
         explain("Sharp trailing edge")
@@ -259,7 +259,7 @@ def main():
             verbose=options.verbose)
 
     if options.output is None:
-        options.output = "naca-%s.dat" % digits
+        options.output = f"naca-{digits}.dat"
 
     print("Output file:", options.output)
     write_points(points, options.output)

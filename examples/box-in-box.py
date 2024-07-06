@@ -24,16 +24,14 @@ def main():
 
     # region attributes
     mesh_info.regions.resize(1)
-    mesh_info.regions[0] = (
+    mesh_info.regions[0] = [
         # point in region
-        [0, 0, 0]
-        + [
-            # region number
-            1,
-            # max volume in region
-            0.001,
-        ]
-    )
+        0, 0, 0,
+        # region number
+        1,
+        # max volume in region
+        0.001,
+    ]
 
     mesh = build(mesh_info, max_volume=0.06,
             volume_constraints=True, attributes=True)
