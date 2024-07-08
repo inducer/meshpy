@@ -68,10 +68,11 @@ Some common notions
 
 :mod:`meshpy.triangle` -- Triangular Meshing
 --------------------------------------------
+
 .. module:: meshpy.triangle
     :synopsis: Generate triangular meshes
-.. moduleauthor:: Andreas Klöckner <inform@tiker.net>
 
+.. moduleauthor:: Andreas Klöckner <inform@tiker.net>
 
 .. class:: ForeignArray
 
