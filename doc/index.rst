@@ -1,6 +1,18 @@
 Welcome to MeshPy's documentation!
 ==================================
 
+.. toctree::
+    :maxdepth: 2
+    :hidden:
+
+    installation
+    tri-tet
+    gmsh
+    geometry
+    faq
+    🚀 Github <https://github.com/inducer/meshpy>
+    💾 Download Releases <https://pypi.org/project/meshpy>
+
 MeshPy offers quality triangular and tetrahedral mesh generation for Python.
 Meshes of this type are chiefly used in finite-element simulation codes, but
 also have many other applications ranging from computer graphics to robotics.
@@ -8,40 +20,23 @@ also have many other applications ranging from computer graphics to robotics.
 In order to generate these 2D and 3D meshes, MeshPy provides Python interfaces
 to a few well-regarded mesh generators:
 
-* `Triangle <http://www.cs.cmu.edu/~quake/triangle.html>`_ by J. Shewchuk.
-* `TetGen <http://tetgen.berlios.de/>`_ by Hang Si.
-* `Gmsh <http://geuz.org/gmsh/>`_ by Christophe Geuzaine and Jean-François Remacle.
+* `Triangle <http://www.cs.cmu.edu/~quake/triangle.html>`__ by J. Shewchuk.
+* `TetGen <http://tetgen.berlios.de/>`__ by Hang Si.
 
-Triangle and TetGen are included in the package in slightly modified versions. Gmsh
-is called as a subprocess.
+Triangle and TetGen are included in the package in slightly modified versions.
+An interface for `Gmsh <https://gmsh.info/>`__ was also part of MeshPy, but is
+now its own package `gmsh_interop <https://github.com/inducer/gmsh_interop>`__.
+
+MeshPy has its own `web page <http://mathema.tician.de/software/meshpy>`_,
+where you can find updated software, news, a forum, and documentation.
 
 Show me! I need examples!
 -------------------------
-This simple code generates a mesh of a "brick"::
 
-    from meshpy.tet import MeshInfo, build
+This file is included in the :mod:`meshpy` distribution as
+:download:`examples/demo.py <../examples/demo.py>`.
 
-    mesh_info = MeshInfo()
-    mesh_info.set_points([
-        (0,0,0), (2,0,0), (2,2,0), (0,2,0),
-        (0,0,12), (2,0,12), (2,2,12), (0,2,12),
-        ])
-    mesh_info.set_facets([
-        [0,1,2,3],
-        [4,5,6,7],
-        [0,4,5,1],
-        [1,5,6,2],
-        [2,6,7,3],
-        [3,7,4,0],
-        ])
-    mesh = build(mesh_info)
-    print "Mesh Points:"
-    for i, p in enumerate(mesh.points):
-        print i, p
-    print "Point numbers in tetrahedra:"
-    for i, t in enumerate(mesh.elements):
-        print i, t
-    mesh.write_vtk("test.vtk")
+.. literalinclude:: ../examples/demo.py
 
 As a result of this, you will get::
 
@@ -67,25 +62,9 @@ As a result of this, you will get::
     4 [41, 45, 24, 54]
     ...
 
-and a file :file:`test.vtk` that you can view with `Paraview <http://paraview.org>`_ or
-`Visit <http://www.llnl.gov/VisIt/>`_.
-
-Contents
-========
-
-.. toctree::
-    :maxdepth: 2
-
-    installation
-    tri-tet
-    gmsh
-    geometry
-    faq
-    🚀 Github <https://github.com/inducer/meshpy>
-    💾 Download Releases <https://pypi.org/project/meshpy>
-
-MeshPy has its own `web page <http://mathema.tician.de/software/meshpy>`_, where you
-can find updated software, news, a forum, and documentation.
+and a file :file:`test.vtk` that you can view with
+`Paraview <http://paraview.org>`__ or
+`Visit <https://visit-dav.github.io/visit-website/>`__.
 
 Indices and tables
 ==================

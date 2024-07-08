@@ -24,11 +24,14 @@ mesh_info.set_facets(
         [3, 7, 4, 0],
     ]
 )
-mesh = build(mesh_info)
+mesh = build(mesh_info, max_volume=0.5)
+
 print("Mesh Points:")
 for i, p in enumerate(mesh.points):
     print(i, p)
+
 print("Point numbers in tetrahedra:")
 for i, t in enumerate(mesh.elements):
     print(i, t)
+
 mesh.write_vtk("test.vtk")
