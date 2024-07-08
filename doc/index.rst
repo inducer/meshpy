@@ -20,14 +20,14 @@ also have many other applications ranging from computer graphics to robotics.
 In order to generate these 2D and 3D meshes, MeshPy provides Python interfaces
 to a few well-regarded mesh generators:
 
-* `Triangle <http://www.cs.cmu.edu/~quake/triangle.html>`__ by J. Shewchuk.
-* `TetGen <http://tetgen.berlios.de/>`__ by Hang Si.
+* `Triangle <https://www.cs.cmu.edu/~quake/triangle.html>`__ by J. Shewchuk.
+* `TetGen <https://wias-berlin.de/software/tetgen>`__ by Hang Si.
 
 Triangle and TetGen are included in the package in slightly modified versions.
 An interface for `Gmsh <https://gmsh.info/>`__ was also part of MeshPy, but is
 now its own package `gmsh_interop <https://github.com/inducer/gmsh_interop>`__.
 
-MeshPy has its own `web page <http://mathema.tician.de/software/meshpy>`_,
+MeshPy has its own `web page <https://mathema.tician.de/software/meshpy>`_,
 where you can find updated software, news, a forum, and documentation.
 
 Show me! I need examples!
@@ -63,7 +63,7 @@ As a result of this, you will get::
     ...
 
 and a file :file:`test.vtk` that you can view with
-`Paraview <http://paraview.org>`__ or
+`Paraview <https://www.paraview.org>`__ or
 `Visit <https://visit-dav.github.io/visit-website/>`__.
 
 Indices and tables

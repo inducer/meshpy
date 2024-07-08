@@ -7,18 +7,18 @@ This tutorial will walk you through the process of building MeshPy. To follow,
 you really only need three basic things:
 
 * A UNIX-like machine with web access.
-* A working `Python <http://www.python.org>`__ installation.
-* A recent C++ compiler. We use `pybind11 <https://pybind11.readthedocs.io>`__
+* A working `Python <https://www.python.org>`__ installation.
+* A recent C++ compiler. We use `pybind11 <https://pybind11.readthedocs.io/en/stable>`__
   to create the wrappers, so see their documentation for minimal required versions
   if in doubt.
-* `meson-python <https://meson-python.readthedocs.io>`__ and
+* `meson-python <https://meson-python.readthedocs.io/en/latest/>`__ and
   `ninja <https://ninja-build.org/>`__, which are used to build the wrapper.
   See the `[buildsystem]` section in `pyproject.toml` for an up to date list.
 
 Step 1: Download and unpack MeshPy
------------------------------------
+----------------------------------
 
-`Download MeshPy <http://pypi.org/project/MeshPy>`_ and unpack it::
+`Download MeshPy <https://pypi.org/project/MeshPy>`_ and unpack it::
 
     $ tar xfz MeshPy-VERSION.tar.gz
 
@@ -29,8 +29,8 @@ If you're downloading from ``git`` instead::
 Step 2: Build MeshPy
 --------------------
 
-MeshPy uses `meson-python <https://meson-python.readthedocs.io>`__ as its build
-system. For additional compilation options (e.g. compiling in debug mode),
+MeshPy uses `meson-python <https://meson-python.readthedocs.io/en/latest>`__ as
+its build system. For additional compilation options (e.g. compiling in debug mode),
 see their official documentation.
 
 First, just type::
