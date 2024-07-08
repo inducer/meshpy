@@ -55,7 +55,7 @@ references, can be found in the comments at the beginning of the triangle.c
 source file.  Another listing of these references, with PostScript copies
 of some of the papers, is available from the Web page
 
-http://www.cs.cmu.edu/~quake/triangle.research.html
+https://www.cs.cmu.edu/~quake/triangle.research.html
 
 These programs may be freely redistributed under the condition that the
 copyright notices (including the copy of this notice in the code comments
@@ -90,5 +90,6 @@ fee. Please send corresponding requests to:
 tetgen@wias-berlin.de. Please do not forget to include some
 description of your company and the realm of its activities.
 
-For details, see the `TetGen web page <http://tetgen.org>`_
+For details, see the
+`TetGen web page <https://wias-berlin.de/software/tetgen/FAQ-license.jsp>`__
 
