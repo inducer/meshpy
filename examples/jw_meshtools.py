@@ -375,13 +375,16 @@ def ConnectMesh(p1, t1, b1, p2, t2, b2, epsilon=1e-8):
     id_nodes = []
     for seg in b1:
         X = p1[seg[0], :]
+        bb2_tmp = bb2.copy()
         for i, node2 in enumerate(bb2):
             Y = p2[node2, :]
             delta = np.sum((X - Y) ** 2)
             if delta < eps:
                 id_nodes += [(seg[0], node2)]
                 # print(X,Y)
-                bb2.pop(i)
+                bb2_tmp.pop(i)
+
+        bb2 = bb2_tmp
 
     # make list with all mesh 2 nodes for renumbering
     node2_table = np.arange(len(p2))
