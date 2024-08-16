@@ -36,3 +36,4 @@ CMakeFiles
 cmake_install.cmake
 
 tmp
+.ipynb_checkpoints

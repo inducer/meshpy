@@ -79,14 +79,11 @@ extend-ignore = [
     "E242", # tab after comma
     "E265", # block comment should start with #
     "E402", # module level import not at the top of file
-
-    # TODO
-    "UP031", # f-string
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"examples/jw_meshtools.py" = ["N806", "N803", "N802"]
-"examples/jw_mesh_examples.ipynb" = ["E", "Q", "N", "I", "UP", "W", "F"]
+"examples/jw_meshtools.py" = ["N802", "N803", "N806"]
+"examples/jw_mesh_examples.ipynb" = ["N802", "N803", "N806", "N816"]
 
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "double"

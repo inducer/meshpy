@@ -1754,7 +1754,7 @@ def AddCurves(p1, v1, p2, v2, connect=False, connect_points=None, eps=1e-12):
     """
     p,v = AddCurves(p1,v1,p2,v2,connect=False,connect_points=[],eps=1e-12)
     """
-    if connect_points:
+    if connect_points is None:
         connect_points = []
 
     # make one list
