@@ -134,7 +134,7 @@ def build(mesh_info, verbose=False, refinement_func=None, attributes=False,
             opts += "q"
 
     if mesh_order is not None:
-        opts += "o%d" % mesh_order
+        opts += f"o{mesh_order}"
 
     if verbose:
         opts += "VV"

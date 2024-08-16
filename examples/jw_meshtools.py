@@ -104,7 +104,7 @@ def PlotMeshNumbers(p, t, edges=None, pltshow=True):
     plt.triplot(p[:, 0], p[:, 1], t[:, 0:3])
     # annotate nodes
     for i in range(len(p)):
-        buf = "%i" % (i)
+        buf = f"{i}"
         x = p[i, 0]
         y = p[i, 1]
         plt.plot(x, y, "ok", markersize=5)
@@ -112,13 +112,13 @@ def PlotMeshNumbers(p, t, edges=None, pltshow=True):
 
     # annotate elements
     for n in range(len(t)):
-        buf = "%i" % (n)
+        buf = f"{n}"
         ps = (p[t[n, 0], :] + p[t[n, 1], :] + p[t[n, 2], :]) / 3.0
         plt.text(ps[0], ps[1], buf, color="b", fontsize=9)
 
     if edges != []:
         for n in range(len(edges)):
-            buf = "%i" % (n)
+            buf = f"{n}"
             ps = (p[edges[n][0], :] + p[edges[n][1], :]) / 2.0
             plt.text(ps[0], ps[1], buf, color="g", fontsize=11)
 
@@ -2255,8 +2255,8 @@ def DoBemBoundary(AllBound, show=True, show_numbers=False):
 
             if show_numbers:
                 for i in range(len(x)):
-                    buf = " %i" % (Z["first"] + i)
-                    plt.text(x[i], y[i], buf, color="k", fontsize=13)
+                    buf = Z["first"] + i
+                    plt.text(x[i], y[i], f" {buf}", color="k", fontsize=13)
         plt.show()
 
     return VecXm, VecB, Curves, D_nodes, N_nodes, I_nodes

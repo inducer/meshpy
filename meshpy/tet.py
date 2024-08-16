@@ -93,10 +93,10 @@ class MeshInfo(internals.TetMeshInfo, MeshInfoBase):
         for name in ["points"]:
             dump_array(name, getattr(self, name))
         for ifacet, facet in enumerate(self.faces):
-            print("facet %d:" % ifacet)
+            print(f"facet {ifacet}:" % ifacet)
             for ipolygon, polygon in enumerate(facet.polygons):
-                print("  polygon %d: vertices [%s]" %
-                        (ipolygon, ",".join(str(vi) for vi in polygon.vertices)))
+                vertices = ",".join(str(vi) for vi in polygon.vertices)
+                print(f"  polygon {ipolygon}: vertices [{vertices}]")
 
     def write_vtk(self, filename):
         import pyvtk
