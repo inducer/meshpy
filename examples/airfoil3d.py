@@ -72,7 +72,7 @@ def main():
     mesh_info.set_holes([(0, 0, 0.5)])
 
     mesh = build(mesh_info)
-    print("%d elements" % len(mesh.elements))
+    print(f"{len(mesh.elements)} elements")
     mesh.write_vtk("airfoil3d.vtk")
 
 

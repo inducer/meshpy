@@ -35,7 +35,7 @@ def main():
 
     mesh = build(mesh_info, max_volume=0.06,
             volume_constraints=True, attributes=True)
-    print("%d elements" % len(mesh.elements))
+    print(f"{len(mesh.elements)} elements")
     mesh.write_vtk("box-in-box.vtk")
 
 

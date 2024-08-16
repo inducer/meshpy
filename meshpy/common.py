@@ -118,8 +118,8 @@ class MeshInfoBase:
         # nodes ---------------------------------------------------------------
         outfile.write("NODAL COORDINATES 2.1.2\n")
         for i, pt in enumerate(self.points):
-            outfile.write("%d %s\n" %
-                    (i+1, " ".join(repr(c) for c in pt)))
+            point = " ".join(repr(c) for c in pt)
+            outfile.write(f"{i + 1} {point}\n")
         outfile.write("ENDOFSECTION\n")
 
         # elements ------------------------------------------------------------
@@ -130,9 +130,8 @@ class MeshInfoBase:
             eltype = 6
 
         for i, el in enumerate(self.elements):
-            outfile.write("%8d%3d%3d %s\n" %
-                    (i+1, eltype, len(el),
-                        "".join("%8d" % (p+1) for p in el)))
+            element = "".join(f"{p + 1:>8d}" for p in el)
+            outfile.write(f"{i + 1:>8d}{eltype:>3d}{len(el):>3d} {element}\n")
         outfile.write("ENDOFSECTION\n")
 
         # element groups ------------------------------------------------------
@@ -142,8 +141,11 @@ class MeshInfoBase:
         grp_elements = list(range(len(self.elements)))
         material = 1
         flags = 0
-        outfile.write("GROUP:%11d ELEMENTS:%11d MATERIAL:%11s NFLAGS: %11d\n"
-                % (1, len(grp_elements), repr(material), flags))
+        outfile.write(
+                f"GROUP:{1:>11d} "
+                f"ELEMENTS:{len(grp_elements):>11d} "
+                f"MATERIAL:{material!r:>11} "
+                f"NFLAGS: {flags:>11d}\n")
         outfile.write((f"epsilon: {material}\n").rjust(32))  # FIXME
         outfile.write("0\n")
         outfile.write(_linebreak_list([str(i+1) for i in grp_elements],
@@ -180,7 +182,7 @@ class MeshInfoBase:
                     face2el.setdefault(face, []).append((ti, fi+1))
 
         else:
-            raise ValueError("invalid number of dimensions (%d)" % dim)
+            raise ValueError(f"invalid number of dimensions: {dim}")
 
         # actually output bc sections
         if not self.faces.allocated:
@@ -208,21 +210,16 @@ class MeshInfoBase:
                     # regular BC
 
                     bc_name, bc_code = bc[bc_marker]
-                    outfile.write("%32s%8d%8d%8d%8d\n"
-                            % (bc_name,
-                                1,  # face BC
-                                len(face_indices),
-                                0,  # zero additional values per face,
-                                bc_code)
+                    outfile.write(
+                            f"{bc_name:>32}{1:>8d}{len(face_indices):>8d}"
+                            f"{0:>8d}{bc_code:>8d}\n"
                             )
                 else:
                     # periodic BC
 
-                    outfile.write("%s%s%8d%8d%8d\n"
-                            % ("periodic", " ".join(repr(p) for p in periods),
-                                len(face_indices),
-                                0,  # zero additional values per face,
-                                0)
+                    periods_repr = " ".join(repr(p) for p in periods)
+                    outfile.write(
+                            f"periodic{periods_repr}{len(face_indices):>8d}{0:>8d}{0:>8d}\n"
                             )
 
                 for fi in face_indices:
@@ -232,8 +229,8 @@ class MeshInfoBase:
 
                     el_index, el_face_number = adj_el[0]
 
-                    outfile.write("%10d%5d%5d\n" %
-                            (el_index+1, eltype, el_face_number))
+                    outfile.write(
+                        f"{el_index + 1:>10d}{eltype:>5d}{el_face_number:>5d}\n")
 
                 outfile.write("ENDOFSECTION\n")
 
@@ -243,8 +240,7 @@ class MeshInfoBase:
 
 
 def dump_array(name, array):
-    print("array %s: %d elements, %d values per element"
-            % (name, len(array), array.unit))
+    print(f"array {name}: {len(array)} elements, {array.unit} values per element")
 
     if len(array) == 0 or array.unit == 0:
         return
@@ -257,6 +253,7 @@ def dump_array(name, array):
 
     for i, entry in enumerate(array):
         if isinstance(entry, list):
-            print("  %d: %s" % (i, ",".join(str(sub) for sub in entry)))
+            value = ",".join(str(sub) for sub in entry)
+            print(f"  {i}: {value}")
         else:
-            print("  %d: %s" % (i, entry))
+            print(f"  {i}: {entry}")

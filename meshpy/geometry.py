@@ -158,7 +158,7 @@ class GeometryBuilder:
             import meshpy.tet
             return meshpy.tet
         else:
-            raise ValueError("unsupported dimensionality %d" % dim)
+            raise ValueError(f"unsupported dimensionality {dim}")
 
     def bounding_box(self):
         return bounding_box(self.points)
@@ -260,7 +260,7 @@ def make_box(a, b, subdivisions=None):
         facet_markers = [Marker.MINUS_Z, Marker.MINUS_Y, Marker.PLUS_X,
                 Marker.PLUS_Y, Marker.MINUS_X, Marker.PLUS_Z]
     else:
-        raise ValueError("unsupported dimension count: %d" % len(a))
+        raise ValueError(f"unsupported dimension count: {len(a)}")
 
     if subdivisions is not None:
         if dimensions != 2:
@@ -509,10 +509,9 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
                 if rz_points[i][0] == 0:
                     assert len(ring_points) == 1
                 else:
-                    assert len(ring_points) == len(base_shape), \
-                            ("Ring points length (%d) does not "
-                                    "match base shape length (%d)"
-                                    % (len(ring_points), len(base_shape)))
+                    assert len(ring_points) == len(base_shape), (
+                        f"Ring points length ({len(ring_points)}) does not "
+                        f"match base shape length ({len(base_shape)})")
 
                 rings[i] = ring_points
 

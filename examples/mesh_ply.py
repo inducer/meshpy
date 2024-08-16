@@ -20,7 +20,7 @@ def main():
     builder.set(mi)
     mi.set_holes([builder.center()])
     mesh = build(mi)
-    print("%d elements" % len(mesh.elements))
+    print(f"{len(mesh.elements)} elements")
     mesh.write_vtk("out.vtk")
 
 

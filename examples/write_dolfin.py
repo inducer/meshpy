@@ -8,31 +8,29 @@ def main():
     mesh = triangle.build(info, max_volume=1e-3, min_angle=25)
 
     print(
-        """
+        f"""
         <?xml version="1.0" encoding="UTF-8"?>
 
         <dolfin xmlns:dolfin="http://www.fenics.org/dolfin/">
           <mesh celltype="triangle" dim="2">
-            <vertices size="%d">
+            <vertices size="{len(mesh.points)}">
         """
-        % len(mesh.points)
     )
 
     for i, pt in enumerate(mesh.points):
-        print('<vertex index="%d" x="%g" y="%g"/>' % (i, pt[0], pt[1]))
+        print(f'<vertex index="{i}" x="{pt[0]}" y="{pt[1]}"/>')
 
     print(
-        """
+        f"""
         </vertices>
-        <cells size="%d">
+        <cells size="{len(mesh.elements)}">
         """
-        % len(mesh.elements)
     )
 
     for i, element in enumerate(mesh.elements):
         print(
-            '<triangle index="%d" v0="%d" v1="%d" v2="%d"/>'
-            % (i, element[0], element[1], element[2])
+            f'<triangle index="{i}" '
+            f'v0="{element[0]}" v1="{element[1]}" v2="{element[2]}"/>'
         )
 
     print(
