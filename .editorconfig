@@ -1,6 +1,6 @@
 # https://editorconfig.org/
-# https://github.com/editorconfig/editorconfig-vim 
-# https://github.com/editorconfig/editorconfig-emacs 
+# https://github.com/editorconfig/editorconfig-vim
+# https://github.com/editorconfig/editorconfig-emacs
 
 root = true
 
@@ -22,6 +22,9 @@ indent_size = 2
 
 [*.hpp]
 indent_size = 2
+
+[*.yml]
+indent_size = 4
 
 # There may be one in doc/
 [Makefile]
