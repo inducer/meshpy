@@ -1,34 +1,33 @@
 Ruff:
-  script: |
-    pipx install ruff
-    ruff check
-  tags:
-  - docker-runner
-  except:
-  - tags
+    script: |
+        pipx install ruff
+        ruff check
+    tags:
+        - docker-runner
+    except:
+        - tags
 
 Python 3:
-  script: |
-    py_version=3
-    PROJECT_INSTALL_FLAGS="--no-build-isolation"
-    EXTRA_INSTALL="numpy pybind11 meson-python ninja"
+    script: |
+        PROJECT_INSTALL_FLAGS="--no-build-isolation"
+        EXTRA_INSTALL="numpy pybind11 meson-python ninja"
 
-    curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/main/build-and-test-py-project.sh
-    . ./build-and-test-py-project.sh
-  tags:
-  - python3
-  except:
-  - tags
-  artifacts:
-    reports:
-      junit: test/pytest.xml
+        curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/main/build-and-test-py-project.sh
+        . ./build-and-test-py-project.sh
+    tags:
+        - python3
+    except:
+        - tags
+    artifacts:
+        reports:
+            junit: test/pytest.xml
 
 Documentation:
-  script: |
-    PROJECT_INSTALL_FLAGS="--no-build-isolation"
-    EXTRA_INSTALL="numpy pybind11 meson-python ninja"
+    script: |
+        PROJECT_INSTALL_FLAGS="--no-build-isolation"
+        EXTRA_INSTALL="numpy pybind11 meson-python ninja"
 
-    curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/main/build-docs.sh
-    . ./build-docs.sh
-  tags:
-  - python3
+        curl -L -O -k https://gitlab.tiker.net/inducer/ci-support/raw/main/build-docs.sh
+        . ./build-docs.sh
+    tags:
+        - python3
