@@ -79,7 +79,7 @@ def parse_ply(name):
         return result
 
     for name, line_count, props in data_queue:
-        prop_names, parsers = list(zip(*props))
+        prop_names, parsers = list(zip(*props, strict=True))
         result[name] = DataBlock(
                 properties=prop_names,
                 data=[parse_line(parsers, ln) for ln in lines[i:i+line_count]])

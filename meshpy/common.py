@@ -12,7 +12,7 @@ class _Table:
 
         lines = [
             " ".join([cell.ljust(col_width)
-                      for cell, col_width in zip(row, col_widths)])
+                      for cell, col_width in zip(row, col_widths, strict=True)])
             for row in self.Rows]
         return "\n".join(lines)
 

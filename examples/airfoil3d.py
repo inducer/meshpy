@@ -22,6 +22,7 @@ def main():
             for x, r in zip(
                 numpy.linspace(-wing_length, 0, wing_subdiv, endpoint=False),
                 numpy.linspace(0.8, 1, wing_subdiv, endpoint=False),
+                strict=True
             )
         ]
         + [(1, 0)]
@@ -30,6 +31,7 @@ def main():
             for x, r in zip(
                 numpy.linspace(wing_length, 0, wing_subdiv, endpoint=False),
                 numpy.linspace(0.8, 1, wing_subdiv, endpoint=False),
+                strict=True
             )
         ][::-1]
         + [(0.7, wing_length * 1.05), (0, wing_length * 1.05)]
