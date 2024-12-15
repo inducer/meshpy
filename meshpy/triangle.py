@@ -84,7 +84,7 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
     def intermediate_points(pa, pb, n):
         for i in range(1, n):
             tau = i/n
-            yield [pai*(1-tau) + tau*pbi for pai, pbi in zip(pa, pb)]
+            yield [pai*(1-tau) + tau*pbi for pai, pbi in zip(pa, pb, strict=True)]
 
     if isinstance(subdivisions, int):
         from itertools import repeat
@@ -100,7 +100,8 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
         assert len(facets) == len(facet_markers)
         new_facet_markers = []
 
-    for facet_idx, ((pidx_a, pidx_b), subdiv) in enumerate(zip(facets, subdiv_it)):
+    for facet_idx, ((pidx_a, pidx_b), subdiv) in enumerate(
+            zip(facets, subdiv_it, strict=True)):
         facet_points = [pidx_a]
         for p in intermediate_points(points[pidx_a], points[pidx_b], subdiv):
             facet_points.append(len(new_points))

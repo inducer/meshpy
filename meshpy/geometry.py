@@ -289,7 +289,7 @@ def make_circle(r, center=(0, 0), subdivisions=40, marker=Marker.SHELL):
     x = r*np.cos(phi) + cx
     y = r*np.sin(phi) + cy
 
-    return ([np.array(pt) for pt in zip(x, y)],
+    return ([np.array(pt) for pt in zip(x, y, strict=True)],
             round_trip_connect(list(range(subdivisions))),
             None,
             subdivisions*[marker])
@@ -490,7 +490,8 @@ def generate_extrusion(rz_points, base_shape, closure=EXT_OPEN,
                 pairs1 = pair_with_successor(ring1)
                 pairs2 = pair_with_successor(ring2)
                 add_polygons(
-                        [(a, b, c, d) for ((a, b), (d, c)) in zip(pairs1, pairs2)],
+                        [(a, b, c, d)
+                         for ((a, b), (d, c)) in zip(pairs1, pairs2, strict=True)],
                         marker=marker)
 
     points = []
