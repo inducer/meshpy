@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-from typing import List
 
 
 @dataclass(frozen=True)
 class DataBlock:
-    properties: List[str]
-    data: List[str]
+    properties: list[str]
+    data: list[str]
 
 
 def parse_int(it):
