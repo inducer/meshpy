@@ -1,11 +1,11 @@
-from typing import ClassVar, List
+from typing import ClassVar
 
 import meshpy._internals as internals
 from meshpy.common import MeshInfoBase, dump_array
 
 
 class MeshInfo(internals.TriMeshInfo, MeshInfoBase):
-    _constituents: ClassVar[List[str]] = [
+    _constituents: ClassVar[list[str]] = [
             "points", "point_attributes", "point_markers",
             "elements", "element_attributes", "element_volumes",
             "neighbors",
