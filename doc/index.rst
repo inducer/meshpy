@@ -7,7 +7,6 @@ Welcome to MeshPy's documentation!
 
     installation
     tri-tet
-    gmsh
     geometry
     faq
     🚀 Github <https://github.com/inducer/meshpy>

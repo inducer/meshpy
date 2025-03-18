@@ -37,7 +37,6 @@ classifiers = [
 ]
 dependencies = [
     "numpy",
-    "gmsh_interop",
 ]
 
 [project.optional-dependencies]

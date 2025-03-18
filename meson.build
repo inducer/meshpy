@@ -51,8 +51,6 @@ py.extension_module(
 py.install_sources([
     'meshpy/common.py',
     'meshpy/geometry.py',
-    'meshpy/gmsh.py',
-    'meshpy/gmsh_reader.py',
     'meshpy/__init__.py',
     'meshpy/naca.py',
     'meshpy/ply.py',
