@@ -9,7 +9,7 @@ requires = [
 
 [project]
 name = "meshpy"
-version = "2025.1"
+version = "2025.1.1"
 description = "Triangular and Tetrahedral Mesh Generator"
 readme= "README.rst"
 license = { file = "LICENSE" }
