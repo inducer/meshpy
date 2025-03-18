@@ -49,6 +49,9 @@ jobs:
   deploy:
     needs: [build_sdist, build_wheels]
     runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
     name: Deploy
     if: github.event_name == 'release' && github.event.action == 'created'
     steps:
@@ -61,7 +64,4 @@ jobs:
           merge-multiple: true
 
       - name: deploy
-        uses: pypa/gh-action-pypi-publish@v1.12.4
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+        uses: pypa/gh-action-pypi-publish@v1
