@@ -757,7 +757,7 @@ def ContourSurface(p, t, u, iso_in, infig):
             for k in range(len(nis) - 1):
                 hhelp = iso_edges[nis[k] : nis[k + 1]]
                 # take only each second point
-                unique_ie = [hhelp[0]] + hhelp[1:-1:2] + [hhelp[-1]]
+                unique_ie = [hhelp[0], *hhelp[1:-1:2], hhelp[-1]]
 
                 # Compute polygon for this iso curve
                 X = Y = Z = []
