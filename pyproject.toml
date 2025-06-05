@@ -12,7 +12,7 @@ name = "meshpy"
 version = "2025.1.1"
 description = "Triangular and Tetrahedral Mesh Generator"
 readme= "README.rst"
-license = { file = "LICENSE" }
+license-files = ["LICENSE"]
 authors = [{ name = "Andreas Kloeckner", email = "inform@tiker.net" }]
 maintainers = [{ name = "Andreas Kloeckner", email = "inform@tiker.net" }]
 requires-python = ">=3.10"
@@ -21,9 +21,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Other Audience",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
-    "License :: OSI Approved :: GNU Affero General Public License v3",
-    "License :: Free for non-commercial use",
     "Natural Language :: English",
     "Programming Language :: C++",
     "Programming Language :: Python",
