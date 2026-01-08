@@ -169,6 +169,56 @@ def test_tetgen_points():
 
     #mesh.write_vtk("test.vtk")
 
+
+def test_tetgen_insert_points():
+    import numpy as np
+
+    from meshpy.tet import MeshInfo, build
+
+    points = [(0, 0, 0),
+              (0, 0, 1),
+              (1, 0, 0),
+              (1, 0, 1),
+              (1, 1, 0),
+              (1, 1, 1),
+              (0, 1, 0),
+              (0, 1, 1)]
+
+    facets = [(0, 1, 3, 2),
+              (2, 3, 5, 4),
+              (4, 5, 7, 6),
+              (6, 7, 1, 0),
+              (0, 2, 4, 6),
+              (1, 3, 5, 7)]
+
+    mesh_info = MeshInfo()
+    mesh_info.set_points(points)
+    mesh_info.set_facets(facets)
+
+    interior_point = (0.33, 0.7, 0.91)
+
+    insert_points_mesh_info = MeshInfo()
+    insert_points_mesh_info.set_points([interior_point])
+
+    mesh = build(mesh_info, max_volume=0.25,
+                 insert_points=insert_points_mesh_info)
+
+    mesh_points = np.array(mesh.points)
+
+    # because of the max_volume==0.25 constraint, TetGen should have
+    # inserted some points in addition to the 8 cube vertices and the
+    # constranied interior point
+    assert mesh_points.shape[0] > 9
+
+    interior_point_index = \
+        np.where((mesh_points == np.array(interior_point)).all(1))[0][0]
+
+    mesh_elements = np.array(mesh.elements, dtype=int)
+
+    # make sure that there cells including the constrained point have
+    # been added to the mesh
+    assert (mesh_elements == interior_point_index).any()
+
 # }}}
 
 
