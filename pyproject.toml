@@ -78,6 +78,8 @@ extend-ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"test/test_*.py" = ["S102"]
+"doc/conf.py" = ["S102", "DTZ002"]
 "examples/jw_meshtools.py" = ["N802", "N803", "N806"]
 "examples/jw_mesh_examples.ipynb" = ["N802", "N803", "N806", "N816"]
 

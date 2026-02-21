@@ -20,14 +20,16 @@ def main():
 
     mesh = build(mesh_info, max_volume=0.01)
     mesh.write_vtk("cylinder.vtk")
-    mesh.write_neu(
-        open("cylinder.neu", "w"),
-        {
-            1: ("minus_z", 1),
-            2: ("outer", 2),
-            3: ("plus_z", 3),
-        },
-    )
+
+    with open("cylinder.neu", "w") as f:
+        mesh.write_neu(
+            f,
+            {
+                1: ("minus_z", 1),
+                2: ("outer", 2),
+                3: ("plus_z", 3),
+            },
+        )
 
 
 if __name__ == "__main__":

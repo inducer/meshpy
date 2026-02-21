@@ -35,7 +35,8 @@ def main():
     mesh.save_elements("torus_mesh")
     mesh.save_nodes("torus_mesh")
 
-    mesh.write_neu(open("torus.neu", "w"), {1: ("pec", 0)})
+    with open("torus.neu", "w") as f:
+        mesh.write_neu(f, {1: ("pec", 0)})
 
 
 if __name__ == "__main__":

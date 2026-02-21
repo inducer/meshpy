@@ -47,7 +47,7 @@ class MeshInfoBase:
 
     def set_points(self, points, point_markers=None):
         if point_markers is not None:
-            assert len(point_markers) == len(point_markers)
+            assert len(point_markers) == len(points)
 
         self.points.resize(len(points))
 
@@ -80,7 +80,7 @@ class MeshInfoBase:
         if bc is None:
             bc = {}
 
-        from datetime import datetime
+        from datetime import datetime, timezone
 
         from meshpy import version
 
@@ -89,7 +89,7 @@ class MeshInfoBase:
         outfile.write("** GAMBIT NEUTRAL FILE\n")
         outfile.write(f"{description}\n")
         outfile.write(f"PROGRAM: MeshPy VERSION: {version}\n")
-        outfile.write(f"{datetime.now().ctime()}\n")
+        outfile.write(f"{datetime.now(timezone.utc).ctime()}\n")
 
         bc_markers = list(bc.keys())
         if periodicity:

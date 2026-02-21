@@ -1,5 +1,5 @@
 def main():
-    import meshpy.triangle as triangle
+    from meshpy import triangle
 
     info = triangle.MeshInfo()
     info.set_points([(1.5, 1), (-1.2, 1), (-1, -1), (1, -1)])

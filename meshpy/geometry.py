@@ -279,10 +279,8 @@ def make_box(a, b, subdivisions=None):
 
 def make_circle(r, center=(0, 0), subdivisions=40, marker=Marker.SHELL):
     def round_trip_connect(seq):
-        result = []
-        for i in range(len(seq)):
-            result.append((i, (i+1) % len(seq)))
-        return result
+        n = len(seq)
+        return [(i, (i + 1) % n) for i in range(n)]
 
     phi = np.linspace(0, 2*np.pi, num=subdivisions, endpoint=False)
     cx, cy = center

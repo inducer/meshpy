@@ -1,20 +1,17 @@
 def main():
     import math
 
-    import meshpy.triangle as triangle
+    from meshpy import triangle
 
     segments = 50
-
     points = [(1, 0), (1, 1), (-1, 1), (-1, -1), (1, -1), (1, 0)]
 
-    for i in range(0, segments + 1):
+    for i in range(segments + 1):
         angle = i * 2 * math.pi / segments
         points.append((0.5 * math.cos(angle), 0.5 * math.sin(angle)))
 
     def round_trip_connect(start, end):
-        result = []
-        for i in range(start, end):
-            result.append((i, i + 1))
+        result = [(i, i + 1) for i in range(start, end)]
         result.append((end, start))
         return result
 

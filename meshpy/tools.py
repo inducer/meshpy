@@ -64,8 +64,8 @@ def uniform_refine_triangles(points, elements, factor=2):
                 new_points.append(a_pt + dr*i + ds*j)
 
         # generate elements
-        for i in range(0, points_per_edge-1):
-            for j in range(0, points_per_edge-1-i):
+        for i in range(points_per_edge-1):
+            for j in range(points_per_edge-1-i):
                 new_elements.append((
                     el_point_dict[i, j],
                     el_point_dict[i+1, j],

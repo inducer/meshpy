@@ -1,5 +1,5 @@
 def main():
-    import meshpy.triangle as triangle
+    from meshpy import triangle
 
     points = [
         (-5, -1),
@@ -15,10 +15,8 @@ def main():
     ]
 
     def round_trip_connect(seq):
-        result = []
-        for i in range(len(seq)):
-            result.append((seq[i], seq[(i + 1) % len(seq)]))
-        return result
+        n = len(seq)
+        return [(seq[i], seq[(i + 1) % n]) for i in range(n)]
 
     info = triangle.MeshInfo()
     info.set_points(points)
@@ -37,7 +35,8 @@ def main():
 
     triangle.write_gnuplot_mesh("triangles.dat", mesh)
 
-    mesh.write_neu(open("tri_pml.neu", "w"))
+    with open("tri_pml.enu", "w") as f:
+        mesh.write_neu(f)
 
 
 if __name__ == "__main__":

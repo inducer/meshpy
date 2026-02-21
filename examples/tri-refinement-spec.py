@@ -3,7 +3,7 @@
 
 import numpy as np
 
-import meshpy.triangle as triangle
+from meshpy import triangle
 
 
 def round_trip_connect(start, end):
@@ -28,7 +28,7 @@ def main():
     info = triangle.MeshInfo()
     info.set_points(points)
     info.set_facets(facets, facet_markers=markers)
-    #
+
     info.regions.resize(1)
     # points [x,y] in region, + region number, + regional area constraints
     info.regions[0] = [0, 0, 1, 0.05]
@@ -45,7 +45,7 @@ def main():
     plt.triplot(mesh_points[:, 0], mesh_points[:, 1], mesh_tris)
     plt.xlabel("x")
     plt.ylabel("y")
-    #
+
     fig = plt.gcf()
     fig.set_size_inches(4.2, 4.2)
     plt.savefig("sec5-meshpy-triangle-ex4.pdf")
