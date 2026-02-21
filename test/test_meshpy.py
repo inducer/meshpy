@@ -20,27 +20,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import math
+
 
 # {{{ triangle
 
 def test_triangle_refine():
-    import math
-
-    import meshpy.triangle as triangle
+    from meshpy import triangle
 
     segments = 50
 
     points = [(1, 0), (1, 1), (-1, 1), (-1, -1), (1, -1)]
     n_outer_points = len(points)
 
-    for i in range(0, segments):
+    for i in range(segments):
         angle = i * 2 * math.pi / segments
         points.append((0.5 * math.cos(angle), 0.5 * math.sin(angle)))
 
     def round_trip_connect(start, end):
-        result = []
-        for i in range(start, end):
-            result.append((i, i+1))
+        result = [(i, i + 1) for i in range(start, end)]
         result.append((end, start))
         return result
 
@@ -75,7 +73,7 @@ def test_triangle_refine():
 
 
 def test_point_attributes():
-    import meshpy.triangle as triangle
+    from meshpy import triangle
 
     points = [(1, 1), (-1, 1), (-1, -1), (1, -1)]
     info = triangle.MeshInfo()

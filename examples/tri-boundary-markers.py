@@ -3,7 +3,7 @@
 
 import numpy as np
 
-import meshpy.triangle as triangle
+from meshpy import triangle
 
 
 def round_trip_connect(start, end):
@@ -31,10 +31,8 @@ def main():
     info.set_holes([(0, 0)])
     info.set_facets(facets, facet_markers=markers)
 
-    #
     mesh = triangle.build(info, refinement_func=refinement_func)
 
-    #
     mesh_points = np.array(mesh.points)
     mesh_tris = np.array(mesh.elements)
     mesh_attr = np.array(mesh.point_markers)
@@ -46,7 +44,7 @@ def main():
     plt.triplot(mesh_points[:, 0], mesh_points[:, 1], mesh_tris)
     plt.xlabel("x")
     plt.ylabel("y")
-    #
+
     n = np.size(mesh_attr)
     inner_nodes = [i for i in range(n) if mesh_attr[i] == 2]
     outer_nodes = [i for i in range(n) if mesh_attr[i] == 3]

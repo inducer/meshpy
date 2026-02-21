@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.linalg as la
 
-import meshpy.triangle as triangle
+from meshpy import triangle
 
 
 def round_trip_connect(start, end):

@@ -30,18 +30,20 @@ def make_parser(it):
         len_parser = make_parser(it)
         item_parser = make_parser(it)
         return ListParser(len_parser, item_parser)
-    elif tp in "float double float32 float64".split():
+    elif tp in {"float", "double", "float32", "float64"}:
         return parse_float
-    elif tp in (
-            "char uchar short ushort int uint int8 uint8 int16 uint16 int32"
-            .split()):
+    elif tp in {
+            "char", "uchar", "short", "ushort", "int", "uint",
+            "int8", "uint8", "int16", "uint16", "int32"
+        }:
         return parse_int
     else:
         raise ValueError(f"unknown type '{tp}'")
 
 
 def parse_ply(name):
-    lines = [ln.strip().lower() for ln in open(name).readlines()]
+    with open(name) as inf:
+        lines = [ln.strip().lower() for ln in inf]
 
     assert lines[0] == "ply"
     assert lines[1].split() == ["format", "ascii", "1.0"]
@@ -73,14 +75,11 @@ def parse_ply(name):
 
     def parse_line(parsers, line):
         it = iter(line.split())
-        result = []
-        for p in parsers:
-            result.append(p(it))
-        return result
+        return [p(it) for p in parsers]
 
-    for name, line_count, props in data_queue:
+    for dname, line_count, props in data_queue:
         prop_names, parsers = list(zip(*props, strict=True))
-        result[name] = DataBlock(
+        result[dname] = DataBlock(
                 properties=prop_names,
                 data=[parse_line(parsers, ln) for ln in lines[i:i+line_count]])
 

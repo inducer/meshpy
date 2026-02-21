@@ -1,18 +1,15 @@
 def main():
     import numpy as np
 
-    import meshpy.triangle as triangle
+    from meshpy import triangle
 
     points = [(1, 1), (-1, 1), (-1, -1), (1, -1)]
 
     rng = np.random.default_rng(seed=42)
-    for pt in rng.normal(size=(100, 2)):
-        points.append(pt * 0.1)
+    points.extend(0.1 * rng.normal(size=(100, 2)))
 
     def round_trip_connect(start, end):
-        result = []
-        for i in range(start, end):
-            result.append((i, i + 1))
+        result = [(i, i + 1) for i in range(start, end)]
         result.append((end, start))
         return result
 

@@ -1,14 +1,12 @@
 def main():
     import math
 
-    import meshpy.triangle as triangle
+    from meshpy import triangle
 
     points = [(1, 1), (-1, 1), (-1, -1), (1, -1)]
 
     def round_trip_connect(start, end):
-        result = []
-        for i in range(start, end):
-            result.append((i, i + 1))
+        result = [(i, i + 1) for i in range(start, end)]
         result.append((end, start))
         return result
 
@@ -27,7 +25,8 @@ def main():
 
     mesh = triangle.build(info, refinement_func=needs_refinement)
 
-    mesh.write_neu(open("nico.neu", "w"))
+    with open("nico.neu", "w") as f:
+        mesh.write_neu(f)
     triangle.write_gnuplot_mesh("triangles.dat", mesh)
 
 

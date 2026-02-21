@@ -7,7 +7,7 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial import cKDTree
 
-import meshpy.triangle as triangle
+from meshpy import triangle
 
 
 def RefineMeshElements(poi, tri, uu, n=1):
@@ -139,7 +139,6 @@ def PlotSurfaceMesh(p, t, color="b"):
         Z = np.array([P1[2], P2[2]])
         ax.plot(X, Y, Z, color)
     plt.show()
-    return
 
 
 # btype can be 'Nodes' or 'Segments'
@@ -780,13 +779,7 @@ def ContourSurface(p, t, u, iso_in, infig):
                     line_width=5,
                 )
 
-    return
 
-
-#
-#
-#
-#
 def ComputeGradient(p, t, u, poi=None, num=10):
     """
     Compute the Gradient of a triangular mesh
@@ -1175,8 +1168,7 @@ def GetPosition(allnodes, node):
 
     Output:  pos       array([pos_of_nn1,pos_of_nn2,...])
     """
-    pos = np.array([np.where(allnodes == x)[0][0] for x in node])
-    return pos
+    return np.array([np.where(allnodes == x)[0][0] for x in node])
 
 
 #
@@ -1394,9 +1386,7 @@ def ConnectBoundary(boundary_segments, Pall, pstart=None):
     # print("all_seg",allseg)
 
     # change order within each closed boundary
-    flag_sorted = []
-    for _ in range(len(boundaries)):
-        flag_sorted.append(False)
+    flag_sorted = [False] * len(boundaries)
 
     for j in range(len(indices)):
         # find position of node in the boundary list
@@ -1508,8 +1498,7 @@ def CircleSegments(
     number_points = num_points
     if edge_length > 0:
         number_points = int(np.floor(abs(radius / edge_length * (a_max - a_min)))) + 1
-        if number_points < 5:
-            number_points = 5
+        number_points = max(number_points, 5)
 
     delta = (a_max - a_min) / number_points
     closed = False
@@ -1650,8 +1639,7 @@ def PointSegments(p, edge_length=-1):
         for i in range(1, len(pt)):
             dp = pt[i] - pt[i - 1]
             N = (int)(np.sqrt(np.sum(dp**2)) / edge_length) + 1
-            if N <= 2:
-                N = 2
+            N = max(N, 2)
             tvals = np.linspace(0, 1, N)
             p1 += [list(pt[i - 1] + tt * dp) for tt in tvals[1:]]
         p1 = np.array(p1)
@@ -1712,7 +1700,7 @@ def AddMultipleCurves(*allC):
         for i in range(4, N, 2):
             p, v = AddCurves(p, v, allC[i], allC[i + 1])
             indi[j] = indi[j - 1] + len(allC[i])
-            j += 1
+            j += 1  # noqa: SIM113
 
     return p, v, indi
 
@@ -2228,15 +2216,13 @@ def DoBemBoundary(AllBound, show=True, show_numbers=False):
             Curves[i]["last"] += D_nodes + N_nodes
 
         # Compute middle point and direction vector
-        count = 0
-        for s in v:
-            VecB[Curves[i]["first"] + count] = np.array(
+        for i, s in enumerate(v):
+            VecB[Curves[i]["first"] + i] = np.array(
                 [0.5 * (p[s[1], :] - p[s[0], :])]
             )
-            VecXm[Curves[i]["first"] + count] = np.array(
+            VecXm[Curves[i]["first"] + i] = np.array(
                 [0.5 * (p[s[1], :] + p[s[0], :])]
             )
-            count += 1
 
         if show:
             PlotBoundary(p, v, "Segments")

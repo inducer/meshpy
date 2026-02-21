@@ -223,9 +223,9 @@ def get_naca_points(naca_digits, number_of_points=100,
 
 
 def write_points(points, filename):
-    file = open(filename, "w")
-    for pt in points:
-        print("\t".join(repr(p_comp) for p_comp in pt), file=file)
+    with open(filename, "w") as file:
+        for pt in points:
+            print("\t".join(repr(p_comp) for p_comp in pt), file=file)
 
 
 def main():
