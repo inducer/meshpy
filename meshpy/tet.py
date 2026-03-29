@@ -93,7 +93,7 @@ class MeshInfo(internals.TetMeshInfo, MeshInfoBase):
         for name in ["points"]:
             dump_array(name, getattr(self, name))
         for ifacet, facet in enumerate(self.faces):
-            print(f"facet {ifacet}:" % ifacet)
+            print(f"facet {ifacet}:")
             for ipolygon, polygon in enumerate(facet.polygons):
                 vertices = ",".join(str(vi) for vi in polygon.vertices)
                 print(f"  polygon {ipolygon}: vertices [{vertices}]")
