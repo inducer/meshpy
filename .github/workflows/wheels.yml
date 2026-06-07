@@ -44,6 +44,15 @@ jobs:
         uses: pypa/cibuildwheel@v3.4.1
         env:
           CIBW_SKIP: "*-musllinux_i686 *-manylinux_i686 *-win32 cp31?t-*"
+          # Make the Windows wheels self-contained. cibuildwheel repairs Linux
+          # (auditwheel) and macOS (delocate) wheels by default, but does
+          # nothing on Windows. The extension is built with MinGW, so the wheel
+          # otherwise ships without its runtime DLLs (libstdc++-6.dll,
+          # libgcc_s_seh-1.dll) and fails to import on a clean Windows Python
+          # ("DLL load failed while importing _internals"). delvewheel bundles
+          # them. See https://github.com/inducer/meshpy/issues/150
+          CIBW_BEFORE_BUILD_WINDOWS: "pip install delvewheel"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
 
       - uses: actions/upload-artifact@v7
         with:
