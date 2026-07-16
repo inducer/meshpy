@@ -1700,7 +1700,7 @@ def AddMultipleCurves(*allC):
         for i in range(4, N, 2):
             p, v = AddCurves(p, v, allC[i], allC[i + 1])
             indi[j] = indi[j - 1] + len(allC[i])
-            j += 1  # noqa: SIM113
+            j += 1  # ruff:ignore[enumerate-for-loop]
 
     return p, v, indi
 

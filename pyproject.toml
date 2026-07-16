@@ -70,18 +70,18 @@ extend-select = [
 ]
 extend-ignore = [
     "C90",  # McCabe complexity
-    "E226", # missing whitespace around arithmetic operator
-    "E241", # multiple spaces after comma
-    "E242", # tab after comma
-    "E265", # block comment should start with #
-    "E402", # module level import not at the top of file
+    "missing-whitespace-around-arithmetic-operator",
+    "multiple-spaces-after-comma",
+    "tab-after-comma",
+    "no-space-after-block-comment",
+    "module-import-not-at-top-of-file",
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"test/test_*.py" = ["S102"]
-"doc/conf.py" = ["S102", "DTZ002"]
-"examples/jw_meshtools.py" = ["N802", "N803", "N806"]
-"examples/jw_mesh_examples.ipynb" = ["N802", "N803", "N806", "N816"]
+"test/test_*.py" = ["exec-builtin"]
+"doc/conf.py" = ["exec-builtin", "call-datetime-today"]
+"examples/jw_meshtools.py" = ["invalid-function-name", "invalid-argument-name", "non-lowercase-variable-in-function"]
+"examples/jw_mesh_examples.ipynb" = ["invalid-function-name", "invalid-argument-name", "non-lowercase-variable-in-function", "mixed-case-variable-in-global-scope"]
 
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "double"
