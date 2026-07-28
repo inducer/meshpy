@@ -71,12 +71,12 @@ namespace
           SegmentConstraints(segmentconstraintlist, numberofsegmentconstraints, 3),
 
           Faces(trifacelist, numberoftrifaces, 3),
-          AdjacentElements(adjtetlist, numberoftrifaces, 2, &Faces),
+          AdjacentElements(face2tetlist, numberoftrifaces, 2, &Faces),
           FaceMarkers(trifacemarkerlist, numberoftrifaces, 1, &Faces),
 
           Edges(edgelist, numberofedges, 2),
           EdgeMarkers(edgemarkerlist, numberofedges, 1, &Edges),
-          EdgeAdjTetList(edgeadjtetlist, numberofedges, 1, &Edges)
+          EdgeAdjTetList(edge2tetlist, numberofedges, 1, &Edges)
       {
         Elements.fixUnit(numberofcorners);
       }
@@ -367,13 +367,12 @@ void expose_tetgen(pybind11::module &m)
       .DEF_RW_MEMBER(coarsen)
       .DEF_RW_MEMBER(weighted)
       .DEF_RW_MEMBER(brio_hilbert)
-      .DEF_RW_MEMBER(incrflip)
       .DEF_RW_MEMBER(flipinsert)
       .DEF_RW_MEMBER(metric)
       .DEF_RW_MEMBER(varvolume)
       .DEF_RW_MEMBER(fixedvolume)
       .DEF_RW_MEMBER(regionattrib)
-      .DEF_RW_MEMBER(conforming)
+      .DEF_RW_MEMBER(cdt)
       .DEF_RW_MEMBER(insertaddpoints)
       .DEF_RW_MEMBER(diagnose)
       .DEF_RW_MEMBER(convex)
@@ -402,16 +401,16 @@ void expose_tetgen(pybind11::module &m)
       .DEF_RW_MEMBER(vertexperblock)
       .DEF_RW_MEMBER(tetrahedraperblock)
       .DEF_RW_MEMBER(shellfaceperblock)
-      .DEF_RW_MEMBER(nobisect_param)
+      .DEF_RW_MEMBER(supsteiner_level)
       .DEF_RW_MEMBER(addsteiner_algo)
       .DEF_RW_MEMBER(coarsen_param)
       .DEF_RW_MEMBER(weighted_param)
       .DEF_RW_MEMBER(fliplinklevel)
       .DEF_RW_MEMBER(flipstarsize)
       .DEF_RW_MEMBER(fliplinklevelinc)
-      .DEF_RW_MEMBER(reflevel)
-      .DEF_RW_MEMBER(optlevel)
-      .DEF_RW_MEMBER(optscheme)
+      .DEF_RW_MEMBER(cdtrefine)
+      .DEF_RW_MEMBER(opt_max_flip_level)
+      .DEF_RW_MEMBER(opt_scheme)
       .DEF_RW_MEMBER(delmaxfliplevel)
       .DEF_RW_MEMBER(order)
       .DEF_RW_MEMBER(steinerleft)
@@ -420,15 +419,13 @@ void expose_tetgen(pybind11::module &m)
       .DEF_RW_MEMBER(hilbert_limit)
       .DEF_RW_MEMBER(brio_threshold)
       .DEF_RW_MEMBER(brio_ratio)
-      .DEF_RW_MEMBER(facet_ang_tol)
+      .DEF_RW_MEMBER(facet_separate_ang_tol)
       .DEF_RW_MEMBER(maxvolume)
       .DEF_RW_MEMBER(minratio)
       .DEF_RW_MEMBER(mindihedral)
       .DEF_RW_MEMBER(optmaxdihedral)
-      .DEF_RW_MEMBER(optminsmtdihed)
-      .DEF_RW_MEMBER(optminslidihed)
       .DEF_RW_MEMBER(epsilon)
-      .DEF_RW_MEMBER(minedgelength)
+      .DEF_RW_MEMBER(min_edge_length)
       .DEF_RW_MEMBER(coarsen_percent)
 
       .def("parse_switches", (bool (tetgenbehavior::*)(char *)) &cl::parse_commandline)
