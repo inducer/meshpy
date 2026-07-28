@@ -125,14 +125,14 @@
 
 #include "tetgen.h"            // Defines the symbol REAL (float or double).
 
-namespace predicates {
-
 #ifdef USE_CGAL_PREDICATES
   #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
   typedef CGAL::Exact_predicates_inexact_constructions_kernel cgalEpick;
   typedef cgalEpick::Point_3 Point;
   cgalEpick cgal_pred_obj;
 #endif // #ifdef USE_CGAL_PREDICATES
+
+namespace predicates {
 
 /* On some machines, the exact arithmetic routines might be defeated by the  */
 /*   use of internal extended precision floating-point registers.  Sometimes */
@@ -401,7 +401,7 @@ static REAL ispstaticfilter;
 //          http://www.math.utah.edu/~beebe/software/ieee/
 // The original program was "fpinfo2.c".
 
-double fppow2(int n)
+static double fppow2(int n)
 {
   double x, power;
   x = (n < 0) ? ((double)1.0/(double)2.0) : (double)2.0;
@@ -414,12 +414,12 @@ double fppow2(int n)
 
 #ifdef SINGLE
 
-float fstore(float x)
+static float fstore(float x)
 {
   return (x);
 }
 
-int test_float(int verbose)
+static int test_float(int verbose)
 {
   float x;
   int pass = 1;
@@ -469,12 +469,12 @@ int test_float(int verbose)
 
 # else
 
-double dstore(double x)
+static double dstore(double x)
 {
   return (x);
 }
 
-int test_double(int verbose)
+static int test_double(int verbose)
 {
   double x;
   int pass = 1;
@@ -541,9 +541,10 @@ int test_double(int verbose)
 /*  Don't change this routine unless you fully understand it.                */
 /*                                                                           */
 /*****************************************************************************/
+
 static int previous_cword;
 
-void exactinit(int verbose, int noexact, int nofilter, REAL maxx, REAL maxy, 
+void exactinit(int verbose, int noexact, int nofilter, REAL maxx, REAL maxy,
                REAL maxz)
 {
   REAL half;
@@ -554,7 +555,6 @@ void exactinit(int verbose, int noexact, int nofilter, REAL maxx, REAL maxy,
 #endif /* LINUX */
 
 #ifdef CPU86
-#error yo
   _FPU_GETCW(previous_cword);
 #ifdef SINGLE
   _control87(_PC_24, _MCW_PC); /* Set FPU control word for single precision. */
@@ -634,10 +634,6 @@ void exactinit(int verbose, int noexact, int nofilter, REAL maxx, REAL maxy,
   // Added by H. Si, 2012-08-23.
 
   // Sort maxx < maxy < maxz. Re-use 'half' for swapping.
-  assert(maxx > 0);
-  assert(maxy > 0);
-  assert(maxz > 0);
-
   if (maxx > maxz) {
     half = maxx; maxx = maxz; maxz = half;
   }
@@ -657,9 +653,8 @@ void exactdeinit()
 {
 #ifdef CPU86
   _FPU_SETCW(previous_cword);
-#endif
+#endif /* CPU86 */
 }
-
 
 /*****************************************************************************/
 /*                                                                           */
@@ -898,7 +893,7 @@ int expansion_sum_zeroelim2(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /*                                                                           */
 /*****************************************************************************/
 
-int fast_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)
+static int fast_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /* h cannot be e or f. */
 {
   REAL Q;
@@ -970,7 +965,7 @@ int fast_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /*  properties.                                                              */
 /*                                                                           */
 /*****************************************************************************/
-
+static
 int fast_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /* h cannot be e or f. */
 {
@@ -1182,7 +1177,7 @@ int linear_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f,
 /*  will h.)                                                                 */
 /*                                                                           */
 /*****************************************************************************/
-
+static
 int scale_expansion(int elen, REAL *e, REAL b, REAL *h)
 /* e and h cannot be the same. */
 {
@@ -1228,7 +1223,7 @@ int scale_expansion(int elen, REAL *e, REAL b, REAL *h)
 /*  will h.)                                                                 */
 /*                                                                           */
 /*****************************************************************************/
-
+static
 int scale_expansion_zeroelim(int elen, REAL *e, REAL b, REAL *h)
 /* e and h cannot be the same. */
 {
@@ -1280,7 +1275,7 @@ int scale_expansion_zeroelim(int elen, REAL *e, REAL b, REAL *h)
 /*  nonadjacent expansion.                                                   */
 /*                                                                           */
 /*****************************************************************************/
-
+static
 int compress(int elen, REAL *e, REAL *h)
 /* e and h may be the same. */
 {
@@ -1323,7 +1318,7 @@ int compress(int elen, REAL *e, REAL *h)
 /*  See either version of my paper for details.                              */
 /*                                                                           */
 /*****************************************************************************/
-
+static
 REAL estimate(int elen, REAL *e)
 {
   REAL Q;
@@ -1361,7 +1356,7 @@ REAL estimate(int elen, REAL *e)
 /*  nearly so.                                                               */
 /*                                                                           */
 /*****************************************************************************/
-
+static
 REAL orient2dfast(REAL *pa, REAL *pb, REAL *pc)
 {
   REAL acx, bcx, acy, bcy;
@@ -1373,6 +1368,7 @@ REAL orient2dfast(REAL *pa, REAL *pb, REAL *pc)
   return acx * bcy - acy * bcx;
 }
 
+//static
 REAL orient2dexact(REAL *pa, REAL *pb, REAL *pc)
 {
   INEXACT REAL axby1, axcy1, bxcy1, bxay1, cxay1, cxby1;
@@ -4198,7 +4194,7 @@ REAL insphere(REAL *pa, REAL *pb, REAL *pc, REAL *pd, REAL *pe)
 /*  See my Robust Predicates paper for details.                              */
 /*                                                                           */
 /*****************************************************************************/
-
+//static
 REAL orient4dexact(REAL* pa, REAL* pb, REAL* pc, REAL* pd, REAL* pe,
                    REAL aheight, REAL bheight, REAL cheight, REAL dheight, 
                    REAL eheight)
@@ -4414,6 +4410,7 @@ REAL orient4dexact(REAL* pa, REAL* pb, REAL* pc, REAL* pd, REAL* pe,
   return deter[deterlen - 1];
 }
 
+static
 REAL orient4dadapt(REAL* pa, REAL* pb, REAL* pc, REAL* pd, REAL* pe,
                    REAL aheight, REAL bheight, REAL cheight, REAL dheight, 
                    REAL eheight, REAL permanent)
@@ -4715,5 +4712,114 @@ REAL orient4d(REAL* pa, REAL* pb, REAL* pc, REAL* pd, REAL* pe,
                       aheight, bheight, cheight, dheight, eheight, permanent);
 }
 
+} // namespace predicates
+
+using namespace predicates;
+
+
+//==============================================================================
+
+static REAL det3x3(REAL adx, REAL ady, REAL adz,
+                   REAL bdx, REAL bdy, REAL bdz,
+                   REAL cdx, REAL cdy, REAL cdz)
+{
+  return adx * (bdy * cdz - bdz * cdy)
+       + bdx * (cdy * adz - cdz * ady)
+       + cdx * (ady * bdz - adz * bdy);
 }
+
+void tetgenmesh::pre_calculate_insphere(point pa, point pb, point pc, point pd,
+                                        REAL* dets)
+{
+  if (pd != dummypoint) {
+    REAL ba_x = pb[0] - pa[0];
+    REAL ba_y = pb[1] - pa[1];
+    REAL ba_z = pb[2] - pa[2];
+    REAL ba_norm = ba_x*ba_x + ba_y*ba_y + ba_z*ba_z;
+    
+    REAL ca_x = pc[0] - pa[0];
+    REAL ca_y = pc[1] - pa[1];
+    REAL ca_z = pc[2] - pa[2];
+    REAL ca_norm = ca_x*ca_x + ca_y*ca_y + ca_z*ca_z;
+    
+    REAL da_x = pd[0] - pa[0];
+    REAL da_y = pd[1] - pa[1];
+    REAL da_z = pd[2] - pa[2];
+    REAL da_norm = da_x*da_x + da_y*da_y + da_z*da_z;
+
+    dets[0] = det3x3(ba_y, ba_z, ba_norm,
+                     ca_y, ca_z, ca_norm,
+                     da_y, da_z, da_norm);
+    
+    dets[1] = det3x3(ba_x, ba_z, ba_norm,
+                     ca_x, ca_z, ca_norm,
+                     da_x, da_z, da_norm);
+
+    dets[2] = det3x3(ba_x, ba_y, ba_norm,
+                     ca_x, ca_y, ca_norm,
+                     da_x, da_y, da_norm);
+    
+    dets[3] = det3x3(ba_x, ba_y, ba_z,
+                     ca_x, ca_y, ca_z,
+                     da_x, da_y, da_z);
+  } else {
+    double ab[4],ac[4];
+    double* a = pa; // mesh->vertices[Node[0]].coord;
+    double* b = pb; //mesh->vertices[Node[1]].coord;
+    double* c = pc; //mesh->vertices[Node[2]].coord;
+    unsigned i;
+    for (i=0; i<3; i++)
+    {
+      ab[i]=b[i]-a[i]; //AB
+      ac[i]=c[i]-a[i]; //AC
+    }
+    dets[0] = ac[1]*ab[2] - ac[2]*ab[1];
+    dets[1] = ac[2]*ab[0] - ac[0]*ab[2];
+    dets[2] = ac[0]*ab[1] - ac[1]*ab[0];
+    dets[3] = dets[0]*dets[0] + dets[1]*dets[1] + dets[2]*dets[2];
+  }
+}
+
+REAL tetgenmesh::insphere_use_subdets(tetrahedron *tet, REAL* pe)
+{
+  REAL *dets = get_polar(tet);
+
+  if (dets[3] == 0) { // Only calculate once.
+    point *pts = (point *) tet;
+    pre_calculate_insphere(pts[4], pts[5], pts[6], pts[7], dets);
+  }
+
+  point pa = (point) tet[4];
+  
+  if (((point) tet[7]) == dummypoint) {
+    double aex = pe[0] - pa[0];
+    double aey = pe[1] - pa[1];
+    double aez = pe[2] - pa[2];
+    double det = aex*dets[0]+aey*dets[1]+aez*dets[2];
+    if(fabs(det) > o3dstaticfilter) return det;
+    point *pts = (point *) tet;
+    det = orient3d(pts[4],pts[4],pts[6],pe);
+    return det;
+  }
+  
+  REAL ea_x = pe[0] - pa[0];
+  REAL ea_y = pe[1] - pa[1];
+  REAL ea_z = pe[2] - pa[2];
+  REAL ea_norm = ea_x * ea_x + ea_y * ea_y + ea_z * ea_z;
+
+  REAL det = -ea_x * dets[0]
+           +  ea_y * dets[1]
+           -  ea_z * dets[2]
+           +  ea_norm * dets[3];
+
+  if (fabs(det) < ispstaticfilter) {
+    point *pts = (point *) tet;
+    det = insphere_s(pts[4], pts[5], pts[6], pts[7], pe);
+  }
+  return det;
+}
+
+
+//==============================================================================
+
 

@@ -210,7 +210,7 @@ Some common notions
     .. attribute:: conformdel
     .. attribute:: diagnose
     .. attribute:: zeroindex
-    .. attribute:: optlevel
+    .. attribute:: opt_max_flip_level
     .. attribute:: optpasses
     .. attribute:: order
     .. attribute:: facesout
