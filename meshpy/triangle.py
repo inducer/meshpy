@@ -91,7 +91,7 @@ def subdivide_facets(subdivisions, points, facets, facet_markers=None):
         subdiv_it = repeat(subdivisions, len(facets))
     else:
         assert len(facets) == len(subdivisions)
-        subdiv_it = subdivisions.__iter__()
+        subdiv_it = iter(subdivisions)
 
     new_points = points[:]
     new_facets = []
