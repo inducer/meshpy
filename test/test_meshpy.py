@@ -120,6 +120,39 @@ def test_tetgen():
     build(mesh_info)
 
 
+def test_tetgen_with_interior_point():
+    import numpy as np
+
+    from meshpy.tet import MeshInfo, build
+
+    interior_point = (0.2, 0.3, 0.4)
+    mesh_info = MeshInfo()
+    mesh_info.set_points([
+        (0, 0, 0), (1, 0, 0), (1, 1, 0), (0, 1, 0),
+        (0, 0, 1), (1, 0, 1), (1, 1, 1), (0, 1, 1),
+        interior_point,
+    ])
+    # The facets reference only the eight boundary vertices.
+    mesh_info.set_facets([
+        [0, 1, 2, 3], [4, 5, 6, 7],
+        [0, 4, 5, 1], [1, 5, 6, 2],
+        [2, 6, 7, 3], [3, 7, 4, 0],
+    ])
+    max_volume = 0.02
+    mesh = build(mesh_info, max_volume=max_volume)
+
+    points = np.asarray(mesh.points)
+    elements = np.asarray(mesh.elements)
+    matches = np.flatnonzero(np.all(points == interior_point, axis=1))
+    assert len(matches) == 1
+    assert matches[0] in elements
+
+    # Verify the volume constraint as well as retention of the interior point.
+    vertices = points[elements]
+    volumes = abs(np.linalg.det(vertices[:, 1:] - vertices[:, :1])) / 6
+    assert np.all(volumes <= max_volume * (1 + 1e-12))
+
+
 def test_torus():
     from math import cos, pi, sin
 

@@ -370,5 +370,37 @@ Some common notions
 
 .. function:: build(mesh_info, options=Options("pq"), verbose=False, attributes=False, volume_constraints=False, max_volume=None, diagnose=False, insert_points=None, mesh_order=None)
 
-    :param insert_points: a :class:`MeshInfo` object specifying additional points to be inserted
+    :param insert_points: currently not forwarded to TetGen. To include interior
+        points when generating a new mesh, see :ref:`tetgen-interior-points`.
 
+.. _tetgen-interior-points:
+
+Including interior points in a tetrahedral mesh
+-----------------------------------------------
+
+To make specified interior points vertices of a new mesh, include them in
+:meth:`MeshInfo.set_points` along with the boundary vertices. Define the closed
+boundary with :meth:`MeshInfo.set_facets`; the interior points need not occur in
+any boundary facet. Then call :func:`build` as usual. This can be combined with
+``max_volume`` to limit the volume of the generated tetrahedra.
+
+The following example meshes a unit cube with an additional interior point.
+It checks that the point participates in a tetrahedron, rather than merely
+appearing in the output point list, and checks the volume bound. This example
+also runs as part of MeshPy's test suite.
+
+.. literalinclude:: ../test/test_meshpy.py
+    :language: python
+    :pyobject: test_tetgen_with_interior_point
+
+Call ``test_tetgen_with_interior_point()`` to run the example. The output may
+contain additional points introduced by TetGen for mesh quality; find the
+requested point in the output instead of assuming that point indices are
+unchanged.
+
+Use distinct points strictly inside the meshed region for this workflow.
+Points used to mark holes or regions are specified separately and do not add
+mesh vertices. This example concerns initial mesh generation, not inserting
+points into an already generated mesh. For the underlying boundary description,
+see `TetGen's PLC documentation
+<https://www.wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#sec67>`__.
