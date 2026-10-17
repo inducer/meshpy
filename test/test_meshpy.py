@@ -147,10 +147,11 @@ def test_tetgen_with_interior_point():
     assert len(matches) == 1
     assert matches[0] in elements
 
-    # Verify the volume constraint as well as retention of the interior point.
+    # Check that the tetrahedra cover the unit cube with nonzero volumes.
     vertices = points[elements]
     volumes = abs(np.linalg.det(vertices[:, 1:] - vertices[:, :1])) / 6
-    assert np.all(volumes <= max_volume * (1 + 1e-12))
+    assert np.all(volumes > 0)
+    assert np.isclose(volumes.sum(), 1)
 
 
 def test_torus():

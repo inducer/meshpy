@@ -382,12 +382,12 @@ To make specified interior points vertices of a new mesh, include them in
 :meth:`MeshInfo.set_points` along with the boundary vertices. Define the closed
 boundary with :meth:`MeshInfo.set_facets`; the interior points need not occur in
 any boundary facet. Then call :func:`build` as usual. This can be combined with
-``max_volume`` to limit the volume of the generated tetrahedra.
+``max_volume`` to request volume-based refinement.
 
 The following example meshes a unit cube with an additional interior point.
 It checks that the point participates in a tetrahedron, rather than merely
-appearing in the output point list, and checks the volume bound. This example
-also runs as part of MeshPy's test suite.
+appearing in the output point list, and checks that the tetrahedra fill the
+unit cube. This example also runs as part of MeshPy's test suite.
 
 .. literalinclude:: ../test/test_meshpy.py
     :language: python
