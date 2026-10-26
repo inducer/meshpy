@@ -38,14 +38,11 @@ wrapper_defines = [
   '-DSELF_CHECK'
 ]
 
-# ARM64 floating-point consistency fix for geometric predicates
-# FMA (fused multiply-add) on ARM64 causes different rounding behavior than x86
-# which breaks TetGen's Shewchuk predicates. Disable FP contraction on aarch64.
+# The geometric predicates rely on separately rounded floating-point operations.
+# FMA contraction breaks these assumptions on both ARM64 and FMA-capable x86.
 cpp_compiler = meson.get_compiler('cpp')
-if host_machine.cpu_family() == 'aarch64'
-  if cpp_compiler.has_argument('-ffp-contract=off')
-    wrapper_defines += '-ffp-contract=off'
-  endif
+if cpp_compiler.has_argument('-ffp-contract=off')
+  wrapper_defines += '-ffp-contract=off'
 endif
 
 py.extension_module(
