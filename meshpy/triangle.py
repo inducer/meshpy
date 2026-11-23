@@ -57,7 +57,15 @@ class MeshInfo(internals.TriMeshInfo, MeshInfoBase):
     def dump(self):
         for name in self._constituents:
             dump_array(name, getattr(self, name))
-
+    
+    def write_vtk(self, filename):
+        import pyvtk
+        vtkelements = pyvtk.VtkData(
+            pyvtk.UnstructuredGrid(
+                self.points,
+                triangle=self.elements),
+            "Mesh")
+        vtkelements.tofile(filename)
 
 def subdivide_facets(subdivisions, points, facets, facet_markers=None):
     """Return a new facets array in which the original facets are
