@@ -12,7 +12,7 @@ from meshpy.triangle import MeshInfo, build
 
 def loop(a, b):
     return list(
-            zip(list(range(a, b)), islice(cycle(list(range(a, b))), 1, None),
+            zip(list(range(a, b)), islice(cycle(list(range(a, b))), 1, b - a + 1),
                 strict=True)
             )
 
